@@ -1,3 +1,470 @@
-Location Name,Partner Name,American Express,MasterCard,Visa,Currency,Building Name Number, Postcode, Street, Local Area Name, TownCity, County/State, Country,Longitude,Latitude
-177 Stratford Westfield,Avios,5555555555,666666,777777,GBP,,,,,,,UK,,
-1515 Restaurant and Lounge,1515 Restaurant and Lounge,1031269442,666667,777778,GBP,1515, 94596,N Main St,,Walnut Creek,CA,UK,37.900134900000,-122.0614963000
+Partner Name,American Express MIDs,MasterCard MIDs,Visa MIDs,Address (Building Name/Number, Street),Postcode,Town/City,County/State,Country,Action
+Pizza Express,9421346362,,,PE Wardour St,,,111,,UK,A
+Pizza Express,9421401878,,,PE Coptic St,,,121,,UK,A
+Pizza Express,9421399528,,,PE Fulham Rd 1 - (363),,,131,,UK,A
+Pizza Express,9421346289,,,PE Notting Hill Gate,,,141,,UK,A
+Pizza Express,9421164252,,,PE Dean St,,,161,,UK,A
+Pizza Express,9421038316,,,PE Hertford,,,171,,UK,A
+Pizza Express,9421346347,,,PE Lavender Hill,,,191,,UK,A
+Pizza Express,9421143785,,,PE Teddington,,,201,,UK,A
+Pizza Express,9421108366,,,PE Maidstone,,,211,,UK,A
+Pizza Express,9421189440,,,PE Bury St Edmunds,,,221,,UK,A
+Pizza Express,9421039363,,,PE Highgate,,,231,,UK,A
+Pizza Express,9421397050,,,PE Fulham Rd 2 - (895 -896),,,241,,UK,A
+Pizza Express,9421423369,,,PE Oxford 1 - Golden Cross,,,251,,UK,A
+Pizza Express,9421516659,,,PE Battersea,,,261,,UK,A
+Pizza Express,9421039157,,,PE South Woodford,,,271,,UK,A
+Pizza Express,9421539594,,,PE Cambridge 2 - Jesus Lane,,,281,,UK,A
+Pizza Express,9421039462,,,PE Sevenoaks,,,301,,UK,A
+Pizza Express,9421415951,,,PE Wimbledon 1 - Village,,,311,,UK,A
+Pizza Express,9421415969,,,PE Kingston 1 - High St,,,321,,UK,A
+Pizza Express,9421399304,,,PE Brighton 1 - Prince Albert St,,,331,,UK,A
+Pizza Express,9421399320,,,PE Beckenham,,,341,,UK,A
+Pizza Express,9421415985,,,PE Bromley,,,351,,UK,A
+Pizza Express,9421327008,,,PE Croydon,,,,,UK,A
+Pizza Express,9421485038,,,PE Bristol 1 - Berkeley Sq,,,371,,UK,A
+Pizza Express,9421523960,,,PE Bath,,,381,,UK,A
+Pizza Express,9421523267,,,PE Basingstoke,,,391,,UK,A
+Pizza Express,9421656935,,,PE Richmond,,,401,,UK,A
+Pizza Express,9421453499,,,PE Camberley,,,411,,UK,A
+Pizza Express,9421452053,,,PE Chichester,,,421,,UK,A
+Pizza Express,9421505462,,,PE Glasgow 1 - Queen St,,,431,,UK,A
+Pizza Express,9421505470,,,PE Nottingham 1 - King St,,,441,,UK,A
+Pizza Express,9421505488,,,PE Cheltenham,,,451,,UK,A
+Pizza Express,9421458712,,,PE Canterbury,,,461,,UK,A
+Pizza Express,9421638933,,,PE Wandsworth 1 - Old York Rd,,,471,,UK,A
+Pizza Express,9421359886,,,PE Barrett St,,,481,,UK,A
+Pizza Express,9421597790,,,PE Salisbury,,,491,,UK,A
+Pizza Express,9421039009,,,PE Belfast 1 - Bedford St,,,501,,UK,A
+Pizza Express,9421435439,,,PE Bow St,,,511,,UK,A
+Pizza Express,9421584137,,,PE Staines,,,521,,UK,A
+Pizza Express,9421749466,,,PE Twickenham,,,531,,UK,A
+Pizza Express,9421435454,,,PE Colchester,,,541,,UK,A
+Pizza Express,9421597782,,,PE Guildford,,,551,,UK,A
+Pizza Express,9421363938,,,PE Streatham,,,561,,UK,A
+Pizza Express,9421497983,,,PE York 1 - River House,,,571,,UK,A
+Pizza Express,9421007261,,,PE Bishops Stortford,,,581,,UK,A
+Pizza Express,9421189341,,,PE Reigate,,,591,,UK,A
+Pizza Express,9421038654,,,PE Walton On Thames,,,601,,UK,A
+Pizza Express,9421038811,,,PE Enfield,,,611,,UK,A
+Pizza Express,9421363946,,,PE Stanmore,,,621,,UK,A
+Pizza Express,9421496969,,,PE Norwich 1 - St Benedict St,,,631,,UK,A
+Pizza Express,9421496977,,,PE Chelmsford,,,641,,UK,A
+Pizza Express,9421574187,,,PE Belsize Park,,,651,,UK,A
+Pizza Express,9421497546,,,PE Ealing,,,671,,UK,A
+Pizza Express,9421364142,,,PE Newcastle,,,691,,UK,A
+Pizza Express,9421364324,,,PE Bedford,,,701,,UK,A
+Pizza Express,9421364340,,,PE Leamington Spa,,,711,,UK,A
+Pizza Express,9421111725,,,PE Greek St,,,721,,UK,A
+Pizza Express,9421111766,,,PE Macclesfield,,,731,,UK,A
+Pizza Express,9421111808,,,PE Tunbridge Wells,,,741,,UK,A
+Pizza Express,9421111832,,,PE Hitchin,,,751,,UK,A
+Pizza Express,9421111691,,,PE Baker St,,,761,,UK,A
+Pizza Express,9421111816,,,PE Farnham,,,771,,UK,A
+Pizza Express,9421111774,,,PE Abbeville Road ( Clapham ) ,,,781,,UK,A
+Pizza Express,9421007303,,,PE London Wall 1 - Alban Gate,,,791,,UK,A
+Pizza Express,9421111782,,,PE Swindon,,,801,,UK,A
+Pizza Express,9421004573,,,PE Southgate,,,811,,UK,A
+Pizza Express,9421004581,,,PE Beauchamp Place,,,821,,UK,A
+Pizza Express,9421584061,,,PE Birmingham 1 - Corporation St,,,831,,UK,A
+Pizza Express,9421345273,,,PE Birmingham 2 - Brindley Place,,,841,,UK,A
+Pizza Express,9421387911,,,PE Brentwood,,,851,,UK,A
+Pizza Express,9421004508,,,PE Hampstead,,,861,,UK,A
+Pizza Express,9421004516,,,PE Eastbourne,,,871,,UK,A
+Pizza Express,9421004524,,,PE Exeter,,,881,,UK,A
+Pizza Express,9421004607,,,PE Pinner,,,891,,UK,A
+Pizza Express,9421004656,,,PE Milton Keynes 1 - Mid Boulevard,,,,,UK,A
+Pizza Express,9421004664,,,PE Leicester 1 - King St,,,911,,UK,A
+Pizza Express,9421004599,,,PE Charlotte St,,,921,,UK,A
+Pizza Express,9421038506,,,PE Dulwich,,,931,,UK,A
+Pizza Express,9421004615,,,PE Whetstone,,,941,,UK,A
+Pizza Express,9421007279,,,PE Bruton Place,,,951,,UK,A
+Pizza Express,9421007170,,,PE Henley,,,961,,UK,A
+Pizza Express,9421007162,,,PE Beaconsfield,,,971,,UK,A
+Pizza Express,9421007212,,,PE Abingdon,,,981,,UK,A
+Pizza Express,9421041104,,,PE Lincoln,,,1001,,UK,A
+Pizza Express,9421138819,,,PE West End Lane,,,,,UK,A
+Pizza Express,9421189507,,,PE Marlow,,,1021,,UK,A
+Pizza Express,9421195603,,,PE East Grinstead,,,1031,,UK,A
+Pizza Express,9421039215,,,PE Lytham St Annes,,,1041,,UK,A
+Pizza Express,9421039629,,,PE Wokingham,,,1051,,UK,A
+Pizza Express,9421138454,,,PE Bexleyheath,,,1061,,UK,A
+Pizza Express,9421191008,,,PE Barnet,,,1091,,UK,A
+Pizza Express,9421192022,,,PE Berkhamsted,,,1101,,UK,A
+Pizza Express,9421191644,,,PE Dorking,,,1111,,UK,A
+Pizza Express,9421191446,,,PE Earls Court 1 - Earls Ct Rd,,,1121,,UK,A
+Pizza Express,9421187758,,,PE East Sheen,,,1131,,UK,A
+Pizza Express,9421188038,,,PE Epsom,,,1141,,UK,A
+Pizza Express,9421188319,,,PE Harrow,,,,,UK,A
+Pizza Express,9421187667,,,PE Islington,,,1181,,UK,A
+Pizza Express,9421187865,,,PE Leeds 1 - Crown St,,,1191,,UK,A
+Pizza Express,9421187592,,,PE Liverpool 1 - Victoria St,,,1201,,UK,A
+Pizza Express,9421188145,,,PE Loughton,,,1211,,UK,A
+Pizza Express,9421188376,,,PE Manchester 1 - South King St,,,,,UK,A
+Pizza Express,9421188947,,,PE Mill Hill,,,1231,,UK,A
+Pizza Express,9421188459,,,PE Muswell Hill,,,1241,,UK,A
+Pizza Express,9421191099,,,PE Reading 1 - St Mary's Butts,,,1261,,UK,A
+Pizza Express,9421191727,,,PE Ruislip,,,1271,,UK,A
+Pizza Express,9421191842,,,PE St Albans,,,1281,,UK,A
+Pizza Express,9421188590,,,PE Shepherds Bush,,,1291,,UK,A
+Pizza Express,9421191941,,,PE Southampton,,,1301,,UK,A
+Pizza Express,9421188699,,,PE Southend,,,1311,,UK,A
+Pizza Express,9421190935,,,PE Sutton,,,1321,,UK,A
+Pizza Express,9421192212,,,PE Swiss Cottage,,,,,UK,A
+Pizza Express,9421191362,,,PE Watford,,,1351,,UK,A
+Pizza Express,9421188855,,,PE Winchester,,,1371,,UK,A
+Pizza Express,9421187931,,,PE Woking,,,1381,,UK,A
+Pizza Express,9421191297,,,PE Worthing,,,1391,,UK,A
+Pizza Express,9421188244,,,PE Chiswick,,,1401,,UK,A
+Pizza Express,9421188525,,,PE Putney,,,1411,,UK,A
+Pizza Express,9421138322,,,PE Winchmore Hill,,,1421,,UK,A
+Pizza Express,9421195694,,,PE Wandsworth 2 - Trinity Rd,,,1431,,UK,A
+Pizza Express,9421141326,,,PE Windsor,,,1441,,UK,A
+Pizza Express,9421139403,,,PE Radlett,,,1451,,UK,A
+Pizza Express,9421141979,,,PE Coventry,,,1461,,UK,A
+Pizza Express,9421195538,,,PE Abbey Road,,,1471,,UK,A
+Pizza Express,9421195769,,,PE Edinburgh 1 - Queensferry St,,,1481,,UK,A
+Pizza Express,9421928938,,,PE Harrogate,,,1501,,UK,A
+Pizza Express,9421152612,,,PE Orpington,,,1511,,UK,A
+Pizza Express,9421152968,,,PE Upminster,,,1521,,UK,A
+Pizza Express,9421152745,,,PE Taunton,,,1531,,UK,A
+Pizza Express,9421152869,,,PE Tonbridge,,,1541,,UK,A
+Pizza Express,9421152513,,,PE Edinburgh 2 - 1 Deanhaugh St,,,1551,,UK,A
+Pizza Express,9421928995,,,PE Stratford East,,,1561,,UK,A
+Pizza Express,9421929118,,,PE Banstead,,,1571,,UK,A
+Pizza Express,9421929050,,,PE Cardiff High St,,,1581,,UK,A
+Pizza Express,9421929324,,,PE Kings Road - Pheasantry,,,1601,,UK,A
+Pizza Express,9421929209,,,PE Horsham,,,1611,,UK,A
+Pizza Express,9421928748,,,PE Weybridge,,,1631,,UK,A
+Pizza Express,9421928870,,,PE Sheffield 1 - Devonshire St,,,1641,,UK,A
+Pizza Express,9421928805,,,PE Sidcup,,,1651,,UK,A
+Pizza Express,9421929381,,,PE Leeds 2 - Park Sq West,,,1671,,UK,A
+Pizza Express,9421929696,,,PE Arundel,,,1681,,UK,A
+Pizza Express,9421931163,,,PE Cheadle,,,1691,,UK,A
+Pizza Express,9421929787,,,PE Torquay,,,1711,,UK,A
+Pizza Express,9421930165,,,PE Wilmslow,,,1721,,UK,A
+Pizza Express,9421929845,,,PE Lewes,,,1731,,UK,A
+Pizza Express,9421930868,,,PE St Martins Lane,,,1741,,UK,A
+Pizza Express,9421930744,,,PE Banbury,,,1751,,UK,A
+Pizza Express,9421930801,,,PE Godalming,,,1761,,UK,A
+Pizza Express,9421931106,,,PE St Brides,,,1771,,UK,A
+Pizza Express,9421931049,,,PE Aberdeen 1 - Union St,,,1781,,UK,A
+Pizza Express,9421930926,,,PE Haywards Heath,,,1791,,UK,A
+Pizza Express,9421931221,,,PE Sutton Coldfield,,,1801,,UK,A
+Pizza Express,9421931767,,,PE Golden Square,,,,,UK,A
+Pizza Express,9421931825,,,PE Shad Thames,,,1821,,UK,A
+Pizza Express,9421928912,,,PE Pimlico,,,1831,,UK,A
+Pizza Express,9421928722,,,PE Nottingham 2 - Goosegate,,,1841,,UK,A
+Pizza Express,9421928789,,,PE Edinburgh 3 - 23 Northbridge,,,1851,,UK,A
+Pizza Express,9421928979,,,PE Harpenden,,,1861,,UK,A
+Pizza Express,9421928854,,,PE Chislehurst,,,1871,,UK,A
+Pizza Express,9421929035,,,PE Crawley,,,1881,,UK,A
+Pizza Express,9421929092,,,PE Didsbury,,,1891,,UK,A
+Pizza Express,9421929159,,,PE Blackheath,,,1901,,UK,A
+Pizza Express,9421930983,,,PE Derby 1 - Irongate,,,1911,,UK,A
+Pizza Express,9421930751,,,PE Beverley,,,1921,,UK,A
+Pizza Express,9421713934,,,PE Stratford Upon Avon,,,1931,,UK,A
+Pizza Express,9421930637,,,PE Glasgow 2 - Sauchiehall St,,,1941,,UK,A
+Pizza Express,9421930819,,,PE Hove,,,1951,,UK,A
+Pizza Express,9421931239,,,PE Maidenhead,,,1961,,UK,A
+Pizza Express,9421931296,,,PE Preston,,,1971,,UK,A
+Pizza Express,9421713454,,,PE Plymouth,,,1981,,UK,A
+Pizza Express,9421864513,,,PE London Bridge,,,1991,,UK,A
+Pizza Express,9421928797,,,PE Kennington,,,2011,,UK,A
+Pizza Express,9421928730,,,PE Caterham,,,2021,,UK,A
+Pizza Express,9421930694,,,PE Victoria 2 - 85 Victoria St,,,2031,,UK,A
+Pizza Express,9421713637,,,PE Langham Place,,,2041,,UK,A
+Pizza Express,9421931171,,,PE Durham,,,2051,,UK,A
+Pizza Express,9421928581,,,PE Ipswich 1 - Lloyds Ave,,,2061,,UK,A
+Pizza Express,9421928672,,,PE Darlington,,,2071,,UK,A
+Pizza Express,9421713330,,,PE Bluewater,,,2081,,UK,A
+Pizza Express,9421713579,,,PE Strand,,,2091,,UK,A
+Pizza Express,9421613241,,,PE Haslemere,,,2101,,UK,A
+Pizza Express,9421713397,,,PE Cranleigh,,,2111,,UK,A
+Pizza Express,9421713819,,,PE Swansea,,,2121,,UK,A
+Pizza Express,9421608456,,,PE West Wickham,,,2131,,UK,A
+Pizza Express,9421613126,,,PE Barnes,,,2141,,UK,A
+Pizza Express,9421613068,,,PE Amersham,,,2151,,UK,A
+Pizza Express,9421608514,,,PE Perth,,,2161,,UK,A
+Pizza Express,9421608571,,,PE Welwyn Garden City,,,2171,,UK,A
+Pizza Express,9421864455,,,PE Bristol 2 - Regent St,,,2191,,UK,A
+Pizza Express,9421930579,,,PE Hale,,,2211,,UK,A
+Pizza Express,9421643545,,,PE Knutsford,,,2251,,UK,A
+Pizza Express,9421656323,,,PE Newark,,,2271,,UK,A
+Pizza Express,9421643727,,,PE Stourbridge,,,2281,,UK,A
+Pizza Express,9421653643,,,PE Bolton,,,2291,,UK,A
+Pizza Express,9423995059,,,PE Harborne,,,2311,,UK,A
+Pizza Express,9421653700,,,PE High Holborn,,,2321,,UK,A
+Pizza Express,9421653528,,,PE Sunningdale,,,2331,,UK,A
+Pizza Express,9421653767,,,PE Greenwich,,,2341,,UK,A
+Pizza Express,9421653940,,,PE Royal Festival Hall,,,2351,,UK,A
+Pizza Express,9421653825,,,PE Curtain Road,,,2381,,UK,A
+Pizza Express,9421658626,,,PE Kings Lynn,,,2391,,UK,A
+Pizza Express,9423995117,,,PE Northampton,,,2401,,UK,A
+Pizza Express,9421656877,,,PE Truro,,,2431,,UK,A
+Pizza Express,9421699802,,,PE Stafford,,,2441,,UK,A
+Pizza Express,9421657115,,,PE Canary Wharf,,,2451,,UK,A
+Pizza Express,9421692922,,,PE Ramsgate,,,2461,,UK,A
+Pizza Express,9421692864,,,PE Aylesbury,,,2471,,UK,A
+Pizza Express,9421577008,,,PE Bicester,,,2491,,UK,A
+Pizza Express,9421577123,,,PE Wapping,,,2511,,UK,A
+Pizza Express,9421658741,,,PE Carlisle,,,2521,,UK,A
+Pizza Express,9421387713,,,PE Leeds 3 - Street Lane,,,2531,,UK,A
+Pizza Express,9421658683,,,PE Oxted,,,2541,,UK,A
+Pizza Express,9421658808,,,PE Wimbledon 2 - Broadway,,,2551,,UK,A
+Pizza Express,9421388109,,,PE Gosforth,,,2561,,UK,A
+Pizza Express,9421393455,,,PE Slough,,,2571,,UK,A
+Pizza Express,9421393398,,,PE Wallington,,,2591,,UK,A
+Pizza Express,9421393513,,,PE Newbury,,,2601,,UK,A
+Pizza Express,9421666710,,,PE Manchester 2 - Peter St,,,2611,,UK,A
+Pizza Express,9427683727,,,PE Marlborough,,,2631,,UK,A
+Pizza Express,9427653084,,,PE Shrewsbury,,,2641,,UK,A
+Pizza Express,9421666777,,,PE Luton,,,2651,,UK,A
+Pizza Express,9421667775,,,PE Livingston,,,2661,,UK,A
+Pizza Express,9428452437,,,PE Euston Road,,,2671,,UK,A
+Pizza Express,9421667890,,,PE London Wall 2,,,2681,,UK,A
+Pizza Express,9427683768,,,PE Portsmouth,,,2701,,UK,A
+Pizza Express,9428414361,,,PE Aldwych,,,2711,,UK,A
+Pizza Express,9427683750,,,PE Bristol 3 - Corn St,,,2721,,UK,A
+Pizza Express,9421668369,,,PE Cirencester,,,2731,,UK,A
+Pizza Express,9427683743,,,PE Manchester 3 - The Corn Exchange,,,2751,,UK,A
+Pizza Express,9427683784,,,PE Earls Court 2 - Expo Centre,,,,,UK,A
+Pizza Express,9428452387,,,PE Purley,,,2781,,UK,A
+Pizza Express,9427683701,,,PE Uxbridge,,,2801,,UK,A
+Pizza Express,9423994995,,,PE Worcester Park,,,2811,,UK,A
+Pizza Express,9428414353,,,PE Romford,,,2831,,UK,A
+Pizza Express,9428452379,,,PE Thayer St,,,2841,,UK,A
+Pizza Express,9428452429,,,PE Bishopsgate,,,2851,,UK,A
+Pizza Express,9427503040,,,PE Leadenhall Market,,,2861,,UK,A
+Pizza Express,9428476717,,,PE Braintree,,,2871,,UK,A
+Pizza Express,9427502935,,,PE Cambridge 3 - Regent St,,,2881,,UK,A
+Pizza Express,9427532320,,,PE Huntingdon,,,2891,,UK,A
+Pizza Express,9427588439,,,PE Norwich 2 - Forum Building,,,2901,,UK,A
+Pizza Express,9421972621,,,CBM Bar Marzano (Norwich),,,,,UK,A
+Pizza Express,9428491435,,,PE Alresford,,,2911,,UK,A
+Pizza Express,9427502927,,,PE Chippenham,,,2931,,UK,A
+Pizza Express,9420672057,,,PE Hampton Court,,,2951,,UK,A
+Pizza Express,9427518774,,,PE Olympia,,,2981,,UK,A
+Pizza Express,9427590666,,,PE Petersfield,,,2991,,UK,A
+Pizza Express,9427590674,,,PE Poole,,,3021,,UK,A
+Pizza Express,9420492829,,,PE Salford Quays,,,3031,,UK,A
+Pizza Express,9427518782,,,PE Stamford,,,3041,,UK,A
+Pizza Express,9428491427,,,PE Uckfield,,,3051,,UK,A
+Pizza Express,9420492852,,,PE Alton,,,3081,,UK,A
+Pizza Express,9420571127,,,Kettners,,,,,UK,A
+Pizza Express,9420651085,,,PE Fulham Palace Road,,,3111,,UK,A
+Pizza Express,9420651093,,,PE Southampton Row,,,3121,,UK,A
+Pizza Express,9420651101,,,PE Haymarket,,,3131,,UK,A
+Pizza Express,9420424343,,,PE New Fetter Lane,,,3191,,UK,A
+Pizza Express,9428491633,,,PE Sheffield 2 - Meadowhall,,,3202,,UK,A
+Pizza Express,9428491666,,,PE Clerkenwell,,,3203,,UK,A
+Pizza Express,9428491641,,,PE Kew,,,3204,,UK,A
+Pizza Express,9420424335,,,PE Edinburgh 4 - Leith,,,3205,,UK,A
+Pizza Express,9421823345,,,PE Ashford,,,3206,,UK,A
+Pizza Express,9420672081,,,PE Ely,,,3207,,UK,A
+Pizza Express,9421823311,,,PE Buxton,,,3208,,UK,A
+Pizza Express,9421823303,,,PE Heswall,,,3209,,UK,A
+Pizza Express,9421841719,,,PE Millbank,,,3210,,UK,A
+Pizza Express,9441743135,,,PE Cheshire Oaks,,,3211,,UK,A
+Pizza Express,9427896071,,,PE Newport - Isle of Wight,,,3212,,UK,A
+Pizza Express,9427896063,,,PE Cardiff Mermaid Quay,,,3213,,UK,A
+Pizza Express,9421841727,,,PE St Andrews,,,3214,,UK,A
+Pizza Express,9421961418,,,PE Inverness,,,3215,,UK,A
+Pizza Express,9421841651,,,PE Belfast 2 - Lisburn Rd,,,3219,,UK,A
+Pizza Express,9441743101,,,PE Warwick ,,,3220,,UK,A
+Pizza Express,9421823394,,,PE Fulham Broadway,,,3221,,UK,A
+Pizza Express,9421823337,,,PE Kingston 2 - The Rotunda,,,3222,,UK,A
+Pizza Express,9426373171,,,PE Bankside,,,3223,,UK,A
+Pizza Express,9427367693,,,PE Hereford,,,3224,,UK,A
+Pizza Express,9441743119,,,PE Birmingham 3 - Bullring,,,3225,,UK,A
+Pizza Express,9426373205,,,PE Wallingford,,,3226,,UK,A
+Pizza Express,9427559117,,,PE Balham,,,3229,,UK,A
+Pizza Express,9421990680,,,PE Byward St,,,3230,,UK,A
+Pizza Express,9444133995,,,PE Brighton 3 - Jubilee St,,,3231,,UK,A
+Pizza Express,9441743143,,,PE Leicester 2 - St Martin's Sq,,,,,UK,A
+Pizza Express,9441676855,,,PE Hemel Hempstead,,,3233,,UK,A
+Pizza Express,9422841544,,,PE Prestwich,,,3234,,UK,A
+Pizza Express,9441743127,,,PE West Bridgford ,,,3236,,UK,A
+Pizza Express,9444114532,,,PE Milton Keynes 2 - Mid Arcade,,,3240,,UK,A
+Pizza Express,9426373197,,,PE Stockton Heath,,,3243,,UK,A
+Pizza Express,9421990813,,,PE Brighton 2 - Brighton Marina,,,3245,,UK,A
+Pizza Express,9423717230,,,PE Edinburgh 5 - Holyrood,,,3246,,UK,A
+Pizza Express,9426973673,,,PE Newmarket,,,3247,,UK,A
+Pizza Express,9427542741,,,PE Esher,,,3248,,UK,A
+Pizza Express,9442135182,,,PE Ilkley,,,3251,,UK,A
+Pizza Express,9441661824,,,PE Glasgow 3 - Braehead,,,3252,,UK,A
+Pizza Express,9441169109,,,PE Oxford 2 - Oxford Castle,,,3253,,UK,A
+Pizza Express,9444105662,,,PE Manchester 5 -  Piccadilly,,,3255,,UK,A
+Pizza Express,9442138954,,,PE Manchester 4 - Trafford,,,3256,,UK,A
+Pizza Express,9444128912,,,PE Teesside Park,,,3257,,UK,A
+Pizza Express,9444079834,,,PE St Paul's,,,3258,,UK,A
+Pizza Express,9444073530,,,PE Reading 2 - Oracle,,,3259,,UK,A
+Pizza Express,9444127039,,,PE Falmouth ,,,3260,,UK,A
+Pizza Express,9444120414,,,PE The O2,,,3261,,UK,A
+Pizza Express,9444536981,,,PE Barnstaple - Three Tuns,,,3262,,UK,A
+Pizza Express,9444050165,,,PE Kendal,,,3263,,UK,A
+Pizza Express,9444120059,,,PE Worcester,,,3264,,UK,A
+Pizza Express,9444769681,,,PE Aberdeen 2 - Belmont St,,,3270,,UK,A
+Pizza Express,9444769632,,,PE Liverpool 2 - King's Waterfront,,,3271,,UK,A
+Pizza Express,9444915862,,,PE Russia Row,,,3272,,UK,A
+Pizza Express,9444145692,,,PE Derby 2 - Westfield Centre,,,3274,,UK,A
+Pizza Express,9444515837,,,PE Peterborough,,,3275,,UK,A
+Pizza Express,9444515845,,,PE Stevenage,,,,,UK,A
+Pizza Express,9444532758,,,PE Monmouth,,,3277,,UK,A
+Pizza Express,9444528855,,,PE Northallerton,,,3278,,UK,A
+Pizza Express,9445166317,,,PE Leeds 4 - Clarence Dock,,,3280,,UK,A
+Pizza Express,9444915854,,,PE Fleet,,,3281,,UK,A
+Pizza Express,9448085217,,,PE Jesmond,,,3282,,UK,A
+Pizza Express,9444758205,,,PE Devizes,,,3283,,UK,A
+Pizza Express,9444901698,,,PE Bristol 4 - Harbourside,,,3284,,UK,A
+Pizza Express,9444769657,,,PE Chester,,,3285,,UK,A
+Pizza Express,9444769665,,,PE Cheam,,,3286,,UK,A
+Pizza Express,9444904809,,,PE Midhurst,,,3287,,UK,A
+Pizza Express,9444769624,,,PE York 2 - McArthur Glen,,,3288,,UK,A
+Pizza Express,9444892590,,,PE Melton Mowbray,,,3291,,UK,A
+Pizza Express,9443069984,,,PE Coventry 2 - Belgrade Plaza,,,3292,,UK,A
+Pizza Express,9444915904,,,PE White City,,,3293,,UK,A
+Pizza Express,9445166309,,,PE York 3 - St Sampsons Sq,,,3294,,UK,A
+Pizza Express,9444915888,,,PE Wrexham,,,3295,,UK,A
+Pizza Express,9443069976,,,PE Cardiff 3 - St David's,,,3297,,UK,A
+Pizza Express,9444769673,,,PE Birmingham 4 - Mailbox,,,3299,,UK,A
+Pizza Express,9445581218,,,PE Great Portland Street,,,3300,,UK,A
+Pizza Express,9445158454,,,PE Bromsgrove,,,3301,,UK,A
+Pizza Express,9444915847,,,PE Ipswich 2 - Regatta Quay,,,3302,,UK,A
+Pizza Express,9445159940,,,PE Belfast 3 - Victoria Square,,,3303,,UK,A
+Pizza Express,9445668338,,,PE Gloucester Quays,,,3304,,UK,A
+Pizza Express,9448072041,,,PE Gateshead,,,3306,,UK,A
+Pizza Express,9445166358,,,PE Castleford,,,3307,,UK,A
+Pizza Express,9448085209,,,PE Cobham 2 - Anyards Rd,,,3308,,UK,A
+Pizza Express,9448073031,,,PE Lakeside,,,3309,,UK,A
+Pizza Express,9445555139,,,PE Newquay,,,3310,,UK,A
+Pizza Express,9445414279,,,PE Edinburgh 6 - George IV Bridge,,,3311,,UK,A
+Pizza Express,9448073049,,,PE Westbourne,,,3312,,UK,A
+Pizza Express,9443075510,,,PE Dudley - Merry Hill,,,3313,,UK,A
+Pizza Express,9445581226,,,PE Solihull,,,3314,,UK,A
+Pizza Express,9445884869,,,PE Carmarthen,,,3315,,UK,A
+Pizza Express,9442578134,,,PE Edinburgh 9 - The Fort,,,3316,,UK,A
+Pizza Express,9445909476,,,PE Bury,,,3317,,UK,A
+Pizza Express,9445682883,,,PE Rochester,,,3318,,UK,A
+Pizza Express,9445887862,,,PE Basildon,,,3319,,UK,A
+Pizza Express,9446013963,,,PE Herne Hill,,,3320,,UK,A
+Pizza Express,9446013955,,,PE Leeds 5 - Headingley,,,3321,,UK,A
+Pizza Express,9421944679,,,PE Gerrards Cross,,,3322,,UK,A
+Pizza Express,9446845117,,,PE St Ives,,,3323,,UK,A
+Pizza Express,9445895360,,,PE Market Harborough,,,3325,,UK,A
+Pizza Express,9445887854,,,PE Milton Keynes 3 - Xscape,,,3328,,UK,A
+Pizza Express,9446007320,,,PE Bath 2 - Barton Street,,,3329,,UK,A
+Pizza Express,9446845125,,,PE Bournemouth 2 - Post Office Rd,,,3330,,UK,A
+Pizza Express,9420031395,,,PE Witney,,,3331,,UK,A
+Pizza Express,9446025546,,,PE Manchester 6 - Oxford St,,,3332,,UK,A
+Pizza Express,9447167644,,,PE Sheffield 4 - Ecclesall Road,,,3333,,UK,A
+Pizza Express,9446856643,,,PE Brent Cross,,,3335,,UK,A
+Pizza Express,9446854267,,,PE Sheffield 3 - Valley Centertainment,,,3336,,UK,A
+Pizza Express,9446029076,,,PE Bramhall,,,3337,,UK,A
+Pizza Express,9447047135,,,PE Blackpool,,,3338,,UK,A
+Pizza Express,9446025553,,,PE Basingstoke 2 - Festival Place,,,3339,,UK,A
+Pizza Express,9446025892,,,PE Liverpool 3 - One,,,3340,,UK,A
+Pizza Express,9446838427,,,PE Newcastle 2 - Eldon Square,,,3341,,UK,A
+Pizza Express,9447027905,,,PE Surbiton,,,3342,,UK,A
+Pizza Express,9428454888,,,PE Skipton,,,3343,,UK,A
+Pizza Express,9428454888,,,PE Skipton,,,3344,,UK,A
+Pizza Express,9446837882,,,PE Port Solent,,,3345,,UK,A
+Pizza Express,9447027095,,,PE Leeds 6 – Albion Place,,,3346,,UK,A
+Pizza Express,9447031071,,,PE Plymouth 2 - Barbican,,,3347,,UK,A
+Pizza Express,9446856635,,,PE Fenchurch Street,,,3349,,UK,A
+Pizza Express,9447027103,,,PE Hull 2 - Princes Quay,,,3350,,UK,A
+Pizza Express,9447162173,,,PE Stratford Westfield,,,3351,,UK,A
+Pizza Express,9440600658,,,PE Edinburgh 8,,,3352,,UK,A
+Pizza Express,9447027897,,,PE Wakefield,,,3353,,UK,A
+Pizza Express,9447031089,,,PE Poole 2 - Tower Park,,,3354,,UK,A
+Pizza Express,9420007486,,,PE Aldershot,,,3355,,UK,A
+Pizza Express,9447167255,,,PE Edinburgh 7 – Ocean Terminal,,,3356,,UK,A
+Pizza Express,9447177726,,,PE Ashford MG,,,3357,,UK,A
+Pizza Express,9447453408,,,PE Glasgow 4 – Princes Square,,,3358,,UK,A
+Pizza Express,9447443102,,,PE Whitstable,,,3359,,UK,A
+Pizza Express,9447177734,,,PE Croydon 2 - George Street,,,3361,,UK,A
+Pizza Express,9440947885,,,PE Street,,,3362,,UK,A
+Pizza Express,9420728818,,,PE Dorchester,,,3363,,UK,A
+Pizza Express,9420039356,,,PE Leeds 8 - Birstall,,,3364,,UK,A
+Pizza Express,9440609006,,,PE Halifax,,,3365,,UK,A
+Pizza Express,9447468976,,,PE Christchurch,,,,,UK,A
+Pizza Express,9421941501,,,PE Glasgow 5 - Fort,,,3367,,UK,A
+Pizza Express,9440600153,,,PE Nottingham 3 - Giltbrook,,,3369,,UK,A
+Pizza Express,9447441528,,,PE Leeds 7 - Horsforth,,,3370,,UK,A
+Pizza Express,9420917445,,,PE Wembley,,,3373,,UK,A
+Pizza Express,9447443094,,,PE Hastings,,,3374,,UK,A
+Pizza Express,9440603413,,,PE Sheffield 5 – St Pauls Place,,,3375,,UK,A
+Pizza Express,9447452608,,,PE Leicester 3 - Highcross,,,3376,,UK,A
+Pizza Express,9449524248,,,New Malden,,,3378,,UK,A
+Pizza Express,9420917403,,,PE Stirling,,,3379,,UK,A
+Pizza Express,9429429160,,,PE Telford,,,3380,,UK,A
+Pizza Express,9429429160,,,PE Telford,,,3381,,UK,A
+Pizza Express,9440767804,,,PE Tamworth,,,3382,,UK,A
+Pizza Express,9440767804,,,PE Tamworth,,,3383,,UK,A
+Pizza Express,9440620334,,,PE Southampton 2 - West Quay,,,3384,,UK,A
+Pizza Express,9447460510,,,PE Chertsey,,,3385,,UK,A
+Pizza Express,9440607521,,,PE Rugby,,,3386,,UK,A
+Pizza Express,9428594014,,,PE Newport,,,3387,,UK,A
+Pizza Express,9428594014,,,PE Newport,,,3388,,UK,A
+Pizza Express,9429072945,,,PE St Neots,,,3389,,UK,A
+Pizza Express,9429072945,,,PE St Neots,,,3391,,UK,A
+Pizza Express,9441201811,,,PE Epping,,,3392,,UK,A
+Pizza Express,9441201811,,,PE Epping,,,3393,,UK,A
+Pizza Express,9440619427,,,PE Leighton Buzzard,,,3394,,UK,A
+Pizza Express,9440619419,,,PE Whiteleys,,,3395,,UK,A
+Pizza Express,9440620052,,,PE Harrow 2,,,3396,,UK,A
+Pizza Express,9440628444,,,PE Sudbury,,,3398,,UK,A
+Pizza Express,9420043531,,,PE Lymington,,,3399,,UK,A
+Pizza Express,9420732398,,,PE Grantham,,,3400,,UK,A
+Pizza Express,9420080426,,,PE Biggleswade,,,3401,,UK,A
+Pizza Express,9421939083,,,PE High Wycombe 2,,,3402,,UK,A
+Pizza Express,9421939109,,,PE Harlow,,,3403,,UK,A
+Pizza Express,9448861278,,,Broughton Park,,,3404,,UK,A
+Pizza Express,9420917429,,,PE Hatfield,,,3405,,UK,A
+Pizza Express,9423435445,,,PE Bristol 5 - The Venue,,,3406,,UK,A
+Pizza Express,9440878783,,,PE Swindon 2,,,3407,,UK,A
+Pizza Express,9440878783,,,PE Swindon 2,,,3408,,UK,A
+Pizza Express,9428669758,,,PE Marine Point New Brighton,,,3411,,UK,A
+Pizza Express,9441329554,,,PE Doncaster,,,3412,,UK,A
+Pizza Express,9421944307,,,PE Hatchend,,,3413,,UK,A
+Pizza Express,9441329570,,,PE Milton Keynes 4,,,3414,,UK,A
+Pizza Express,9442891008,,,Glasgow Silverburn,,,3415,,UK,A
+Pizza Express,9429416043,,,PE Shirley,,,3416,,UK,A
+Pizza Express,9429416043,,,PE Shirley,,,3417,,UK,A
+Pizza Express,9449945534,,,Loughborough,,,3418,,UK,A
+Pizza Express,9429429012,,,PE Aberdeen 3,,,3419,,UK,A
+Pizza Express,9429429012,,,PE Aberdeen 3,,,3420,,UK,A
+Pizza Express,9440767895,,,PE Manchester 7 - King Street,,,3421,,UK,A
+Pizza Express,9440767895,,,PE Manchester 7 - King Street,,,3422,,UK,A
+Pizza Express,9429416092,,,PE Southport 2,,,3423,,UK,A
+Pizza Express,9429416092,,,PE Southport 2,,,3424,,UK,A
+Pizza Express,9429424351,,,PE Spitalfields,,,3425,,UK,A
+Pizza Express,9429424351,,,PE Spitalfields,,,3426,,UK,A
+Pizza Express,9447452020,,,PE Billericay,,,3427,,UK,A
+Pizza Express,9447452020,,,PE Billericay,,,3428,,UK,A
+Pizza Express,9441329588,,,PE Bristol Cabot Circus,,,3429,,UK,A
+Pizza Express,9449742162,,,Whiteley Village,,,3430,,UK,A
+Pizza Express,9600540264,,,Dalton Park,,,3434,,UK,A
+Pizza Express,9449478015,,,Scarborough,,,3436,,UK,A
+Pizza Express,9442571907,,,PE Walthamstow,,,3439,,UK,A
+Pizza Express,9442571907,,,PE Walthamstow,,,3440,,UK,A
+Pizza Express,9449531565,,,Birmingham Resorts World,,,3441,,UK,A
+Pizza Express,9449706258,,,Manchester 8 - First Street,,,3442,,UK,A
+Pizza Express,9442953519,,,Leicester Square,,,3444,,UK,A
+Pizza Express,9449283373,,,Milton Keynes - The Hub,,,3445,,UK,A
+Pizza Express,9449283381,,,East Midlands Park,,,3446,,UK,A
+Pizza Express,9449859313,,,Walsall,,,5010,,UK,A
+Pizza Express,9449285527,,,Coulsdon,,,5020,,UK,A
+Pizza Express,9448861286,,,Croydon 3 - Valley Park,,,,,UK,A
+Pizza Express,9448861260,,,O2 Finchley,,,,,UK,A
+Pizza Express,9449859586,,,Rayleigh,,,,,UK,A
+Pizza Express,9449742022,,,Ludlow,,,,,UK,A
+Pizza Express,9449743020,,,Stoke on Trent,,,,,UK,A
+Pizza Express,9449524255,,,Paddington,,,,,UK,A
+Pizza Express,9449742253,,,Glasgow Byres Road,,,,,UK,A
+Pizza Express,9600025456,,,Liverpool Hope Street,,,,,UK,A
+Pizza Express,9449859578,,,Leeds - White Rose,,,,,UK,A
+Pizza Express,9449495555,,,Andover,,,,,UK,A
+Pizza Express,9449945583,,,Moseley,,,,,UK,A
+Pizza Express,9449945575,,,Belfast - St Annes Square,,,,,UK,A
+Pizza Express,9449945583,,,Belfast - Ballyhackamore,,,,,UK,A

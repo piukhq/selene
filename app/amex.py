@@ -2,6 +2,8 @@ import arrow
 import os
 import settings
 from app.csvfile import CSVReader
+from bigdatalib.schema import Schema
+from cassandralib.client import Client
 
 
 class Field(object):
@@ -141,13 +143,14 @@ class AmexMerchantFile(object):
 
 class Amex(object):
     delimiter = ','
-    column_names = ['Location Name', 'Partner Name', 'American Express', 'MasterCard', 'Visa', 'Currency',
-                    'Building Name Number', 'Postcode', 'Street', 'Local Area Name', 'TownCity', 'CountyState',
-                    'Country', 'Longitude', 'Latitude'
+    column_names = ['Partner Name', 'American Express MIDs', 'MasterCard MIDs', 'Visa MIDs',
+                    'Address (Building Name/Number, Street)', 'Postcode', 'Town/City', 'County/State',
+                    'Country', 'Action',
                     ]
-    column_keep = {'Location Name', 'Partner Name', 'American Express', 'MasterCard', 'Visa', 'Currency',
-                   'Building Name Number', 'Postcode', 'Street', 'Local Area Name', 'TownCity', 'CountyState',
-                   'Country', 'Longitude', 'Latitude'
+
+    column_keep = {'Partner Name', 'American Express MIDs', 'MasterCard MIDs', 'Visa MIDs',
+                   'Address (Building Name/Number, Street)', 'Postcode', 'Town/City', 'County/State',
+                   'Country', 'Action',
                    }
 
     @staticmethod
@@ -155,9 +158,9 @@ class Amex(object):
         """
         formats an <arrow> datetime into the format expected by Amex
         :param datetime: the <arrow> datetime to be formatted
-        :return: a datetime string in the format 'MM-DD-YYYY'
+        :return: a datetime string in the format 'YYYYMMDD_hhmmss'
         """
-        return datetime.format('YYYY-MM-DD')
+        return datetime.format('DD/MM/YYYY')
 
     @staticmethod
     def write_to_file(amex_input_file, file_name):
@@ -179,14 +182,15 @@ class Amex(object):
         :return: None
         """
         detail_record_count = len(merchants)
+        file_num = sequential_file_number() + 1
 
         header = Header(
             date=self.format_datetime(arrow.now()),
-            sequence_number='0000000001',
+            sequence_number=str(file_num).rjust(10, '0'),
             from_to='P2A',
             file_type='10',
             file_description='Merchant Registration',
-            partner_id='bink_pid',
+            partner_id='AADP0050',
             filler=''
         )
 
@@ -199,54 +203,63 @@ class Amex(object):
         file = AmexMerchantFile()
         file.set_header(header)
         file.set_footer(footer)
-        column_keep = {'Location Name', 'Partner Name', 'American Express', 'MasterCard', 'Visa', 'Currency',
-                       'Building Name Number', 'Postcode', 'Street', 'Local Area Name', 'TownCity', 'CountyState',
-                       'Country', 'Longitude', 'Latitude'
-                       }
 
         for merchant in merchants:
             file.add_detail(
                 Detail(
-                    action_code='A',  # A=Add, U=Update, D=Delete
+                    action_code=merchant['Action'],  # A=Add, U=Update, D=Delete
                     partner_id='AADP0050',
                     version_number='1.0',
-                    seller_id='TBD',
-                    tpa_se='TBD',
-                    merchant_number=merchant['American Express'],
-                    offer_id='900000000',
+                    seller_id='',
+                    tpa_se='',
+                    merchant_number=merchant['American Express MIDs'],
+                    offer_id='0',
                     offer_name='',
-                    offer_start_date=self.format_datetime(arrow.now()),
-                    offer_end_date=self.format_datetime(arrow.now()),
-                    source_system_id='GBP',
+                    offer_start_date='',
+                    offer_end_date='',
+                    source_system_id='GEN',
                     merchant_dba_name=merchant['Partner Name'],
                     merchant_legal_name=merchant['Partner Name'],
                     merchant_start_date=self.format_datetime(arrow.now()),
                     merchant_end_date='',
-                    address_line_1='{0} {1}'.format(merchant['Building Name Number'], merchant['Street']),
-                    address_line_2=merchant['Local Area Name'],
+                    address_line_1='{}'.format(merchant['Address (Building Name/Number, Street)']),
+                    address_line_2='',
                     address_line_3='',
                     address_line_4='',
                     address_line_5='',
-                    city=merchant['TownCity'],
-                    state=merchant['CountyState'],
+                    city=merchant['Town/City'],
+                    state=merchant['County/State'],
                     postal_code=merchant['Postcode'],
                     country=merchant['Country'],
-                    geographical_code_latitude=merchant['Latitude'],
-                    geographical_code_longitude=merchant['Longitude'],
+                    geographical_code_latitude='',
+                    geographical_code_longitude='',
                     custom_field_1='',
                     custom_field_2='',
                     filler=''
                 ),
             )
 
-        # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
-        file_name = '{}{}{}'.format(
-            'BINK',
-            '_AXP_mer_reg_',
-            self.format_datetime(arrow.now()),
-        )
+        file_name = self.create_file_name()
+        try:
+            self.write_to_file(file, file_name)
+            status = 'written'
+        except IOError as err:
+            status = 'error'
+            raise Exception('Error writing file:' + file_name)
 
-        self.write_to_file(file, file_name)
+        log = {
+            'provider': 'bink',
+            'receiver': 'amex',
+            'file_name': file_name,
+            'date': arrow.now(),
+            'process_date': arrow.now(),
+            'status': status,
+            'file_type': 'out',
+            'direction': 'out',
+            'sequence_number': file_num,
+            'comment': 'Merchant onboarding'
+        }
+        insert_file_log(log)
 
     def export(self, merchant):
         files = fetch_files(merchant, 'csv')
@@ -265,6 +278,16 @@ class Amex(object):
 
         self.export_merchants(merchant_list)
 
+    def create_file_name(self):
+        # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
+        file_name = '{}{}{}'.format(
+            'BINK',
+            '_AXP_mer_reg_',
+            arrow.now().format('YYYYMMDD_hhmmss')
+        )
+
+        return file_name
+
 
 def fetch_files(merchant, file_extension):
     file_path = os.path.join(settings.APP_DIR + '/merchants',
@@ -277,3 +300,22 @@ def file_list(file_path, file_ext):
     if not os.path.isdir(file_path):
         return []
     return [os.path.join(file_path, fn) for fn in next(os.walk(file_path))[2] if fn.endswith(file_ext)]
+
+
+def sequential_file_number():
+    db_client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
+    # Get the currently logged files. This could be just the last file logged.
+    # If returns nothing, then must be first file, so need to create the name.
+    logged_files = db_client.select('file_logging', provider='amex', file_type='out')
+
+    db_client.close()
+    return len(logged_files.current_rows)
+
+
+def insert_file_log(log):
+    db_client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
+    # Get the currently logged files. This could be just the last file logged.
+    # If returns nothing, then must be first file, so need to create the name.
+    db_client.insert('file_logging', [log])
+
+    db_client.close()
