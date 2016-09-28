@@ -160,7 +160,7 @@ class Amex(object):
         :param datetime: the <arrow> datetime to be formatted
         :return: a datetime string in the format 'YYYYMMDD_hhmmss'
         """
-        return datetime.format('DD/MM/YYYY')
+        return datetime.format('MM/DD/YYYY')
 
     @staticmethod
     def write_to_file(amex_input_file, file_name):
@@ -280,10 +280,11 @@ class Amex(object):
 
     def create_file_name(self):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
-        file_name = '{}{}{}'.format(
-            'BINK',
-            '_AXP_mer_reg_',
-            arrow.now().format('YYYYMMDD_hhmmss')
+        file_name = '{}{}{}{}'.format(
+            'CHINGS',
+            '_AXP_MER_REG_',
+            arrow.now().format('YYYYMMDD_hhmmss'),
+            '.txt'
         )
 
         return file_name
