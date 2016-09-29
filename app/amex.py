@@ -1,10 +1,12 @@
 import arrow
 import os
 import settings
-from app.csvfile import CSVReader
+
 from bigdatalib.schema import Schema
 from cassandralib.client import Client
 
+from app.csvfile import CSVReader
+from app.utils import validate_uk_postcode
 
 class Field(object):
     def __init__(self, **kwargs):
@@ -175,14 +177,14 @@ class Amex(object):
         with open(path, 'w+') as f:
             f.write(amex_input_file.freeze())
 
-    def export_merchants(self, merchants):
+    def export_merchants(self, merchants, validated):
         """
         uses a given set of merchants to generate a file in Amex input file format
         :param merchants: a list of merchants to send to Amex
         :return: None
         """
         detail_record_count = len(merchants)
-        file_num = sequential_file_number() + 1
+        file_num = 1#sequential_file_number() + 1
 
         header = Header(
             date=self.format_datetime(arrow.now()),
@@ -239,7 +241,7 @@ class Amex(object):
                 ),
             )
 
-        file_name = self.create_file_name()
+        file_name = self.create_file_name(validated)
         try:
             self.write_to_file(file, file_name)
             status = 'written'
@@ -259,26 +261,33 @@ class Amex(object):
             'sequence_number': file_num,
             'comment': 'Merchant onboarding'
         }
-        insert_file_log(log)
+        #insert_file_log(log)
 
     def export(self, merchant):
         files = fetch_files(merchant, 'csv')
         start_line = 2
         reader = CSVReader(self.column_names, self.delimiter, self.column_keep)
 
+        merchant_list = []
+        bad_merchant_list = []
+
         for txt_file in files:
             current_line = 0
-            merchant_list = []
 
             for row in reader(txt_file):
                 current_line += 1
 
                 if current_line >= start_line:
-                    merchant_list.append(row)
+                    if validate_row_data(row):
+                        merchant_list.append(row)
+                    else:
+                        bad_merchant_list.append(row)
 
-        self.export_merchants(merchant_list)
+        self.export_merchants(merchant_list, True)
+        self.export_merchants(bad_merchant_list, False)
 
-    def create_file_name(self):
+
+    def create_file_name(self, validated):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
         file_name = '{}{}{}{}'.format(
             'CHINGS',
@@ -287,7 +296,29 @@ class Amex(object):
             '.txt'
         )
 
+        if not validated:
+            file_name = 'INVALID_' + file_name
+
         return file_name
+
+
+def validate_row_data(row):
+    """Validate data within a row from the csv file"""
+
+    if row['Postcode'] != '':
+        if not validate_uk_postcode(row['Postcode']):
+            print("postcode fail", row['Postcode'])
+            return False
+
+    if row['Partner Name'] == '' or \
+        row['American Express MIDs'] == '' or \
+        row['Address (Building Name/Number, Street)'] == '' or \
+        row['Town/City'] == '' or \
+        row['Country'] == '' or \
+        row['Action'] == '':
+        return False
+
+    return True
 
 
 def fetch_files(merchant, file_extension):
