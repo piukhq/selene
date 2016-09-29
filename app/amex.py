@@ -315,7 +315,6 @@ def validate_row_data(row):
         row['Town/City'] == '' or \
         row['Country'] == '' or \
         row['Action'] == '':
-        print("string fail", row['Partner Name'])
         return False
 
     return True
