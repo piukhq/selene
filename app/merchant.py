@@ -4,6 +4,7 @@ import settings
 
 from bigdatalib.schema import Schema
 from cassandralib.client import Client
+from openpyxl import Workbook
 
 from app.csvfile import CSVReader
 from app.utils import validate_uk_postcode
@@ -33,7 +34,7 @@ class Header(Field):
         self.record_identifier = 'H'
 
 
-class Detail(Field):
+class AmexDetail(Field):
     fields = [
         ('record_identifier', 1),
         ('action_code', 1),
@@ -85,12 +86,13 @@ class Footer(Field):
         self.record_identifier = 'T'
 
 
-class AmexMerchantFile(object):
+class MerchantFile(object):
 
     def __init__(self):
         self.header_string = ''
         self.details = []
         self.footer_string = ''
+        self.visa_lines = []
 
     @staticmethod
     def _serialize(field_class, fields):
@@ -121,15 +123,22 @@ class AmexMerchantFile(object):
         """
         self.footer_string = self._serialize(Footer, footer)
 
-    def add_detail(self, detail):
+    def add_amex_detail(self, detail):
         """
         add a detail record to the file
         :param detail: the detail to add
         :return: None
         """
         self.details.append({
-            'detail': self._serialize(Detail, detail),
+            'detail': self._serialize(AmexDetail, detail),
         })
+
+    def add_visa_detail(self, detail):
+        """Add a detail record for a line in the visa output file
+        :param detail: the detail to add
+        :return: None
+        """
+        self.visa_lines.append(detail)
 
     def freeze(self):
         """
@@ -142,8 +151,12 @@ class AmexMerchantFile(object):
         file_contents.append(self.footer_string)
         return '\n'.join(file_contents)
 
+    def get_visa_lines(self):
+        """Retrieve a list of lines of visa data"""
+        return self.visa_lines
 
-class Amex(object):
+
+class PaymentCard(object):
     delimiter = ','
     column_names = ['Partner Name', 'American Express MIDs', 'MasterCard MIDs', 'Visa MIDs',
                     'Address (Building Name/Number, Street)', 'Postcode', 'Town/City', 'County/State',
@@ -165,19 +178,35 @@ class Amex(object):
         return datetime.format('MM/DD/YYYY')
 
     @staticmethod
-    def write_to_file(amex_input_file, file_name):
+    def write_to_file(input_file, file_name, provider_type):
         """
         writes the given input file to a file under a given name.
         :param amex_input_file: the file to write
         :param file_name: the file name under which to write the data
         :return: None
         """
-        path = os.path.join(settings.APP_DIR, 'merchants/amex', file_name)
 
-        with open(path, 'w+') as f:
-            f.write(amex_input_file.freeze())
+        path = os.path.join(settings.APP_DIR, 'merchants/{0}'.format(provider_type), file_name)
 
-    def export_merchants(self, merchants, validated):
+        if provider_type == 'amex':
+            with open(path, 'w+') as f:
+                f.write(input_file.freeze())
+        elif provider_type == 'visa':
+            wb = Workbook()
+            ws1 = wb.active
+            ws1.title = "PVnnn_90523_Choice_20160101"
+
+            visa_header = ['GLB_MID', 'ACQUIRER_MID', 'GLB_MERCHANT_NAME', 'MERCHANT_CITY', 'POST_CODE', 'ADDRESS',
+                           'ALTERNATIVE_MERCHANT_NAME', 'STATUS', 'VISA_COMMENTS', 'MSG_COMMENTS'
+                           ]
+            ws1.append(visa_header)
+            visa_lines = input_file.get_visa_lines()
+            for line in visa_lines:
+                ws1.append(line)
+
+            wb.save(path)
+
+    def export_merchants(self, merchants, validated, provider_type):
         """
         uses a given set of merchants to generate a file in Amex input file format
         :param merchants: a list of merchants to send to Amex
@@ -202,13 +231,13 @@ class Amex(object):
             filler=''
         )
 
-        file = AmexMerchantFile()
+        file = MerchantFile()
         file.set_header(header)
         file.set_footer(footer)
 
         for merchant in merchants:
-            file.add_detail(
-                Detail(
+            if provider_type == 'amex':
+                detail = AmexDetail(
                     action_code=merchant['Action'],  # A=Add, U=Update, D=Delete
                     partner_id='AADP0050',
                     version_number='1.0',
@@ -238,12 +267,22 @@ class Amex(object):
                     custom_field_1='',
                     custom_field_2='',
                     filler=''
-                ),
-            )
+                )
 
-        file_name = self.create_file_name(validated)
+                file.add_amex_detail(detail)
+
+            elif provider_type == 'visa':
+                detail = ['90523', merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'], merchant['Postcode'],
+                               merchant['Address (Building Name/Number, Street)'], '', 'New', '', '',
+                               ]
+                file.add_visa_detail(detail)
+
+            elif provider_type == 'mastercard':
+                mids = merchant['MasterCard MIDs']
+
+        file_name = self.create_file_name(validated, provider_type)
         try:
-            self.write_to_file(file, file_name)
+            self.write_to_file(file, file_name, provider_type)
             status = 'written'
         except IOError as err:
             status = 'error'
@@ -251,7 +290,7 @@ class Amex(object):
 
         log = {
             'provider': 'bink',
-            'receiver': 'amex',
+            'receiver': provider_type,
             'file_name': file_name,
             'date': arrow.now(),
             'process_date': arrow.now(),
@@ -263,8 +302,8 @@ class Amex(object):
         }
         #insert_file_log(log)
 
-    def export(self, merchant):
-        files = fetch_files(merchant, 'csv')
+    def export(self, provider_type):
+        files = fetch_files(provider_type, 'csv')
         start_line = 2
         reader = CSVReader(self.column_names, self.delimiter, self.column_keep)
 
@@ -278,23 +317,41 @@ class Amex(object):
                 current_line += 1
 
                 if current_line >= start_line:
-                    if validate_row_data(row):
+                    if validate_row_data(row, provider_type):
                         merchant_list.append(row)
                     else:
                         bad_merchant_list.append(row)
 
-        self.export_merchants(merchant_list, True)
-        self.export_merchants(bad_merchant_list, False)
+        self.export_merchants(merchant_list, True, provider_type)
+        self.export_merchants(bad_merchant_list, False, provider_type)
 
 
-    def create_file_name(self, validated):
+    def create_file_name(self, validated, provider_type):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
-        file_name = '{}{}{}{}'.format(
-            'CHINGS',
-            '_AXP_MER_REG_',
-            arrow.now().format('YYYYMMDD_hhmmss'),
-            '.txt'
-        )
+        file_name = ''
+
+        if provider_type == 'amex':
+            file_name = '{}{}{}{}'.format(
+                'BINK',
+                '_AXP_MER_REG_',
+                arrow.now().format('YYYYMMDD_hhmmss'),
+                '.txt'
+            )
+        elif provider_type == 'visa':
+            pv_num = 'nnn'
+            glb_mid = '12345'
+            mrch_name = 'MrchName'
+
+            file_name = '{}{}{}{}{}{}'.format(
+                'PV',
+                pv_num + '_',
+                glb_mid + '_',
+                'BINK_',
+                arrow.now().format('YYYYMMDD'),
+                '.xlsx'
+            )
+        elif provider_type == 'mastercard':
+            pass
 
         if not validated:
             file_name = 'INVALID_' + file_name
@@ -302,7 +359,7 @@ class Amex(object):
         return file_name
 
 
-def validate_row_data(row):
+def validate_row_data(row, merchant):
     """Validate data within a row from the csv file"""
 
     if row['Postcode'] != '':
@@ -311,12 +368,21 @@ def validate_row_data(row):
             return False
 
     if row['Partner Name'] == '' or \
-        row['American Express MIDs'] == '' or \
         row['Address (Building Name/Number, Street)'] == '' or \
         row['Town/City'] == '' or \
         row['Country'] == '' or \
         row['Action'] == '':
         return False
+
+    if merchant == 'amex':
+        if row['American Express MIDs'] == '':
+            return False
+    elif merchant == 'visa':
+        if row['Visa MIDs'] == '':
+            return False
+    elif merchant == 'mastercard':
+        if row['MasterCard MIDs'] == '':
+            return False
 
     return True
 
