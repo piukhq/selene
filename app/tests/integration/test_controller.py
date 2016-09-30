@@ -1,30 +1,24 @@
 import arrow
 import unittest
-import app.merchant
+import app.controller
 from unittest.mock import patch
 
 
-class TestMerchantFile(unittest.TestCase):
-    @patch('app.merchant.PaymentCard.write_to_file')
+class TestControllerFile(unittest.TestCase):
+    @patch('app.controller.PaymentCard.write_to_file')
     def test_write_to_file(self, mock_write_to_file):
         mock_write_to_file.return_value = True
-        payment_card = app.merchant.PaymentCard()
-        payment_card.export('amex')
+        payment_card = app.controller.PaymentCard()
+        payment_card.export()
         assert mock_write_to_file.called
-        payment_card.export('visa')
-        assert mock_write_to_file.called
-        #payment_card.export('mastercard')
-        #assert mock_write_to_file.called
 
     def test_output_write_to_file(self):
-        payment_card = app.merchant.PaymentCard()
-        payment_card.export('amex')
-        payment_card.export('visa')
-        #payment_card.export('mastercard')
+        payment_card = app.controller.PaymentCard()
+        payment_card.export()
         self.assertTrue(True)
 
     def test_sequential_file_number(self):
-        file_number = app.merchant.sequential_file_number()
+        file_number = app.controller.sequential_file_number()
         self.assertTrue(file_number >= 0)
 
     def test_insert_log_data(self):
@@ -40,5 +34,5 @@ class TestMerchantFile(unittest.TestCase):
             'sequence_number': '1',
             'comment': 'Merchant onboarding'
         }
-        #app.merchant.insert_file_log(log)
+        #app.controller.insert_file_log(log)
         self.assertTrue(True)
