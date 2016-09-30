@@ -8,13 +8,11 @@ class TestControllerFile(unittest.TestCase):
     @patch('app.controller.PaymentCard.write_to_file')
     def test_write_to_file(self, mock_write_to_file):
         mock_write_to_file.return_value = True
-        payment_card = app.controller.PaymentCard()
-        payment_card.export()
+        app.controller.export()
         assert mock_write_to_file.called
 
     def test_output_write_to_file(self):
-        payment_card = app.controller.PaymentCard()
-        payment_card.export()
+        app.controller.export()
         self.assertTrue(True)
 
     def test_sequential_file_number(self):
