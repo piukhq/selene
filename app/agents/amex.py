@@ -2,11 +2,8 @@ import arrow
 import os
 import settings
 
-from bigdatalib.schema import Schema
-from cassandralib.client import Client
+from app.source_format import SourceFormat
 
-from app.csvfile import CSVReader
-from app.utils import validate_uk_postcode
 
 class Field(object):
     def __init__(self, **kwargs):
@@ -33,7 +30,20 @@ class Header(Field):
         self.record_identifier = 'H'
 
 
-class Detail(Field):
+class Footer(Field):
+    fields = [
+        ('record_identifier', 1),
+        ('file_type', 2),
+        ('trailer_count', 12),
+        ('filler', 982),
+    ]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.record_identifier = 'T'
+
+
+class AmexDetail(Field):
     fields = [
         ('record_identifier', 1),
         ('action_code', 1),
@@ -72,20 +82,7 @@ class Detail(Field):
         self.record_identifier = 'D'
 
 
-class Footer(Field):
-    fields = [
-        ('record_identifier', 1),
-        ('file_type', 2),
-        ('trailer_count', 12),
-        ('filler', 982),
-    ]
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.record_identifier = 'T'
-
-
-class AmexMerchantFile(object):
+class AmexMerchantFile():
 
     def __init__(self):
         self.header_string = ''
@@ -121,17 +118,7 @@ class AmexMerchantFile(object):
         """
         self.footer_string = self._serialize(Footer, footer)
 
-    def add_detail(self, detail):
-        """
-        add a detail record to the file
-        :param detail: the detail to add
-        :return: None
-        """
-        self.details.append({
-            'detail': self._serialize(Detail, detail),
-        })
-
-    def freeze(self):
+    def get_detail(self):
         """
         freeze the current file contents into a string
         :return: a string representing the current state of the file
@@ -142,18 +129,20 @@ class AmexMerchantFile(object):
         file_contents.append(self.footer_string)
         return '\n'.join(file_contents)
 
+    def add_detail(self, detail):
+        """
+        add a detail record to the file
+        :param detail: the detail to add
+        :return: None
+        """
+        self.details.append({
+            'detail': self._serialize(AmexDetail, detail),
+        })
 
-class Amex(object):
-    delimiter = ','
-    column_names = ['Partner Name', 'American Express MIDs', 'MasterCard MIDs', 'Visa MIDs',
-                    'Address (Building Name/Number, Street)', 'Postcode', 'Town/City', 'County/State',
-                    'Country', 'Action',
-                    ]
 
-    column_keep = {'Partner Name', 'American Express MIDs', 'MasterCard MIDs', 'Visa MIDs',
-                   'Address (Building Name/Number, Street)', 'Postcode', 'Town/City', 'County/State',
-                   'Country', 'Action',
-                   }
+class Amex(SourceFormat):
+    def __init__(self):
+        pass
 
     @staticmethod
     def format_datetime(datetime):
@@ -164,18 +153,27 @@ class Amex(object):
         """
         return datetime.format('MM/DD/YYYY')
 
+    def has_mid(self, row):
+        """return True if there is a visa mid in the row"""
+        if row['American Express MIDs'] != '':
+            return True
+
+        return False
+
     @staticmethod
-    def write_to_file(amex_input_file, file_name):
+    def write_to_file(input_file, file_name):
         """
         writes the given input file to a file under a given name.
         :param amex_input_file: the file to write
         :param file_name: the file name under which to write the data
         :return: None
         """
-        path = os.path.join(settings.APP_DIR, 'merchants/amex', file_name)
+
+        path = os.path.join(settings.APP_DIR, 'provider_types', file_name)
 
         with open(path, 'w+') as f:
-            f.write(amex_input_file.freeze())
+            f.write(input_file.get_detail())
+
 
     def export_merchants(self, merchants, validated):
         """
@@ -207,39 +205,40 @@ class Amex(object):
         file.set_footer(footer)
 
         for merchant in merchants:
-            file.add_detail(
-                Detail(
-                    action_code=merchant['Action'],  # A=Add, U=Update, D=Delete
-                    partner_id='AADP0050',
-                    version_number='1.0',
-                    seller_id='',
-                    tpa_se='',
-                    merchant_number=merchant['American Express MIDs'],
-                    offer_id='0',
-                    offer_name='',
-                    offer_start_date='',
-                    offer_end_date='',
-                    source_system_id='GEN',
-                    merchant_dba_name=merchant['Partner Name'],
-                    merchant_legal_name=merchant['Partner Name'],
-                    merchant_start_date=self.format_datetime(arrow.now()),
-                    merchant_end_date='',
-                    address_line_1='{}'.format(merchant['Address (Building Name/Number, Street)']),
-                    address_line_2='',
-                    address_line_3='',
-                    address_line_4='',
-                    address_line_5='',
-                    city=merchant['Town/City'],
-                    state=merchant['County/State'],
-                    postal_code=merchant['Postcode'],
-                    country=merchant['Country'],
-                    geographical_code_latitude='',
-                    geographical_code_longitude='',
-                    custom_field_1='',
-                    custom_field_2='',
-                    filler=''
-                ),
+            detail = AmexDetail(
+                action_code=merchant['Action'],  # A=Add, U=Update, D=Delete
+                partner_id='AADP0050',
+                version_number='1.0',
+                seller_id='',
+                tpa_se='',
+                merchant_number=merchant['American Express MIDs'],
+                offer_id='0',
+                offer_name='',
+                offer_start_date='',
+                offer_end_date='',
+                source_system_id='GEN',
+                merchant_dba_name=merchant['Partner Name'],
+                merchant_legal_name=merchant['Partner Name'],
+                merchant_start_date=self.format_datetime(arrow.now()),
+                merchant_end_date='',
+                address_line_1='{}'.format(merchant['Address (Building Name/Number, Street)']),
+                address_line_2='',
+                address_line_3='',
+                address_line_4='',
+                address_line_5='',
+                city=merchant['Town/City'],
+                state=merchant['County/State'],
+                postal_code=merchant['Postcode'],
+                country=merchant['Country'],
+                geographical_code_latitude='',
+                geographical_code_longitude='',
+                custom_field_1='',
+                custom_field_2='',
+                filler=''
             )
+
+            file.add_detail(detail)
+
 
         file_name = self.create_file_name(validated)
         try:
@@ -263,34 +262,12 @@ class Amex(object):
         }
         #insert_file_log(log)
 
-    def export(self, merchant):
-        files = fetch_files(merchant, 'csv')
-        start_line = 2
-        reader = CSVReader(self.column_names, self.delimiter, self.column_keep)
-
-        merchant_list = []
-        bad_merchant_list = []
-
-        for txt_file in files:
-            current_line = 0
-
-            for row in reader(txt_file):
-                current_line += 1
-
-                if current_line >= start_line:
-                    if validate_row_data(row):
-                        merchant_list.append(row)
-                    else:
-                        bad_merchant_list.append(row)
-
-        self.export_merchants(merchant_list, True)
-        self.export_merchants(bad_merchant_list, False)
-
 
     def create_file_name(self, validated):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
+        # TODO: Change BINK to suitable name
         file_name = '{}{}{}{}'.format(
-            'CHINGS',
+            'BINK',
             '_AXP_MER_REG_',
             arrow.now().format('YYYYMMDD_hhmmss'),
             '.txt'
@@ -300,54 +277,3 @@ class Amex(object):
             file_name = 'INVALID_' + file_name
 
         return file_name
-
-
-def validate_row_data(row):
-    """Validate data within a row from the csv file"""
-
-    if row['Postcode'] != '':
-        if not validate_uk_postcode(row['Postcode']):
-            print("postcode fail", row['Postcode'])
-            return False
-
-    if row['Partner Name'] == '' or \
-        row['American Express MIDs'] == '' or \
-        row['Address (Building Name/Number, Street)'] == '' or \
-        row['Town/City'] == '' or \
-        row['Country'] == '' or \
-        row['Action'] == '':
-        return False
-
-    return True
-
-
-def fetch_files(merchant, file_extension):
-    file_path = os.path.join(settings.APP_DIR + '/merchants',
-                             merchant)
-    merchant_files = file_list(file_path, file_extension)
-    return merchant_files
-
-
-def file_list(file_path, file_ext):
-    if not os.path.isdir(file_path):
-        return []
-    return [os.path.join(file_path, fn) for fn in next(os.walk(file_path))[2] if fn.endswith(file_ext)]
-
-
-def sequential_file_number():
-    db_client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
-    # Get the currently logged files. This could be just the last file logged.
-    # If returns nothing, then must be first file, so need to create the name.
-    logged_files = db_client.select('file_logging', provider='amex', file_type='out')
-
-    db_client.close()
-    return len(logged_files.current_rows)
-
-
-def insert_file_log(log):
-    db_client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
-    # Get the currently logged files. This could be just the last file logged.
-    # If returns nothing, then must be first file, so need to create the name.
-    db_client.insert('file_logging', [log])
-
-    db_client.close()

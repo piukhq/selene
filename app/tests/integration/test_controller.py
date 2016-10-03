@@ -1,24 +1,22 @@
 import arrow
 import unittest
-import app.amex
+import app.controller
 from unittest.mock import patch
 
 
-class TestAmexMerchantFile(unittest.TestCase):
-    @patch('app.amex.Amex.write_to_file')
+class TestControllerFile(unittest.TestCase):
+    @patch('app.controller.PaymentCard.write_to_file')
     def test_write_to_file(self, mock_write_to_file):
         mock_write_to_file.return_value = True
-        amex = app.amex.Amex()
-        amex.export('amex')
+        app.controller.export()
         assert mock_write_to_file.called
 
     def test_output_write_to_file(self):
-        amex = app.amex.Amex()
-        amex.export('amex')
+        app.controller.export()
         self.assertTrue(True)
 
     def test_sequential_file_number(self):
-        file_number = app.amex.sequential_file_number()
+        file_number = app.controller.sequential_file_number()
         self.assertTrue(file_number >= 0)
 
     def test_insert_log_data(self):
@@ -34,5 +32,5 @@ class TestAmexMerchantFile(unittest.TestCase):
             'sequence_number': '1',
             'comment': 'Merchant onboarding'
         }
-        app.amex.insert_file_log(log)
+        app.controller.insert_file_log(log)
         self.assertTrue(True)
