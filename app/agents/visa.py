@@ -56,7 +56,7 @@ class Visa(SourceFormat):
         :return: None
         """
 
-        path = os.path.join(settings.APP_DIR, 'provider_types', file_name)
+        path = os.path.join(settings.APP_DIR, 'merchants/visa', file_name)
 
         wb = Workbook()
         ws1 = wb.active

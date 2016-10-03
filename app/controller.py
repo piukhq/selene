@@ -59,7 +59,6 @@ def validate_row_data(row):
 
     if row['Postcode'] != '':
         if not validate_uk_postcode(row['Postcode']):
-            print("postcode fail", row['Postcode'])
             return False
 
     if row['Partner Name'] == '' or \

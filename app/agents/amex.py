@@ -169,7 +169,7 @@ class Amex(SourceFormat):
         :return: None
         """
 
-        path = os.path.join(settings.APP_DIR, 'provider_types', file_name)
+        path = os.path.join(settings.APP_DIR, 'merchants/amex', file_name)
 
         with open(path, 'w+') as f:
             f.write(input_file.get_detail())
@@ -267,7 +267,7 @@ class Amex(SourceFormat):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
         # TODO: Change BINK to suitable name
         file_name = '{}{}{}{}'.format(
-            'BINK',
+            'CHINGS',
             '_AXP_MER_REG_',
             arrow.now().format('YYYYMMDD_hhmmss'),
             '.txt'
