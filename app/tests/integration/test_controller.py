@@ -32,5 +32,5 @@ class TestControllerFile(unittest.TestCase):
             'sequence_number': '1',
             'comment': 'Merchant onboarding'
         }
-        #app.controller.insert_file_log(log)
+        app.controller.insert_file_log(log)
         self.assertTrue(True)

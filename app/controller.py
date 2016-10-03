@@ -6,10 +6,20 @@ from cassandralib.client import Client
 
 from app.csvfile import CSVReader
 from app.utils import validate_uk_postcode
+from app.utils import resolve_agent
 
-from app.visa import Visa
-from app.amex import Amex
 from app.source_format import SourceFormat
+from app.active import AGENTS
+
+
+def get_agent(partner_slug):
+    try:
+        agent_class = resolve_agent(partner_slug)
+        return agent_class()
+    except KeyError:
+        raise('No such agent')
+    except Exception as ex:
+        raise(ex)
 
 
 def export():
@@ -18,9 +28,12 @@ def export():
     pcard = SourceFormat()
     reader = CSVReader(pcard.column_names, pcard.delimiter, pcard.column_keep)
 
-    card_data = {"amex":[Amex(), [], []],
-                 "visa": [Visa(), [], []],
-                 }
+    card_data = {}
+    for k, v in AGENTS.items():
+        agent_instance = get_agent(k)
+        valid_merchants = []
+        invalid_merchants = []
+        card_data.update({k:[agent_instance, valid_merchants, invalid_merchants]})
 
     for txt_file in files:
         current_line = 0
