@@ -1,3 +1,4 @@
+import csv
 import arrow
 import os
 import settings
@@ -47,11 +48,27 @@ class Visa(SourceFormat):
 
         return False
 
+    def write_transaction_matched_csv(self, merchants):
+        try:
+            path = os.path.join(settings.APP_DIR, 'merchants/visa', 'cass_inp.csv')
+            with open(path, 'w') as csv_file:
+                csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
+                for merchant in merchants:
+                    csv_writer.writerow(['visa',
+                                         merchant['Visa MIDs'],
+                                         merchant['Scheme'].strip('"'),
+                                         merchant['Partner Name'].strip('"')
+                                         ])
+
+        except IOError as err:
+            status = 'error'
+            raise Exception('Error writing file:' + path)
+
     @staticmethod
     def write_to_file(input_file, file_name):
         """
         writes the given input file to a file under a given name.
-        :param amex_input_file: the file to write
+        :param visa_input_file: the file to write
         :param file_name: the file name under which to write the data
         :return: None
         """

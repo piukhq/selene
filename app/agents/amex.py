@@ -1,3 +1,4 @@
+import csv
 import arrow
 import os
 import settings
@@ -159,6 +160,22 @@ class Amex(SourceFormat):
             return True
 
         return False
+
+    def write_transaction_matched_csv(self, merchants):
+        try:
+            path = os.path.join(settings.APP_DIR, 'merchants/amex', 'cass_inp.csv')
+            with open(path, 'w') as csv_file:
+                csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
+                for merchant in merchants:
+                    csv_writer.writerow(['amex',
+                                         merchant['American Express MIDs'],
+                                         merchant['Scheme'].strip('"'),
+                                         merchant['Partner Name'].strip('"')
+                                         ])
+
+        except IOError as err:
+            status = 'error'
+            raise Exception('Error writing file:' + path)
 
     @staticmethod
     def write_to_file(input_file, file_name):
