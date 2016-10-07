@@ -38,7 +38,11 @@ class MasterCard(SourceFormat):
     def has_mid(self, row):
         """return True if there is a mastercard mid in the row"""
         if row['MasterCard MIDs'] != '':
-            return True
+            try:
+                mid = int(row['MasterCard MIDs'])
+                return True
+            except:
+                return False
 
         return False
 

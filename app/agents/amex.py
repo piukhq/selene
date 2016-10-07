@@ -157,7 +157,11 @@ class Amex(SourceFormat):
     def has_mid(self, row):
         """return True if there is a visa mid in the row"""
         if row['American Express MIDs'] != '':
-            return True
+            try:
+                mid = int(row['American Express MIDs'])
+                return True
+            except:
+                return False
 
         return False
 
