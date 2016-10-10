@@ -3,6 +3,9 @@ import settings
 
 from bigdatalib.schema import Schema
 from cassandralib.client import Client
+import yagmail
+import pysftp
+import shutil
 
 from app.csvfile import CSVReader
 from app.utils import validate_uk_postcode
@@ -10,6 +13,19 @@ from app.utils import resolve_agent
 
 from app.source_format import SourceFormat
 from app.active import AGENTS
+
+
+def upload_sftp(url, username, password, src_dir, dst_dir):
+    """Upload all the files in the source directory to the sftp location url in the destination directory
+    with appropriate user credentials"""
+    with pysftp.Connection(url, username=username, password=password) as sftp:
+        files = os.listdir(src_dir)
+        for filename in files:
+            path = os.path.join(src_dir, filename)
+            if os.path.isfile(path):
+                src_path = path
+                dst_path = os.path.join(dst_dir, filename)
+                sftp.put(src_path, dst_path, preserve_mtime=True)
 
 
 def get_agent(partner_slug):
@@ -101,3 +117,41 @@ def insert_file_log(log):
     db_client.insert('file_logging', [log])
 
     db_client.close()
+
+
+def send_email_and_archive(agent):
+    """Send an email with generated MID data to each agent that requires it"""
+    yag = yagmail.SMTP(user='service@bink.com', password='pass', host='mail.bink.com', port='587')
+    src_dir = os.path.join(settings.APP_DIR, 'merchants/'+agent)
+    files = os.listdir(src_dir)
+    for f in files:
+        if 'INVALID' is not in f:
+            contents = ['This is the body, and here is just text',
+                        'You can find an attachment here.', os.path.join(src_dir, f)]
+            yag.send('oe@bink.com', 'subject', contents)
+        # archive all files in this directory to destination directory...
+        dst_dir = src_dir + '/archive'
+        if not os.path.isdir(dst_dir):
+            os.makedirs(dst_dir)
+        copy_local(src_dir, dst_dir)
+
+
+def copy_local(src_dir, dst_dir):
+    files = os.listdir(src_dir)
+    for filename in files:
+        path = os.path.join(src_dir, filename)
+        if os.path.isfile(path):
+            shutil.move(path, dst_dir)
+
+
+
+if __name__ == '__main__':
+    #export()
+
+    # Amex only requires SFTP
+    #url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
+    #src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
+    #upload_sftp(url, username, password, src_dir, dst_dir)
+
+    send_email_and_archive('visa')
+    send_email_and_archive('mastercard')
