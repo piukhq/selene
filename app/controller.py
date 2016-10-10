@@ -43,11 +43,10 @@ def export():
 
             if current_line >= start_line:
                 for k, v in card_data.items():
-                    if v[0].has_mid(row):
-                        if validate_row_data(row):
-                            v[1].append(row)
-                        else:
-                            v[2].append(row)
+                    if v[0].has_mid(row) and validate_row_data(row):
+                        v[1].append(row)
+                    else:
+                        v[2].append(row)
 
     for k, v in card_data.items():
         v[0].export_merchants(v[1], True)
