@@ -1,3 +1,4 @@
+import csv
 import arrow
 import os
 import settings
@@ -156,9 +157,29 @@ class Amex(SourceFormat):
     def has_mid(self, row):
         """return True if there is a visa mid in the row"""
         if row['American Express MIDs'] != '':
-            return True
+            try:
+                mid = int(row['American Express MIDs'])
+                return True
+            except:
+                return False
 
         return False
+
+    def write_transaction_matched_csv(self, merchants):
+        try:
+            path = os.path.join(settings.APP_DIR, 'merchants/amex', 'cass_inp.csv')
+            with open(path, 'w') as csv_file:
+                csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
+                for merchant in merchants:
+                    csv_writer.writerow(['amex',
+                                         merchant['American Express MIDs'],
+                                         merchant['Scheme'].strip('"'),
+                                         merchant['Partner Name'].strip('"')
+                                         ])
+
+        except IOError as err:
+            status = 'error'
+            raise Exception('Error writing file:' + path)
 
     @staticmethod
     def write_to_file(input_file, file_name):
@@ -169,7 +190,7 @@ class Amex(SourceFormat):
         :return: None
         """
 
-        path = os.path.join(settings.APP_DIR, 'provider_types', file_name)
+        path = os.path.join(settings.APP_DIR, 'merchants/amex', file_name)
 
         with open(path, 'w+') as f:
             f.write(input_file.get_detail())
@@ -267,7 +288,7 @@ class Amex(SourceFormat):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
         # TODO: Change BINK to suitable name
         file_name = '{}{}{}{}'.format(
-            'BINK',
+            'CHINGS',
             '_AXP_MER_REG_',
             arrow.now().format('YYYYMMDD_hhmmss'),
             '.txt'

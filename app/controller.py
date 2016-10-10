@@ -53,13 +53,14 @@ def export():
         v[0].export_merchants(v[1], True)
         v[0].export_merchants(v[2], False)
 
+        v[0].write_transaction_matched_csv(v[1])
+
 
 def validate_row_data(row):
     """Validate data within a row from the csv file"""
 
     if row['Postcode'] != '':
         if not validate_uk_postcode(row['Postcode']):
-            print("postcode fail", row['Postcode'])
             return False
 
     if row['Partner Name'] == '' or \

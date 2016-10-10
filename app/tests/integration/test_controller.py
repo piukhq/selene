@@ -5,11 +5,14 @@ from unittest.mock import patch
 
 
 class TestControllerFile(unittest.TestCase):
-    @patch('app.controller.PaymentCard.write_to_file')
-    def test_write_to_file(self, mock_write_to_file):
-        mock_write_to_file.return_value = True
+    @patch('app.agents.amex.Amex.write_to_file')
+    @patch('app.agents.visa.Visa.write_to_file')
+    def test_write_to_file(self, mock_write_to_file1, mock_write_to_file2):
+        mock_write_to_file1.return_value = True
+        mock_write_to_file2.return_value = True
         app.controller.export()
-        assert mock_write_to_file.called
+        assert mock_write_to_file1.called
+        assert mock_write_to_file2.called
 
     def test_output_write_to_file(self):
         app.controller.export()
