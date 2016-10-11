@@ -121,19 +121,39 @@ def insert_file_log(log):
 
 def send_email_and_archive(agent):
     """Send an email with generated MID data to each agent that requires it"""
-    yag = yagmail.SMTP(user='service@bink.com', password='pass', host='mail.bink.com', port='587')
+    yag = yagmail.SMTP(user=settings.EMAIL_SOURCE_CONFIG[0], password=settings.EMAIL_SOURCE_CONFIG[1],
+                       host=settings.EMAIL_SOURCE_CONFIG[2], port=settings.EMAIL_SOURCE_CONFIG[3])
     src_dir = os.path.join(settings.APP_DIR, 'merchants/'+agent)
     files = os.listdir(src_dir)
+
+    csv_files = fetch_files('csv')
+    start_line = 2
+    pcard = SourceFormat()
+    reader = CSVReader(pcard.column_names, pcard.delimiter, pcard.column_keep)
+
     for f in files:
-        if 'INVALID' is not in f:
-            contents = ['This is the body, and here is just text',
-                        'You can find an attachment here.', os.path.join(src_dir, f)]
-            yag.send('oe@bink.com', 'subject', contents)
-        # archive all files in this directory to destination directory...
-        dst_dir = src_dir + '/archive'
-        if not os.path.isdir(dst_dir):
-            os.makedirs(dst_dir)
-        copy_local(src_dir, dst_dir)
+        file_path = os.path.join(src_dir, f)
+        if not os.path.isdir(file_path):
+            if not 'INVALID' in f and 'cass' not in f:
+                partner_name = ''
+                for txt_file in csv_files:
+                    current_line = 0
+                    for row in reader(txt_file):
+                        current_line += 1
+                        if current_line >= start_line:
+                            partner_name = row['Partner Name']
+                            break
+
+                contents = ['Please load the attached MIDs for ' + partner_name + ' and confirm your forecast on-boarding date.']
+                attachments = file_path
+
+                yag.send(settings.EMAIL_TARGETS[agent], 'MID files for on-boarding with ' + partner_name, contents, attachments)
+
+    # archive all files in this directory to destination directory...
+    dst_dir = src_dir + '/archive'
+    if not os.path.isdir(dst_dir):
+        os.makedirs(dst_dir)
+    copy_local(src_dir, dst_dir)
 
 
 def copy_local(src_dir, dst_dir):
@@ -146,12 +166,13 @@ def copy_local(src_dir, dst_dir):
 
 
 if __name__ == '__main__':
-    #export()
+    export()
 
     # Amex only requires SFTP
-    #url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
-    #src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
-    #upload_sftp(url, username, password, src_dir, dst_dir)
+    url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
+    src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
+    upload_sftp(url, username, password, src_dir, dst_dir)
 
+    # Visa and Mastercard require an email
     send_email_and_archive('visa')
     send_email_and_archive('mastercard')

@@ -2,6 +2,7 @@ import csv
 import arrow
 import os
 import settings
+import random
 
 from openpyxl import Workbook
 
@@ -54,7 +55,7 @@ class Visa(SourceFormat):
 
     def write_transaction_matched_csv(self, merchants):
         try:
-            path = os.path.join(settings.APP_DIR, 'merchants/visa', 'cass_inp.csv')
+            path = os.path.join(settings.APP_DIR, 'merchants/visa', 'cass_inp_' + str(arrow.now()) + '.csv')
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
@@ -134,7 +135,7 @@ class Visa(SourceFormat):
         file_name = ''
 
         pv_num = 'nnn'
-        glb_mid = '12345'
+        glb_mid = str(random.random()*10000)
         mrch_name = 'MrchName'
 
         file_name = '{}{}{}{}{}{}'.format(

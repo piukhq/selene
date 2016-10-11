@@ -1,6 +1,8 @@
 arrow==0.8.0
 openpyxl
 yagmail
+shutil
+pysftp
 git+ssh://git@gitlab.loyaltyangels.local/Olympus/bigdatalib.git
 git+ssh://git@gitlab.loyaltyangels.local/Olympus/cassandralib.git
 git+ssh://git@gitlab.loyaltyangels.local/Olympus/handylib.git

@@ -19,3 +19,15 @@ TRANSACTION_MATCHING_FILES_CONFIG = [
     # sftp | slug | URL | username | password | dest
     ('sftp', 'amex', 'fsgateway.aexp.com', 'CHINGSPRD', 'taua@13', 'inbox'),
 ]
+
+EMAIL_SOURCE_CONFIG = [
+    # user | password | host | port
+    'mids@bink.com', 'supersecretsquirrelpassword', 'mail.bink.com', 587,
+]
+
+EMAIL_TARGETS = {
+    # merchant : email address
+    'visa': 'oe@bink.com',
+    'mastercard': 'oe@bink.com',
+}
+
