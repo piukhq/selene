@@ -119,37 +119,52 @@ def insert_file_log(log):
     db_client.close()
 
 
-def send_email_and_archive(agent):
-    """Send an email with generated MID data to each agent that requires it"""
-    yag = yagmail.SMTP(user=settings.EMAIL_SOURCE_CONFIG[0], password=settings.EMAIL_SOURCE_CONFIG[1],
-                       host=settings.EMAIL_SOURCE_CONFIG[2], port=settings.EMAIL_SOURCE_CONFIG[3])
-    src_dir = os.path.join(settings.APP_DIR, 'merchants/'+agent)
-    files = os.listdir(src_dir)
-
+def get_partner_name():
+    """Retrieve the partner name from the input csv file"""
     csv_files = fetch_files('csv')
     start_line = 2
     pcard = SourceFormat()
     reader = CSVReader(pcard.column_names, pcard.delimiter, pcard.column_keep)
 
+    pname = []
+    partner_name = ''
+    first = True
+    plural = False
+    for txt_file in csv_files:
+        current_line = 0
+        if first:
+            first = False
+        for row in reader(txt_file):
+            current_line += 1
+            if current_line >= start_line:
+                pname.append(row['Partner Name'])
+
+    s = set(pname)
+    if len(s) > 0:
+        for item in s:
+            partner_name += item + ', '
+        partner_name = partner_name[:-2]
+    else:
+        partner_name = s[0]
+
+    return partner_name
+
+def get_attachments(src_dir, partner_name):
+    """Send an email with generated MID data to each agent that requires it"""
+    files = os.listdir(src_dir)
+
+    attachments = []
     for f in files:
         file_path = os.path.join(src_dir, f)
         if not os.path.isdir(file_path):
             if not 'INVALID' in f and 'cass' not in f:
-                partner_name = ''
-                for txt_file in csv_files:
-                    current_line = 0
-                    for row in reader(txt_file):
-                        current_line += 1
-                        if current_line >= start_line:
-                            partner_name = row['Partner Name']
-                            break
+                attachments.append(file_path)
 
-                contents = ['Please load the attached MIDs for ' + partner_name + ' and confirm your forecast on-boarding date.']
-                attachments = file_path
+    return attachments
 
-                yag.send(settings.EMAIL_TARGETS[agent], 'MID files for on-boarding with ' + partner_name, contents, attachments)
 
-    # archive all files in this directory to destination directory...
+def archive_files(src_dir):
+    """Archive generated files"""
     dst_dir = src_dir + '/archive'
     if not os.path.isdir(dst_dir):
         os.makedirs(dst_dir)
@@ -164,15 +179,30 @@ def copy_local(src_dir, dst_dir):
             shutil.move(path, dst_dir)
 
 
+def send_email(agent, partner_name, contents, attachments=None):
+    """Send an email with MIDs"""
+    yag = yagmail.SMTP(user=settings.EMAIL_SOURCE_CONFIG[0], password=settings.EMAIL_SOURCE_CONFIG[1],
+                       host=settings.EMAIL_SOURCE_CONFIG[2], port=settings.EMAIL_SOURCE_CONFIG[3])
+
+    yag.send(settings.EMAIL_TARGETS[agent], 'MID files for on-boarding with ' + partner_name, contents, attachments)
+
 
 if __name__ == '__main__':
     export()
 
     # Amex only requires SFTP
-    url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
-    src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
-    upload_sftp(url, username, password, src_dir, dst_dir)
+    #url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
+    #src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
+    #upload_sftp(url, username, password, src_dir, dst_dir)
 
-    # Visa and Mastercard require an email
-    send_email_and_archive('visa')
-    send_email_and_archive('mastercard')
+    partner_name = get_partner_name()
+    contents = ['Please load the attached MIDs for ' + partner_name + ' and confirm your forecast on-boarding date.']
+
+    # VISA
+    src_dir = os.path.join(settings.APP_DIR, 'merchants/visa')
+    attachments = get_attachments(src_dir, partner_name)
+    send_email('visa', partner_name, contents, attachments)
+    archive_files(src_dir)
+
+    # MASTERCARD (requires no attachments)
+    send_email('mastercard', partner_name, contents)
