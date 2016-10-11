@@ -149,7 +149,7 @@ def get_partner_name():
 
     return partner_name
 
-def get_attachments(src_dir, partner_name):
+def get_attachments(src_dir):
     """Send an email with generated MID data to each agent that requires it"""
     files = os.listdir(src_dir)
 
@@ -200,7 +200,7 @@ if __name__ == '__main__':
 
     # VISA
     src_dir = os.path.join(settings.APP_DIR, 'merchants/visa')
-    attachments = get_attachments(src_dir, partner_name)
+    attachments = get_attachments(src_dir)
     send_email('visa', partner_name, contents, attachments)
     archive_files(src_dir)
 
