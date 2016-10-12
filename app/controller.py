@@ -131,13 +131,8 @@ def get_partner_name():
     reader = CSVReader(pcard.column_names, pcard.delimiter, pcard.column_keep)
 
     pname = []
-    partner_name = ''
-    first = True
-    plural = False
     for txt_file in csv_files:
         current_line = 0
-        if first:
-            first = False
         for row in reader(txt_file):
             current_line += 1
             if current_line >= start_line:
