@@ -1,5 +1,9 @@
 import os
 import settings
+try:
+    from os import scandir
+except ImportError:
+    from scandir import scandir
 
 from bigdatalib.schema import Schema
 from cassandralib.client import Client
@@ -139,13 +143,7 @@ def get_partner_name():
             if current_line >= start_line:
                 pname.append(row['Partner Name'])
 
-    s = set(pname)
-    if len(s) > 0:
-        for item in s:
-            partner_name += item + ', '
-        partner_name = partner_name[:-2]
-    else:
-        partner_name = s[0]
+    partner_name = ', '.join(set(pname))
 
     return partner_name
 
@@ -166,17 +164,15 @@ def get_attachments(src_dir):
 def archive_files(src_dir):
     """Archive generated files"""
     dst_dir = src_dir + '/archive'
-    if not os.path.isdir(dst_dir):
-        os.makedirs(dst_dir)
+    os.makedirs(dst_dir, exist_ok=True)
     copy_local(src_dir, dst_dir)
 
 
 def copy_local(src_dir, dst_dir):
-    files = os.listdir(src_dir)
-    for filename in files:
-        path = os.path.join(src_dir, filename)
-        if os.path.isfile(path):
-            shutil.move(path, dst_dir)
+    """Copy files locally from one directory to another"""
+    for entry in scandir(src_dir):
+        if entry.is_file(follow_symlinks=False):
+            shutil.move(entry.path, dst_dir)
 
 
 def send_email(agent, partner_name, contents, attachments=None):
