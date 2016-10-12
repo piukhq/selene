@@ -144,13 +144,11 @@ def get_partner_name():
 
 def get_attachments(src_dir):
     """Send an email with generated MID data to each agent that requires it"""
-    files = os.listdir(src_dir)
-
     attachments = []
-    for f in files:
-        file_path = os.path.join(src_dir, f)
-        if not os.path.isdir(file_path):
-            if not 'INVALID' in f and 'cass' not in f:
+    for entry in scandir(src_dir):
+        if entry.is_file(follow_symlinks=False):
+            file_path = entry.path
+            if not 'INVALID' in file_path and not 'cass' in file_path:
                 attachments.append(file_path)
 
     return attachments
