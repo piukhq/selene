@@ -60,7 +60,7 @@ class Visa(SourceFormat):
                 for merchant in merchants:
                     csv_writer.writerow(['visa',
                                          merchant['Visa MIDs'],
-                                         merchant['Scheme'].strip('"'),
+                                         merchant['Scheme'].strip('"').lower(),
                                          merchant['Partner Name'].strip('"')
                                          ])
 

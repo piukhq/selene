@@ -54,7 +54,7 @@ class MasterCard(SourceFormat):
                 for merchant in merchants:
                     csv_writer.writerow(['mastercard',
                                          merchant['MasterCard MIDs'],
-                                         merchant['Scheme'].strip('"'),
+                                         merchant['Scheme'].strip('"').lower(),
                                          merchant['Partner Name'].strip('"')
                                          ])
 

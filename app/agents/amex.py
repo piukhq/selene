@@ -173,7 +173,7 @@ class Amex(SourceFormat):
                 for merchant in merchants:
                     csv_writer.writerow(['amex',
                                          merchant['American Express MIDs'],
-                                         merchant['Scheme'].strip('"'),
+                                         merchant['Scheme'].strip('"').lower(),
                                          merchant['Partner Name'].strip('"')
                                          ])
 
