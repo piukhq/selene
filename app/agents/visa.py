@@ -21,8 +21,8 @@ class VisaMerchantFile():
         """
         ws1.title = "PVnnn_90523_Choice_20160101"
 
-        visa_header = ['GLB_MID', 'ACQUIRER_MID', 'GLB_MERCHANT_NAME', 'MERCHANT_CITY', 'POST_CODE', 'ADDRESS',
-                       'ALTERNATIVE_MERCHANT_NAME', 'STATUS', 'VISA_COMMENTS', 'MSG_COMMENTS'
+        visa_header = ['CUSTOMER_MERCHANT_ID', 'ACQUIRER_CAI', 'MERCHANT_NAME', 'MERCHANT_CITY', 'POST_CODE', 'ADDRESS',
+                       'ALTERNATIVE_MERCHANT_NAME', 'STATUS', 'VISA_VALIDATION_COMMENTS', 'CUSTOMER_COMMENTS'
                        ]
         ws1.append(visa_header)
 
@@ -102,7 +102,7 @@ class Visa(SourceFormat):
 
         for merchant in merchants:
             # TODO: 90523 might be partner ID or similar but is a BINK identifier; confirm
-            detail = ['90523', merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
+            detail = ['12723', merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
                       merchant['Postcode'],
                       merchant['Address (Building Name/Number, Street)'], '', 'New', '', '',
                       ]
@@ -135,13 +135,13 @@ class Visa(SourceFormat):
         file_name = ''
 
         pv_num = 'nnn'
-        glb_mid = str(random.random()*10000)
+        cust_merch_id = '12345'
         mrch_name = 'MrchName'
 
         file_name = '{}{}{}{}{}{}'.format(
             'PV',
             pv_num + '_',
-            glb_mid + '_',
+            cust_merch_id + '_',
             'BINK_',
             arrow.now().format('YYYYMMDD'),
             '.xlsx'
