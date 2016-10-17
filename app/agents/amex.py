@@ -167,13 +167,13 @@ class Amex(SourceFormat):
 
     def write_transaction_matched_csv(self, merchants):
         try:
-            path = os.path.join(settings.APP_DIR, 'merchants/amex', 'cass_inp.csv')
+            path = os.path.join(settings.APP_DIR, 'merchants/amex', 'cass_inp_' + str(arrow.now()) + '.csv')
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
                     csv_writer.writerow(['amex',
                                          merchant['American Express MIDs'],
-                                         merchant['Scheme'].strip('"'),
+                                         merchant['Scheme'].strip('"').lower(),
                                          merchant['Partner Name'].strip('"')
                                          ])
 
