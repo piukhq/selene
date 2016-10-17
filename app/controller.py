@@ -1,8 +1,15 @@
 import os
 import settings
+try:
+    from os import scandir
+except ImportError:
+    from scandir import scandir
 
 from bigdatalib.schema import Schema
 from cassandralib.client import Client
+import yagmail
+import pysftp
+import shutil
 
 from app.csvfile import CSVReader
 from app.utils import validate_uk_postcode
@@ -10,6 +17,19 @@ from app.utils import resolve_agent
 
 from app.source_format import SourceFormat
 from app.active import AGENTS
+
+
+def upload_sftp(url, username, password, src_dir, dst_dir):
+    """Upload all the files in the source directory to the sftp location url in the destination directory
+    with appropriate user credentials"""
+    with pysftp.Connection(url, username=username, password=password) as sftp:
+        files = os.listdir(src_dir)
+        for filename in files:
+            path = os.path.join(src_dir, filename)
+            if os.path.isfile(path):
+                src_path = path
+                dst_path = os.path.join(dst_dir, filename)
+                sftp.put(src_path, dst_path, preserve_mtime=True)
 
 
 def get_agent(partner_slug):
@@ -100,3 +120,77 @@ def insert_file_log(log):
     db_client.insert('file_logging', [log])
 
     db_client.close()
+
+
+def get_partner_name():
+    """Retrieve the partner name from the input csv file"""
+    csv_files = fetch_files('csv')
+    start_line = 2
+    pcard = SourceFormat()
+    reader = CSVReader(pcard.column_names, pcard.delimiter, pcard.column_keep)
+
+    pname = []
+    for txt_file in csv_files:
+        current_line = 0
+        for row in reader(txt_file):
+            current_line += 1
+            if current_line >= start_line:
+                pname.append(row['Partner Name'])
+
+    partner_name = ', '.join(set(pname))
+
+    return partner_name
+
+def get_attachments(src_dir):
+    """Send an email with generated MID data to each agent that requires it"""
+    attachments = []
+    for entry in scandir(src_dir):
+        if entry.is_file(follow_symlinks=False):
+            file_path = entry.path
+            if not 'INVALID' in file_path and not 'cass' in file_path:
+                attachments.append(file_path)
+
+    return attachments
+
+
+def archive_files(src_dir):
+    """Archive generated files"""
+    dst_dir = src_dir + '/archive'
+    os.makedirs(dst_dir, exist_ok=True)
+    copy_local(src_dir, dst_dir)
+
+
+def copy_local(src_dir, dst_dir):
+    """Copy files locally from one directory to another"""
+    for entry in scandir(src_dir):
+        if entry.is_file(follow_symlinks=False):
+            shutil.move(entry.path, dst_dir)
+
+
+def send_email(agent, partner_name, contents, attachments=None):
+    """Send an email with MIDs"""
+    yag = yagmail.SMTP(user=settings.EMAIL_SOURCE_CONFIG[0], password=settings.EMAIL_SOURCE_CONFIG[1],
+                       host=settings.EMAIL_SOURCE_CONFIG[2], port=settings.EMAIL_SOURCE_CONFIG[3])
+
+    yag.send(settings.EMAIL_TARGETS[agent], 'MID files for on-boarding with ' + partner_name, contents, attachments)
+
+
+if __name__ == '__main__':
+    export()
+
+    # Amex only requires SFTP
+    #url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
+    #src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
+    #upload_sftp(url, username, password, src_dir, dst_dir)
+
+    partner_name = get_partner_name()
+    contents = ['Please load the attached MIDs for ' + partner_name + ' and confirm your forecast on-boarding date.']
+
+    # VISA
+    src_dir = os.path.join(settings.APP_DIR, 'merchants/visa')
+    attachments = get_attachments(src_dir)
+    send_email('visa', partner_name, contents, attachments)
+    archive_files(src_dir)
+
+    # MASTERCARD (requires no attachments)
+    send_email('mastercard', partner_name, contents)
