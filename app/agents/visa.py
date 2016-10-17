@@ -2,6 +2,7 @@ import csv
 import arrow
 import os
 import settings
+import random
 
 from openpyxl import Workbook
 
@@ -20,8 +21,8 @@ class VisaMerchantFile():
         """
         ws1.title = "PVnnn_90523_Choice_20160101"
 
-        visa_header = ['GLB_MID', 'ACQUIRER_MID', 'GLB_MERCHANT_NAME', 'MERCHANT_CITY', 'POST_CODE', 'ADDRESS',
-                       'ALTERNATIVE_MERCHANT_NAME', 'STATUS', 'VISA_COMMENTS', 'MSG_COMMENTS'
+        visa_header = ['CUSTOMER_MERCHANT_ID', 'ACQUIRER_CAI', 'MERCHANT_NAME', 'MERCHANT_CITY', 'POST_CODE', 'ADDRESS',
+                       'ALTERNATIVE_MERCHANT_NAME', 'STATUS', 'VISA_VALIDATION_COMMENTS', 'CUSTOMER_COMMENTS'
                        ]
         ws1.append(visa_header)
 
@@ -54,7 +55,8 @@ class Visa(SourceFormat):
 
     def write_transaction_matched_csv(self, merchants):
         try:
-            path = os.path.join(settings.APP_DIR, 'merchants/visa', 'cass_inp.csv')
+            a = arrow.utcnow()
+            path = os.path.join(settings.APP_DIR, 'merchants/visa', 'cass_inp_visa_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv')
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
@@ -147,13 +149,13 @@ class Visa(SourceFormat):
         file_name = ''
 
         pv_num = 'nnn'
-        glb_mid = '12345'
+        cust_merch_id = '12345'
         mrch_name = 'MrchName'
 
         file_name = '{}{}{}{}{}{}'.format(
             'PV',
             pv_num + '_',
-            glb_mid + '_',
+            cust_merch_id + '_',
             'BINK_',
             arrow.now().format('YYYYMMDD'),
             '.xlsx'

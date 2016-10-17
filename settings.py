@@ -14,3 +14,20 @@ CASSANDRA_CLUSTER = ('192.168.1.60', '192.168.1.61',  '192.168.1.62')
 # CASSANDRA_CLUSTER=(['unknown', 'unknown', 'unknown')
 
 CASSANDRA_TRANSACTION_KEYSPACE = 'lakeyspace'
+
+TRANSACTION_MATCHING_FILES_CONFIG = [
+    # sftp | slug | URL | username | password | dest
+    ('sftp', 'amex', 'fsgateway.aexp.com', 'CHINGSPRD', 'taua@13', 'inbox'),
+]
+
+EMAIL_SOURCE_CONFIG = [
+    # user | password | host | port
+    'mids@bink.com', 'supersecretsquirrelpassword', 'mail.bink.com', 587,
+]
+
+EMAIL_TARGETS = {
+    # merchant : email address
+    'visa': 'oe@bink.com',
+    'mastercard': 'oe@bink.com',
+}
+
