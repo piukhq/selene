@@ -52,13 +52,11 @@ class MasterCard(SourceFormat):
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
-                    merchant_partner_town_field = merchant['Partner Name'].strip('"') + \
-                                          ' - ' + \
-                                          merchant['Town/City'].strip('"')
                     csv_writer.writerow(['mastercard',
                                          merchant['MasterCard MIDs'],
                                          merchant['Scheme'].strip('"').lower(),
-                                         merchant_partner_town_field,
+                                         merchant['Partner Name'].strip('"'),
+                                         merchant['Town/City'].strip('"'),
                                          ])
 
         except IOError as err:
