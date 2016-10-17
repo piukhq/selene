@@ -105,16 +105,16 @@ class Visa(SourceFormat):
         file = VisaMerchantFile()
 
         cnt = 0
+        reference_scheme_id = ''
         for merchant in merchants:
+            reference_scheme_id = merchant['Scheme ID']
             if validated:
-                # TODO: 90523 might be partner ID or similar but is a BINK identifier; confirm
-                detail = ['90523', merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
+                detail = [merchant['Scheme ID'], merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
                           merchant['Postcode'],
                           merchant['Address (Building Name/Number, Street)'], '', 'New', '', '',
                           ]
             else:
-                # TODO: 90523 might be partner ID or similar but is a BINK identifier; confirm
-                detail = ['90523', merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
+                detail = [merchant['Scheme ID'], merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
                           merchant['Postcode'],
                           merchant['Address (Building Name/Number, Street)'], '', 'New', '', reason[cnt],
                           ]
@@ -122,7 +122,7 @@ class Visa(SourceFormat):
             file.add_detail(detail)
             cnt += 1
 
-        file_name = self.create_file_name(validated)
+        file_name = self.create_file_name(validated, reference_scheme_id)
         try:
             self.write_to_file(file, file_name)
             status = 'written'
@@ -144,12 +144,12 @@ class Visa(SourceFormat):
         }
         # insert_file_log(log)
 
-    def create_file_name(self, validated):
+    def create_file_name(self, validated, reference_scheme_id):
         # e.g. PVnnn_GLBMID_BINK_yyyymmdd.xlsx
         file_name = ''
 
         pv_num = 'nnn'
-        cust_merch_id = '12345'
+        cust_merch_id = reference_scheme_id
         mrch_name = 'MrchName'
 
         file_name = '{}{}{}{}{}{}'.format(
