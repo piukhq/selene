@@ -91,7 +91,7 @@ class Visa(SourceFormat):
 
         wb.save(path)
 
-    def export_merchants(self, merchants, validated):
+    def export_merchants(self, merchants, validated, reason=[]):
         """
         uses a given set of merchants to generate a file in Visa input file format
         :param merchants: a list of merchants to send to Visa
@@ -102,13 +102,23 @@ class Visa(SourceFormat):
 
         file = VisaMerchantFile()
 
+        cnt = 0
         for merchant in merchants:
-            # TODO: 90523 might be partner ID or similar but is a BINK identifier; confirm
-            detail = ['90523', merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
-                      merchant['Postcode'],
-                      merchant['Address (Building Name/Number, Street)'], '', 'New', '', '',
-                      ]
+            if validated:
+                # TODO: 90523 might be partner ID or similar but is a BINK identifier; confirm
+                detail = ['90523', merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
+                          merchant['Postcode'],
+                          merchant['Address (Building Name/Number, Street)'], '', 'New', '', '',
+                          ]
+            else:
+                # TODO: 90523 might be partner ID or similar but is a BINK identifier; confirm
+                detail = ['90523', merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
+                          merchant['Postcode'],
+                          merchant['Address (Building Name/Number, Street)'], '', 'New', '', reason[cnt],
+                          ]
+
             file.add_detail(detail)
+            cnt += 1
 
         file_name = self.create_file_name(validated)
         try:

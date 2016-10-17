@@ -76,7 +76,7 @@ class MasterCard(SourceFormat):
 
         pass
 
-    def export_merchants(self, merchants, validated):
+    def export_merchants(self, merchants, validated, reason=[]):
         """
         uses a given set of merchants to generate a file in Visa input file format
         :param merchants: a list of merchants to send to Visa
