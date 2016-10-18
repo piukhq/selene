@@ -198,7 +198,7 @@ class Amex(SourceFormat):
             f.write(input_file.get_detail())
 
 
-    def export_merchants(self, merchants, validated):
+    def export_merchants(self, merchants, validated, reason=[]):
         """
         uses a given set of merchants to generate a file in Amex input file format
         :param merchants: a list of merchants to send to Amex
@@ -227,7 +227,11 @@ class Amex(SourceFormat):
         file.set_header(header)
         file.set_footer(footer)
 
-        for merchant in merchants:
+        for count, merchant in enumerate(merchants):
+            if validated:
+                the_reason = ''
+            else:
+                the_reason = reason[count]
             detail = AmexDetail(
                 action_code=merchant['Action'],  # A=Add, U=Update, D=Delete
                 partner_id='AADP0050',
@@ -257,11 +261,10 @@ class Amex(SourceFormat):
                 geographical_code_longitude='',
                 custom_field_1='',
                 custom_field_2='',
-                filler=''
+                filler=the_reason
             )
 
             file.add_detail(detail)
-
 
         file_name = self.create_file_name(validated)
         try:

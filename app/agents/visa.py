@@ -91,7 +91,7 @@ class Visa(SourceFormat):
 
         wb.save(path)
 
-    def export_merchants(self, merchants, validated):
+    def export_merchants(self, merchants, validated, reason=[]):
         """
         uses a given set of merchants to generate a file in Visa input file format
         :param merchants: a list of merchants to send to Visa
@@ -102,15 +102,21 @@ class Visa(SourceFormat):
 
         file = VisaMerchantFile()
 
-        for merchant in merchants:
-            # TODO: 90523 might be partner ID or similar but is a BINK identifier; confirm
-            detail = ['12723', merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
+        reference_scheme_id = ''
+        for count, merchant in enumerate(merchants):
+            reference_scheme_id = merchant['Scheme ID']
+            detail = [merchant['Scheme ID'], merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
                       merchant['Postcode'],
-                      merchant['Address (Building Name/Number, Street)'], '', 'New', '', '',
+                      merchant['Address (Building Name/Number, Street)'], '', 'New', '',
                       ]
+            if validated:
+                detail.append('')
+            else:
+                detail.append(reason[count])
+
             file.add_detail(detail)
 
-        file_name = self.create_file_name(validated)
+        file_name = self.create_file_name(validated, reference_scheme_id)
         try:
             self.write_to_file(file, file_name)
             status = 'written'
@@ -132,12 +138,12 @@ class Visa(SourceFormat):
         }
         # insert_file_log(log)
 
-    def create_file_name(self, validated):
+    def create_file_name(self, validated, reference_scheme_id):
         # e.g. PVnnn_GLBMID_BINK_yyyymmdd.xlsx
         file_name = ''
 
         pv_num = 'nnn'
-        cust_merch_id = '12345'
+        cust_merch_id = reference_scheme_id
         mrch_name = 'MrchName'
 
         file_name = '{}{}{}{}{}{}'.format(

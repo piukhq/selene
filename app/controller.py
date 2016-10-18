@@ -53,7 +53,8 @@ def export():
         agent_instance = get_agent(k)
         valid_merchants = []
         invalid_merchants = []
-        card_data.update({k:[agent_instance, valid_merchants, invalid_merchants]})
+        reasons = []
+        card_data.update({k:[agent_instance, valid_merchants, invalid_merchants, reasons]})
 
     for txt_file in files:
         current_line = 0
@@ -62,15 +63,23 @@ def export():
             current_line += 1
 
             if current_line >= start_line:
+                has_mid = False
                 for k, v in card_data.items():
-                    if v[0].has_mid(row) and validate_row_data(row):
+                    if v[0].has_mid(row):
+                        has_mid = True
+                    validated, reasons = validate_row_data(row)
+                    if validated and has_mid:
                         v[1].append(row)
                     else:
+                        if not has_mid:
+                            reasons += 'Missing MID. '
+                        reasons += 'Line no. {} of file {}'.format(current_line, txt_file)
                         v[2].append(row)
+                        v[3].append(reasons)
 
     for k, v in card_data.items():
         v[0].export_merchants(v[1], True)
-        v[0].export_merchants(v[2], False)
+        v[0].export_merchants(v[2], False, v[3])
 
         v[0].write_transaction_matched_csv(v[1])
 
@@ -78,17 +87,28 @@ def export():
 def validate_row_data(row):
     """Validate data within a row from the csv file"""
 
+    validated = True
+    reasons = ''
+
     if row['Postcode'] != '':
         if not validate_uk_postcode(row['Postcode']):
-            return False
+            reasons = 'Invalid post code. '
+            validated = False
 
-    if row['Partner Name'] == '' or \
-        row['Address (Building Name/Number, Street)'] == '' or \
-        row['Town/City'] == '' or \
-        row['Action'] == '':
-        return False
+    if row['Partner Name'] == '':
+        reasons += 'Invalid Partner Name. '
+        validated = False
+    if row['Address (Building Name/Number, Street)'] == '':
+        reasons += 'Invalid Address. '
+        validated = False
+    if row['Town/City'] == '':
+        reasons += 'Invalid Town/City. '
+        validated = False
+    if row['Action'] == '':
+        reasons += 'Invalid Action. '
+        validated = False
 
-    return True
+    return validated, reasons
 
 
 def fetch_files(file_extension):
