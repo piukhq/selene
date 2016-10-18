@@ -104,9 +104,8 @@ class Visa(SourceFormat):
 
         file = VisaMerchantFile()
 
-        cnt = 0
         reference_scheme_id = ''
-        for merchant in merchants:
+        for count, merchant in enumerate(merchants):
             reference_scheme_id = merchant['Scheme ID']
             if validated:
                 detail = [merchant['Scheme ID'], merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
@@ -116,11 +115,10 @@ class Visa(SourceFormat):
             else:
                 detail = [merchant['Scheme ID'], merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
                           merchant['Postcode'],
-                          merchant['Address (Building Name/Number, Street)'], '', 'New', '', reason[cnt],
+                          merchant['Address (Building Name/Number, Street)'], '', 'New', '', reason[count],
                           ]
 
             file.add_detail(detail)
-            cnt += 1
 
         file_name = self.create_file_name(validated, reference_scheme_id)
         try:

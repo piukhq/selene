@@ -229,12 +229,11 @@ class Amex(SourceFormat):
         file.set_header(header)
         file.set_footer(footer)
 
-        cnt = 0
-        for merchant in merchants:
+        for count, merchant in enumerate(merchants):
             if validated:
                 the_reason = ''
             else:
-                the_reason = reason[cnt]
+                the_reason = reason[count]
             detail = AmexDetail(
                 action_code=merchant['Action'],  # A=Add, U=Update, D=Delete
                 partner_id='AADP0050',
@@ -268,8 +267,6 @@ class Amex(SourceFormat):
             )
 
             file.add_detail(detail)
-            cnt += 1
-
 
         file_name = self.create_file_name(validated)
         try:
