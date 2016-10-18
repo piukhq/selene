@@ -107,16 +107,14 @@ class Visa(SourceFormat):
         reference_scheme_id = ''
         for count, merchant in enumerate(merchants):
             reference_scheme_id = merchant['Scheme ID']
+            detail = [merchant['Scheme ID'], merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
+                      merchant['Postcode'],
+                      merchant['Address (Building Name/Number, Street)'], '', 'New', '',
+                      ]
             if validated:
-                detail = [merchant['Scheme ID'], merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
-                          merchant['Postcode'],
-                          merchant['Address (Building Name/Number, Street)'], '', 'New', '', '',
-                          ]
+                detail.append('')
             else:
-                detail = [merchant['Scheme ID'], merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
-                          merchant['Postcode'],
-                          merchant['Address (Building Name/Number, Street)'], '', 'New', '', reason[count],
-                          ]
+                detail.append(reason[count])
 
             file.add_detail(detail)
 
