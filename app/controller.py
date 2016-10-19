@@ -90,7 +90,7 @@ def validate_row_data(row):
     validated = True
     reasons = ''
 
-    if not validate_uk_postcode(row['Postcode']):
+    if not validate_uk_postcode(row['Postcode'].strip('"')):
         reasons = 'Invalid post code. '
         validated = False
 
