@@ -192,7 +192,7 @@ def send_email(agent, partner_name, contents, attachments=None):
                        host=settings.EMAIL_SOURCE_CONFIG[2], port=settings.EMAIL_SOURCE_CONFIG[3],
                        smtp_starttls=False, smtp_skip_login=True)
 
-    yag.send(settings.EMAIL_TARGETS[agent], 'MID files for on-boarding with ' + partner_name, contents, attachments)
+    yag.send(settings.EMAIL_TARGETS[agent.lower()], agent + ' MID files for on-boarding with ' + partner_name, contents, attachments)
 
 
 if __name__ == '__main__':
@@ -209,8 +209,8 @@ if __name__ == '__main__':
     # VISA
     src_dir = os.path.join(settings.APP_DIR, 'merchants/visa')
     attachments = get_attachments(src_dir)
-    send_email('visa', partner_name, contents, attachments)
+    send_email('Visa', partner_name, contents, attachments)
     archive_files(src_dir)
 
     # MASTERCARD (requires no attachments)
-    send_email('mastercard', partner_name, contents)
+    send_email('Mastercard', partner_name, contents)
