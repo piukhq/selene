@@ -192,7 +192,7 @@ def send_email(agent, partner_name, contents, attachments=None):
                        host=settings.EMAIL_SOURCE_CONFIG[2], port=settings.EMAIL_SOURCE_CONFIG[3],
                        smtp_starttls=False, smtp_skip_login=True)
 
-    yag.send(settings.EMAIL_TARGETS[agent], 'MID files for on-boarding with ' + partner_name, contents, attachments)
+    yag.send(settings.EMAIL_TARGETS[agent], agent.title() + ' MID files for on-boarding with ' + partner_name, contents, attachments)
 
 
 if __name__ == '__main__':
