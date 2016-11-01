@@ -189,7 +189,8 @@ def copy_local(src_dir, dst_dir):
 def send_email(agent, partner_name, contents, attachments=None):
     """Send an email with MIDs"""
     yag = yagmail.SMTP(user=settings.EMAIL_SOURCE_CONFIG[0], password=settings.EMAIL_SOURCE_CONFIG[1],
-                       host=settings.EMAIL_SOURCE_CONFIG[2], port=settings.EMAIL_SOURCE_CONFIG[3])
+                       host=settings.EMAIL_SOURCE_CONFIG[2], port=settings.EMAIL_SOURCE_CONFIG[3],
+                       smtp_starttls=False, smtp_skip_login=True)
 
     yag.send(settings.EMAIL_TARGETS[agent], 'MID files for on-boarding with ' + partner_name, contents, attachments)
 
@@ -198,9 +199,9 @@ if __name__ == '__main__':
     export()
 
     # Amex only requires SFTP
-    #url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
-    #src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
-    #upload_sftp(url, username, password, src_dir, dst_dir)
+    url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
+    src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
+    upload_sftp(url, username, password, src_dir, dst_dir)
 
     partner_name = get_partner_name()
     contents = ['Please load the attached MIDs for ' + partner_name + ' and confirm your forecast on-boarding date.']

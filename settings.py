@@ -17,17 +17,18 @@ CASSANDRA_TRANSACTION_KEYSPACE = 'lakeyspace'
 
 TRANSACTION_MATCHING_FILES_CONFIG = [
     # sftp | slug | URL | username | password | dest
-    ('sftp', 'amex', 'fsgateway.aexp.com', 'CHINGSPRD', 'taua@13', 'inbox'),
+    #('sftp', 'amex', 'fsgateway.aexp.com', 'CHINGSPRD', 'taua@13', 'inbox'),
+    'sftp', 'amex', '192.168.1.13', 'amexsftp', 'am3xr00lz', 'inbox',
 ]
 
 EMAIL_SOURCE_CONFIG = [
     # user | password | host | port
-    'mids@bink.com', 'supersecretsquirrelpassword', 'mail.bink.com', 587,
+    'mids@bink.com', '=Yg4CaG@6K', 'mail.bink.com', 25,
 ]
 
 EMAIL_TARGETS = {
     # merchant : email address
-    'visa': 'oe@bink.com',
-    'mastercard': 'oe@bink.com',
+    'visa': 'mids@bink.com',
+    'mastercard': 'mids@bink.com',
 }
 
