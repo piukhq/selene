@@ -1,5 +1,7 @@
 import os
 import settings
+import csv
+
 try:
     from os import scandir
 except ImportError:
@@ -42,6 +44,34 @@ def get_agent(partner_slug):
         raise(ex)
 
 
+def export_mastercard():
+    files = fetch_files('psv')
+    agent_instance = get_agent('mastercard')
+    merchants = []
+
+    for txt_file in files:
+        with open(txt_file, newline='') as csvfile:
+            mcardreader = csv.reader(csvfile, delimiter='|')
+
+            for count, row in enumerate(mcardreader):
+                if count == 0:
+                    continue
+                elif count == int(row[0]):
+                    # EOF
+                    break
+                else:
+                    merchant = {}
+                    merchant['MasterCard MIDs'] = row[5]
+                    merchant['Partner Name'] = row[7]
+                    merchant['Town/City'] = row[13]
+                    merchant['Scheme'] = row[39]
+
+                    merchants.append(merchant)
+
+        if len(merchants):
+            agent_instance.write_transaction_matched_csv(merchants)
+
+
 def export():
     files = fetch_files('csv')
     start_line = 2
@@ -50,11 +80,12 @@ def export():
 
     card_data = {}
     for k, v in AGENTS.items():
-        agent_instance = get_agent(k)
-        valid_merchants = []
-        invalid_merchants = []
-        reasons = []
-        card_data.update({k:[agent_instance, valid_merchants, invalid_merchants, reasons]})
+        if k != 'mastercard':
+            agent_instance = get_agent(k)
+            valid_merchants = []
+            invalid_merchants = []
+            reasons = []
+            card_data.update({k:[agent_instance, valid_merchants, invalid_merchants, reasons]})
 
     for txt_file in files:
         current_line = 0
@@ -65,24 +96,26 @@ def export():
             if current_line >= start_line:
                 has_mid = False
                 for k, v in card_data.items():
-                    if v[0].has_mid(row):
-                        has_mid = True
-                    validated, reasons = validate_row_data(row)
-                    if validated and has_mid:
-                        v[1].append(row)
-                    else:
-                        if not has_mid:
-                            reasons += 'Missing MID. '
-                        reasons += 'Line no. {} of file {}'.format(current_line, txt_file)
-                        v[2].append(row)
-                        v[3].append(reasons)
+                    if k != 'mastercard':
+                        if v[0].has_mid(row):
+                            has_mid = True
+                        validated, reasons = validate_row_data(row)
+                        if validated and has_mid:
+                            v[1].append(row)
+                        else:
+                            if not has_mid:
+                                reasons += 'Missing MID. '
+                            reasons += 'Line no. {} of file {}'.format(current_line, txt_file)
+                            v[2].append(row)
+                            v[3].append(reasons)
 
     for k, v in card_data.items():
-        v[0].export_merchants(v[1], True)
-        v[0].export_merchants(v[2], False, v[3])
+        if k != 'mastercard':
+            v[0].export_merchants(v[1], True)
+            v[0].export_merchants(v[2], False, v[3])
 
-        if len(v[1]):
-            v[0].write_transaction_matched_csv(v[1])
+            if len(v[1]):
+                v[0].write_transaction_matched_csv(v[1])
 
 
 def validate_row_data(row):
@@ -197,6 +230,7 @@ def send_email(agent, partner_name, contents, attachments=None):
 
 
 if __name__ == '__main__':
+    export_mastercard()
     export()
 
     # Amex only requires SFTP

@@ -37,12 +37,12 @@ class MasterCard(SourceFormat):
 
     def has_mid(self, row):
         """return True if there is a mastercard mid in the row"""
-        if row['MasterCard MIDs'] != '':
+        """if row['MasterCard MIDs'] != '':
             try:
                 mid = int(row['MasterCard MIDs'])
                 return True
             except:
-                return False
+                return False"""
 
         return False
 
@@ -65,6 +65,7 @@ class MasterCard(SourceFormat):
         except IOError as err:
             status = 'error'
             raise Exception('Error writing file:' + path)
+
 
     @staticmethod
     def write_to_file(input_file, file_name):
