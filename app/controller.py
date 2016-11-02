@@ -229,8 +229,7 @@ def send_email(agent, partner_name, contents, attachments=None):
     yag.send(settings.EMAIL_TARGETS[agent], agent.title() + ' MID files for on-boarding with ' + partner_name, contents, attachments)
 
 
-if __name__ == '__main__':
-    export_mastercard()
+def onboard_mids():
     export()
 
     # Amex only requires SFTP
@@ -249,3 +248,18 @@ if __name__ == '__main__':
 
     # MASTERCARD (requires no attachments)
     send_email('mastercard', partner_name, contents)
+
+def process_mastercard_handback_file():
+    export_mastercard()
+
+
+if __name__ == '__main__':
+    decision = input('Selene asks that you choose your fate from our funky laser display board:\n'
+                     '1) Onboard MIDs\n'
+                     '2) Process Mastercard handback file\n')
+    if decision == '1':
+        onboard_mids()
+    elif decision == '2':
+        process_mastercard_handback_file()
+    else:
+        print("Invalid choice, you must select 1 or 2.  Exiting program.")
