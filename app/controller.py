@@ -81,7 +81,8 @@ def export():
         v[0].export_merchants(v[1], True)
         v[0].export_merchants(v[2], False, v[3])
 
-        v[0].write_transaction_matched_csv(v[1])
+        if len(v[1]):
+            v[0].write_transaction_matched_csv(v[1])
 
 
 def validate_row_data(row):

@@ -49,7 +49,8 @@ class MasterCard(SourceFormat):
     def write_transaction_matched_csv(self, merchants):
         try:
             a = arrow.utcnow()
-            path = os.path.join(settings.APP_DIR, 'merchants/mastercard', 'cass_inp_mastercard_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv')
+            filename = 'cass_inp_mastercard_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
+            path = os.path.join(settings.APP_DIR, 'merchants/mastercard', filename)
 
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
@@ -57,7 +58,7 @@ class MasterCard(SourceFormat):
                     csv_writer.writerow(['mastercard',
                                          merchant['MasterCard MIDs'],
                                          merchant['Scheme'].strip('"').lower(),
-                                         merchant['Partner Name'].strip('"'),
+                                         merchant['Partner Name'].strip('"').replace(' ', ''),
                                          merchant['Town/City'].strip('"'),
                                          ])
 
