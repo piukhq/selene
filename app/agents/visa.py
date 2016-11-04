@@ -44,10 +44,13 @@ class Visa(SourceFormat):
 
     def has_mid(self, row):
         """return True if there is a visa mid in the row"""
-        if row['Visa MIDs'] != '':
+        if row['Visa MIDs'] != '' and row['Visa MIDs'] is not None:
             try:
                 mid = int(row['Visa MIDs'])
-                return True
+                if type(mid) is int:
+                    return True
+                else:
+                    return False
             except:
                 return False
 
