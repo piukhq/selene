@@ -94,8 +94,8 @@ def export():
             current_line += 1
 
             if current_line >= start_line:
-                has_mid = False
                 for k, v in card_data.items():
+                    has_mid = False
                     if k != 'mastercard':
                         if v[0].has_mid(row):
                             has_mid = True
