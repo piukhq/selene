@@ -159,10 +159,7 @@ class Amex(SourceFormat):
         if row['American Express MIDs'] != '' and row['American Express MIDs'] is not None:
             try:
                 mid = int(row['American Express MIDs'])
-                if type(mid) is int:
-                    return True
-                else:
-                    return False
+                return True
             except:
                 return False
 

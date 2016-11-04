@@ -47,10 +47,7 @@ class Visa(SourceFormat):
         if row['Visa MIDs'] != '' and row['Visa MIDs'] is not None:
             try:
                 mid = int(row['Visa MIDs'])
-                if type(mid) is int:
-                    return True
-                else:
-                    return False
+                return True
             except:
                 return False
 
