@@ -48,6 +48,7 @@ def export_mastercard():
     files = fetch_files('psv')
     agent_instance = get_agent('mastercard')
     merchants = []
+    footer_id = 30
 
     for txt_file in files:
         with open(txt_file, newline='') as csvfile:
@@ -56,7 +57,7 @@ def export_mastercard():
             for count, row in enumerate(mcardreader):
                 if count == 0:
                     continue
-                elif count == int(row[0]):
+                elif footer_id == int(row[0]):
                     # EOF
                     break
                 else:
