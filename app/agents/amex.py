@@ -141,7 +141,7 @@ class AmexMerchantFile():
         })
 
 
-class Amex(SourceFormat):
+class Amex():
     def __init__(self):
         pass
 
