@@ -38,7 +38,7 @@ class VisaMerchantFile():
         self.visa_lines.append(detail)
 
 
-class Visa(SourceFormat):
+class Visa():
     def __init__(self):
         pass
 

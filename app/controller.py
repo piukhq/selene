@@ -47,7 +47,7 @@ def get_agent(partner_slug):
 def export_mastercard():
     files = fetch_files('psv')
     agent_instance = get_agent('mastercard')
-    merchants = []
+    merchants = set()
     footer_id = 30
 
     for txt_file in files:
@@ -61,16 +61,22 @@ def export_mastercard():
                     # EOF
                     break
                 else:
-                    merchant = {}
-                    merchant['MasterCard MIDs'] = row[5]
-                    merchant['Partner Name'] = row[7]
-                    merchant['Town/City'] = row[13]
-                    merchant['Scheme'] = row[39]
+                    if agent_instance.has_mid(row[5]):
+                        merchant = (row[5], row[7], row[13], row[45])
+                        merchants.add(merchant)
+                    else:
+                        print("Invalid MID, row: {}".format(count))
 
-                    merchants.append(merchant)
-
-        if len(merchants):
-            agent_instance.write_transaction_matched_csv(merchants)
+    if len(merchants):
+        prepped_merchants = []
+        for merc in merchants:
+            merc_dict = {}
+            merc_dict['MasterCard MIDs'] = merc[0]
+            merc_dict['Partner Name'] = merc[1]
+            merc_dict['Town/City'] = merc[2]
+            merc_dict['Scheme'] = merc[3]
+            prepped_merchants.append(merc_dict)
+        agent_instance.write_transaction_matched_csv(prepped_merchants)
 
 
 def export():
