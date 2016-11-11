@@ -1,7 +1,6 @@
 arrow==0.8.0
 openpyxl
 yagmail
-shutil
 pysftp
 scandir
 git+ssh://git@gitlab.loyaltyangels.local/Olympus/bigdatalib.git
