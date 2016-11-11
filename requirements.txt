@@ -3,6 +3,6 @@ openpyxl
 yagmail
 pysftp
 scandir
-git+ssh://git@gitlab.loyaltyangels.local/Olympus/bigdatalib.git
-git+ssh://git@gitlab.loyaltyangels.local/Olympus/cassandralib.git
-git+ssh://git@gitlab.loyaltyangels.local/Olympus/handylib.git
+git+ssh://git@gitlab.com/olympus-libs/bigdatalib.git
+git+ssh://git@gitlab.com/olympus-libs/cassandralib.git
+git+ssh://git@gitlab.com/olympus-libs/handylib.git
