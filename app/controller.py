@@ -61,11 +61,11 @@ def export_mastercard():
                     # EOF
                     break
                 else:
-                    if agent_instance.has_mid(row[5]):
-                        merchant = (row[5], row[7], row[13], row[45])
+                    if agent_instance.has_mid(row[23]):
+                        merchant = (row[23], row[7], row[13], row[45])
                         merchants.add(merchant)
                     else:
-                        print("Invalid MID, row: {}".format(count))
+                        print("Invalid MID, row: {}, file: {}".format(count, txt_file))
 
     if len(merchants):
         prepped_merchants = []
