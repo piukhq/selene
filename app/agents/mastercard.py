@@ -39,7 +39,7 @@ class MasterCard():
         """return True if there is a mastercard mid in the row"""
 
         try:
-            if len(row[5]):
+            if len(str(row)):
                 return True
         except:
             pass
