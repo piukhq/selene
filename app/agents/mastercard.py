@@ -35,14 +35,11 @@ class MasterCard():
     def __init__(self):
         pass
 
-    def has_mid(self, row):
+    def has_mid(self, element):
         """return True if there is a mastercard mid in the row"""
 
-        try:
-            if len(str(row)):
-                return True
-        except:
-            pass
+        if len(str(element)):
+            return True
 
         return False
 
