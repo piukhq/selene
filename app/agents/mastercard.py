@@ -67,7 +67,7 @@ class MasterCard():
     def write_duplicates_csv(self, duplicates):
         try:
             a = arrow.utcnow()
-            filename = 'dups_mastercard.txt'
+            filename = 'duplicates_mastercard_{}.txt'.format(a.format('DD-MM-YYYY'))
             path = os.path.join(settings.APP_DIR, 'merchants/mastercard', filename)
 
             with open(path, 'w') as dup_file:
