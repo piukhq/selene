@@ -64,6 +64,21 @@ class MasterCard():
             raise Exception('Error writing file:' + path)
 
 
+    def write_duplicates_csv(self, duplicates):
+        try:
+            a = arrow.utcnow()
+            filename = 'dups_mastercard.csv'
+            path = os.path.join(settings.APP_DIR, 'merchants/mastercard', filename)
+
+            with open(path, 'w') as dup_file:
+                for dup in duplicates:
+                    dup_file.write(dup + '\n')
+
+        except IOError as err:
+            status = 'error'
+            raise Exception('Error writing file:' + path)
+
+
     @staticmethod
     def write_to_file(input_file, file_name):
         """
