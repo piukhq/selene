@@ -138,9 +138,6 @@ def validate_row_data(row):
     if row['Partner Name'] == '':
         reasons += 'Invalid Partner Name. '
         validated = False
-    if row['Address (Building Name/Number, Street)'] == '':
-        reasons += 'Invalid Address. '
-        validated = False
     if row['Town/City'] == '':
         reasons += 'Invalid Town/City. '
         validated = False
@@ -259,14 +256,62 @@ def onboard_mids():
 def process_mastercard_handback_file():
     export_mastercard()
 
+def handle_duplicate_MIDs_in_mastercard_handback_files():
+    files = fetch_files('psv')
+    agent_instance = get_agent('mastercard')
+    footer_id = 30
+    mids = []
+
+    for txt_file in files:
+        with open(txt_file, newline='') as csvfile:
+            mcardreader = csv.reader(csvfile, delimiter='|')
+
+            for count, row in enumerate(mcardreader):
+                if count == 0:
+                    continue
+                elif footer_id == int(row[0]):
+                    # EOF
+                    break
+                else:
+                    if agent_instance.has_mid(row[23]):
+                        mids.append([row[23], count, txt_file])
+                    else:
+                        print("Invalid MID, row: {}, file: {}".format(count, txt_file))
+
+    duplicates = set()
+    dup_mids = set()
+    for i in range(0, len(mids)):
+        found = False
+        dup = False
+
+        for j in range(0, len(mids)):
+            if found and mids[i][0] == mids[j][0] and i != j:
+                dup = True
+            if mids[i][0] == mids[j][0] and i != j:
+                found = True
+        if dup:
+            msg = "Duplicate MID: {} found on line number {} in file {}".format(mids[i][0], mids[i][1], mids[i][2])
+            duplicates.add(msg)
+            dup_mids.add(mids[i][0])
+
+    if len(dup_mids):
+        print(dup_mids)
+
+        agent_instance.write_duplicates_csv(duplicates)
+    else:
+        print("No duplicates found.")
+
 
 if __name__ == '__main__':
     decision = input('Selene asks that you choose your fate from our funky laser display board:\n'
                      '1) Onboard MIDs\n'
-                     '2) Process Mastercard handback file\n')
+                     '2) Process Mastercard handback file(s)\n'
+                     '3) Find duplicate MIDs in Mastercard handback file(s)\n')
     if decision == '1':
         onboard_mids()
     elif decision == '2':
         process_mastercard_handback_file()
+    elif decision == '3':
+        handle_duplicate_MIDs_in_mastercard_handback_files()
     else:
-        print("Invalid choice, you must select 1 or 2.  Exiting program.")
+        print("Invalid choice, you must select 1, 2, or 3.  Exiting program.")
