@@ -64,7 +64,7 @@ class MasterCard():
             raise Exception('Error writing file:' + path)
 
 
-    def write_duplicates_csv(self, duplicates):
+    def write_duplicates_file(self, duplicates):
         try:
             a = arrow.utcnow()
             filename = 'duplicates_mastercard_{}.txt'.format(a.format('DD-MM-YYYY'))
