@@ -282,14 +282,15 @@ def handle_duplicate_MIDs_in_mastercard_handback_files():
     dup_mids = set()
     for i in range(0, len(mids)):
         found = False
-        dup = False
 
         for j in range(0, len(mids)):
-            if found and mids[i][0] == mids[j][0] and i != j:
-                dup = True
-            if mids[i][0] == mids[j][0] and i != j:
-                found = True
-        if dup:
+            if i != j:
+                if found:
+                    break
+                if (mids[i][0] == mids[j][0]):
+                    found = True
+
+        if found:
             msg = "Duplicate MID: {} found on line number {} in file {}".format(mids[i][0], mids[i][1], mids[i][2])
             duplicates.add(msg)
             dup_mids.add(mids[i][0])
@@ -297,7 +298,7 @@ def handle_duplicate_MIDs_in_mastercard_handback_files():
     if len(dup_mids):
         print(dup_mids)
 
-        agent_instance.write_duplicates_csv(duplicates)
+        agent_instance.write_duplicates_file(duplicates)
     else:
         print("No duplicates found.")
 

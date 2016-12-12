@@ -64,13 +64,14 @@ class MasterCard():
             raise Exception('Error writing file:' + path)
 
 
-    def write_duplicates_csv(self, duplicates):
+    def write_duplicates_file(self, duplicates):
         try:
             a = arrow.utcnow()
-            filename = 'dups_mastercard.csv'
+            filename = 'duplicates_mastercard_{}.txt'.format(a.format('DD-MM-YYYY'))
             path = os.path.join(settings.APP_DIR, 'merchants/mastercard', filename)
 
             with open(path, 'w') as dup_file:
+                dup_file.write('Date of file creation: {}\n'.format(a.format('DD-MM-YYYY')))
                 for dup in duplicates:
                     dup_file.write(dup + '\n')
 
