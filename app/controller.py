@@ -236,25 +236,26 @@ def send_email(agent, partner_name, contents, attachments=None):
     yag.send(settings.EMAIL_TARGETS[agent], agent.title() + ' MID files for on-boarding with ' + partner_name, contents, attachments)
 
 
-def onboard_mids():
+def onboard_mids(send_export_files):
     export()
 
     # Amex only requires SFTP
     url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
     src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
-    # upload_sftp(url, username, password, src_dir, dst_dir)
+    if send_export_files:
+        upload_sftp(url, username, password, src_dir, dst_dir)
 
     partner_name = get_partner_name()
     contents = ['Please load the attached MIDs for ' + partner_name + ' and confirm your forecast on-boarding date.']
 
-    # VISA
+    # Visa & MasterCard
     src_dir = os.path.join(settings.APP_DIR, 'merchants/visa')
     attachments = get_attachments(src_dir)
-    #send_email('visa', partner_name, contents, attachments)
+    if send_export_files:
+        send_email('visa', partner_name, contents, attachments)
+        send_email('mastercard', partner_name, contents)
     archive_files(src_dir)
 
-    # MASTERCARD (requires no attachments)
-    #send_email('mastercard', partner_name, contents)
 
 def process_mastercard_handback_file():
     export_mastercard()
@@ -307,15 +308,21 @@ def handle_duplicate_MIDs_in_mastercard_handback_files():
 
 
 if __name__ == '__main__':
-    decision = input('Selene asks that you choose your fate from our funky laser display board:\n'
+
+    decision1 = input('Selene asks that you choose your fate from our funky laser display board:\n'
                      '1) Onboard MIDs\n'
                      '2) Process Mastercard handback file(s)\n'
                      '3) Find duplicate MIDs in Mastercard handback file(s)\n')
-    if decision == '1':
-        onboard_mids()
-    elif decision == '2':
+    if decision1 == '1':
+        decision2 = input('Do you want to send the export files now? Yes/No\n')
+        if decision2.lower() == 'yes':
+            send_export_files = True
+        else:
+            send_export_files = False
+        onboard_mids(send_export_files)
+    elif decision1 == '2':
         process_mastercard_handback_file()
-    elif decision == '3':
+    elif decision1 == '3':
         handle_duplicate_MIDs_in_mastercard_handback_files()
     else:
         print("Invalid choice, you must select 1, 2, or 3.  Exiting program.")
