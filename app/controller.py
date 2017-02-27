@@ -60,12 +60,14 @@ def export_mastercard():
                 elif footer_id == int(row[0]):
                     # EOF
                     break
-                else:
-                    if agent_instance.has_mid(row[23]):
-                        merchant = (row[23], row[7], row[13], row[45])
-                        merchants.add(merchant)
+                elif agent_instance.has_mid(row[23]):
+                    if not validate_uk_postcode(row[17].strip('"')):
+                        print("Invalid post code, row: {}, file: {}".format(count, txt_file))
                     else:
-                        print("Invalid MID, row: {}, file: {}".format(count, txt_file))
+                        merchant = (row[23], row[7], row[13], row[45], row[17],)
+                        merchants.add(merchant)
+                else:
+                    print("Invalid MID, row: {}, file: {}".format(count, txt_file))
 
     if len(merchants):
         prepped_merchants = []
@@ -75,6 +77,7 @@ def export_mastercard():
             merc_dict['Partner Name'] = merc[1]
             merc_dict['Town/City'] = merc[2]
             merc_dict['Scheme'] = merc[3]
+            merc_dict['Postcode'] = merc[4]
             prepped_merchants.append(merc_dict)
         agent_instance.write_transaction_matched_csv(prepped_merchants)
 
@@ -239,7 +242,7 @@ def onboard_mids():
     # Amex only requires SFTP
     url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
     src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
-    upload_sftp(url, username, password, src_dir, dst_dir)
+    # upload_sftp(url, username, password, src_dir, dst_dir)
 
     partner_name = get_partner_name()
     contents = ['Please load the attached MIDs for ' + partner_name + ' and confirm your forecast on-boarding date.']
@@ -247,11 +250,11 @@ def onboard_mids():
     # VISA
     src_dir = os.path.join(settings.APP_DIR, 'merchants/visa')
     attachments = get_attachments(src_dir)
-    send_email('visa', partner_name, contents, attachments)
+    #send_email('visa', partner_name, contents, attachments)
     archive_files(src_dir)
 
     # MASTERCARD (requires no attachments)
-    send_email('mastercard', partner_name, contents)
+    #send_email('mastercard', partner_name, contents)
 
 def process_mastercard_handback_file():
     export_mastercard()
