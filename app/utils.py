@@ -1,4 +1,4 @@
-import re
+import requests
 import importlib
 
 from app.active import AGENTS
@@ -14,14 +14,21 @@ def resolve_agent(name):
 def validate_uk_postcode(postcode):
     """Validate a UK post code"""
 
-    # validate post code using regex
-    pattern = re.compile('^(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ]'
-                         '[a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9]'
-                         '[a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]'
-                         '[0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-z'
-                         'ABD-HJLNP-UW-Z]{2}))$')
+    result = False
+    if len(postcode):
+        r = requests.get('http://api.postcodes.io/postcodes/{}/validate'.format(postcode))
 
-    if not re.match(pattern, postcode):
-        return False
+        if r.status_code == 200:
+            try:
+                result = r.json()['result']
+            except KeyError:
+                print("EXCEPTION: KeyError 'result' for post code {}".format(postcode))
+        else:
+            print('Got HTTP status code {} from third party post code validator for post code {}.'.format(r.status_code, postcode))
 
-    return True
+    if result:
+        print('Post code {} is valid'.format(postcode))
+    else:
+        print('Post code {} is invalid'.format(postcode))
+
+    return result
