@@ -14,15 +14,16 @@ def resolve_agent(name):
 def validate_uk_postcode(postcode):
     """Validate a UK post code"""
 
+    # old API key: KLogDsJB7E2Oy-2WHME-tQ2451
     result = False
     if len(postcode):
-        r = requests.get('http://api.postcodes.io/postcodes/{}/validate'.format(postcode))
+        r = requests.get('https://api.getAddress.io/v2/uk/{}?api-key=1h-2FYKur0-3JmtmPmNlRQ7622'.format(postcode))
 
         if r.status_code == 200:
             try:
-                result = r.json()['result']
+                result = bool(r.json()['Addresses'])
             except KeyError:
-                print("EXCEPTION: KeyError 'result' for post code {}".format(postcode))
+                print("EXCEPTION: KeyError 'Addresses' for post code {}".format(postcode))
         else:
             print('Got HTTP status code {} from third party post code validator for post code {}.'.format(r.status_code, postcode))
 
