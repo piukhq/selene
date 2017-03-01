@@ -50,6 +50,7 @@ def export_mastercard():
     merchants = set()
     footer_id = 30
 
+    errors = []
     for txt_file in files:
         with open(txt_file, newline='') as csvfile:
             mcardreader = csv.reader(csvfile, delimiter='|')
@@ -62,12 +63,17 @@ def export_mastercard():
                     break
                 elif agent_instance.has_mid(row[23]):
                     if not validate_uk_postcode(row[17].strip('"')):
-                        print("Invalid post code, row: {}, file: {}".format(count, txt_file))
+                        error = "Invalid post code, post code='{}', row: {}, file: {}".format(row[17].strip('"'),
+                                                                                              count, txt_file)
+                        print(error)
+                        errors.append(error)
                     else:
                         merchant = (row[23], row[7], row[13], row[45], row[17],)
                         merchants.add(merchant)
                 else:
-                    print("Invalid MID, row: {}, file: {}".format(count, txt_file))
+                    error = "Invalid MID, MID='{}', row: {}, file: {}".format(row[23], count, txt_file)
+                    print(error)
+                    errors.append(error)
 
     if len(merchants):
         prepped_merchants = []
@@ -81,6 +87,11 @@ def export_mastercard():
             prepped_merchants.append(merc_dict)
         agent_instance.write_transaction_matched_csv(prepped_merchants)
 
+    err_filename = 'mastercard_errors.txt'
+    path = os.path.join(settings.APP_DIR, 'merchants/mastercard', err_filename)
+    with open(path, 'w') as error_output_file:
+        for err in errors:
+            error_output_file.write(err + '\n')
 
 def export():
     files = fetch_files('csv')
