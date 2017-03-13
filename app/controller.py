@@ -67,9 +67,8 @@ def export_mastercard():
                                                                                               count, txt_file)
                         print(error)
                         errors.append(error)
-                    else:
-                        merchant = (row[23], row[7], row[13], row[45], row[17],)
-                        merchants.add(merchant)
+                    merchant = (row[23], row[7], row[13], row[45], row[17],)
+                    merchants.add(merchant)
                 else:
                     error = "Invalid MID, MID='{}', row: {}, file: {}".format(row[23], count, txt_file)
                     print(error)
@@ -93,6 +92,7 @@ def export_mastercard():
         for err in errors:
             error_output_file.write(err + '\n')
 
+
 def export():
     files = fetch_files('csv')
     start_line = 2
@@ -105,8 +105,10 @@ def export():
             agent_instance = get_agent(k)
             valid_merchants = []
             invalid_merchants = []
+            transaction_matched_merchants = []
             reasons = []
-            card_data.update({k:[agent_instance, valid_merchants, invalid_merchants, reasons]})
+            card_data.update({k: [agent_instance, valid_merchants, invalid_merchants, transaction_matched_merchants,
+                                  reasons]})
 
     for txt_file in files:
         current_line = 0
@@ -120,34 +122,37 @@ def export():
                     if k != 'mastercard':
                         if v[0].has_mid(row):
                             has_mid = True
-                        validated, reasons = validate_row_data(row)
+                        validated, reasons, bad_post_code = validate_row_data(row)
                         if validated and has_mid:
-                            v[1].append(row)
+                            if not bad_post_code:
+                                v[1].append(row)
+                            v[3].append(row)
                         else:
                             if not has_mid:
                                 reasons += 'Missing MID. '
                             reasons += 'Line no. {} of file {}'.format(current_line, txt_file)
                             v[2].append(row)
-                            v[3].append(reasons)
+                            v[4].append(reasons)
 
     for k, v in card_data.items():
         if k != 'mastercard':
             v[0].export_merchants(v[1], True)
-            v[0].export_merchants(v[2], False, v[3])
+            v[0].export_merchants(v[2], False, v[4])
 
             if len(v[1]):
-                v[0].write_transaction_matched_csv(v[1])
+                v[0].write_transaction_matched_csv(v[3])
 
 
 def validate_row_data(row):
     """Validate data within a row from the csv file"""
 
     validated = True
+    bad_post_code = False
     reasons = ''
 
     if not validate_uk_postcode(row['Postcode'].strip('"')):
         reasons = 'Invalid post code. '
-        validated = False
+        bad_post_code = True
 
     if row['Partner Name'] == '':
         reasons += 'Invalid Partner Name. '
@@ -159,7 +164,7 @@ def validate_row_data(row):
         reasons += 'Invalid Action. '
         validated = False
 
-    return validated, reasons
+    return validated, reasons, bad_post_code
 
 
 def fetch_files(file_extension):
@@ -212,6 +217,7 @@ def get_partner_name():
 
     return partner_name
 
+
 def get_attachments(src_dir):
     """Send an email with generated MID data to each agent that requires it"""
     attachments = []
@@ -244,7 +250,8 @@ def send_email(agent, partner_name, contents, attachments=None):
                        host=settings.EMAIL_SOURCE_CONFIG[2], port=settings.EMAIL_SOURCE_CONFIG[3],
                        smtp_starttls=False, smtp_skip_login=True)
 
-    yag.send(settings.EMAIL_TARGETS[agent], agent.title() + ' MID files for on-boarding with ' + partner_name, contents, attachments)
+    yag.send(settings.EMAIL_TARGETS[agent], agent.title() +
+             ' MID files for on-boarding with ' + partner_name, contents, attachments)
 
 
 def onboard_mids(send_export_files):
@@ -270,6 +277,7 @@ def onboard_mids(send_export_files):
 
 def process_mastercard_handback_file():
     export_mastercard()
+
 
 def handle_duplicate_MIDs_in_mastercard_handback_files():
     files = fetch_files('psv')
@@ -321,9 +329,9 @@ def handle_duplicate_MIDs_in_mastercard_handback_files():
 if __name__ == '__main__':
 
     decision1 = input('Selene asks that you choose your fate from our funky laser display board:\n'
-                     '1) Onboard MIDs\n'
-                     '2) Process Mastercard handback file(s)\n'
-                     '3) Find duplicate MIDs in Mastercard handback file(s)\n')
+                      '1) Onboard MIDs\n'
+                      '2) Process Mastercard handback file(s)\n'
+                      '3) Find duplicate MIDs in Mastercard handback file(s)\n')
     if decision1 == '1':
         decision2 = input('Do you want to send the export files now? Yes/No\n')
         if decision2.lower() == 'yes':
