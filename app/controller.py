@@ -63,9 +63,8 @@ def export_mastercard():
                 elif agent_instance.has_mid(row[23]):
                     if not validate_uk_postcode(row[17].strip('"')):
                         print("Invalid post code, row: {}, file: {}".format(count, txt_file))
-                    else:
-                        merchant = (row[23], row[7], row[13], row[45], row[17],)
-                        merchants.add(merchant)
+                    merchant = (row[23], row[7], row[13], row[45], row[17],)
+                    merchants.add(merchant)
                 else:
                     print("Invalid MID, row: {}, file: {}".format(count, txt_file))
 
@@ -94,8 +93,10 @@ def export():
             agent_instance = get_agent(k)
             valid_merchants = []
             invalid_merchants = []
+            transaction_matched_merchants = []
             reasons = []
-            card_data.update({k:[agent_instance, valid_merchants, invalid_merchants, reasons]})
+            card_data.update({k:[agent_instance, valid_merchants, invalid_merchants, transaction_matched_merchants,
+                                 reasons]})
 
     for txt_file in files:
         current_line = 0
@@ -109,34 +110,37 @@ def export():
                     if k != 'mastercard':
                         if v[0].has_mid(row):
                             has_mid = True
-                        validated, reasons = validate_row_data(row)
+                        validated, reasons, bad_post_code = validate_row_data(row)
                         if validated and has_mid:
-                            v[1].append(row)
+                            if not bad_post_code:
+                                v[1].append(row)
+                            v[3].append(row)
                         else:
                             if not has_mid:
                                 reasons += 'Missing MID. '
                             reasons += 'Line no. {} of file {}'.format(current_line, txt_file)
                             v[2].append(row)
-                            v[3].append(reasons)
+                            v[4].append(reasons)
 
     for k, v in card_data.items():
         if k != 'mastercard':
             v[0].export_merchants(v[1], True)
-            v[0].export_merchants(v[2], False, v[3])
+            v[0].export_merchants(v[2], False, v[4])
 
             if len(v[1]):
-                v[0].write_transaction_matched_csv(v[1])
+                v[0].write_transaction_matched_csv(v[3])
 
 
 def validate_row_data(row):
     """Validate data within a row from the csv file"""
 
     validated = True
+    bad_post_code = False
     reasons = ''
 
     if not validate_uk_postcode(row['Postcode'].strip('"')):
         reasons = 'Invalid post code. '
-        validated = False
+        bad_post_code = True
 
     if row['Partner Name'] == '':
         reasons += 'Invalid Partner Name. '
@@ -148,7 +152,7 @@ def validate_row_data(row):
         reasons += 'Invalid Action. '
         validated = False
 
-    return validated, reasons
+    return validated, reasons, bad_post_code
 
 
 def fetch_files(file_extension):
