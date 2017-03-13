@@ -126,6 +126,10 @@ def export():
                         if validated and has_mid:
                             if not bad_post_code:
                                 v[1].append(row)
+                            else:
+                                reasons += 'Line no. {} of file {}'.format(current_line, txt_file)
+                                v[2].append(row)
+                                v[4].append(reasons)
                             v[3].append(row)
                         else:
                             if not has_mid:
@@ -151,7 +155,7 @@ def validate_row_data(row):
     reasons = ''
 
     if not validate_uk_postcode(row['Postcode'].strip('"')):
-        reasons = 'Invalid post code. '
+        reasons = "Invalid post code: '{}' ".format(row['Postcode'].strip('"'))
         bad_post_code = True
 
     if row['Partner Name'] == '':
