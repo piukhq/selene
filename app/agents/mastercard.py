@@ -55,9 +55,9 @@ class MasterCard():
                     csv_writer.writerow(['mastercard',
                                          merchant['MasterCard MIDs'].strip(' '),
                                          merchant['Scheme'].strip('"').lower().strip(' '),
-                                         merchant['Partner Name'].strip('"').strip(' '),
-                                         merchant['Town/City'].strip('"').strip(' '),
-                                         merchant['Postcode'].strip('"').strip(' '),
+                                         merchant['Partner Name'].strip('" '),
+                                         merchant['Town/City'].strip('" '),
+                                         merchant['Postcode'].strip('" '),
                                          ])
 
         except IOError as err:

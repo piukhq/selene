@@ -64,9 +64,9 @@ class Visa():
                     csv_writer.writerow(['visa',
                                          merchant['Visa MIDs'].strip(' '),
                                          merchant['Scheme'].strip('"').lower().strip(' '),
-                                         merchant['Partner Name'].strip('"').strip(' '),
-                                         merchant['Town/City'].strip('"').strip(' '),
-                                         merchant['Postcode'].strip('"').strip(' '),
+                                         merchant['Partner Name'].strip('" '),
+                                         merchant['Town/City'].strip('" '),
+                                         merchant['Postcode'].strip('" '),
                                          ])
 
         except IOError as err:

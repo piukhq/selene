@@ -176,9 +176,9 @@ class Amex():
                     csv_writer.writerow(['amex',
                                          merchant['American Express MIDs'].strip(' '),
                                          merchant['Scheme'].strip('"').lower().strip(' '),
-                                         merchant['Partner Name'].strip('"').strip(' '),
-                                         merchant['Town/City'].strip('"').strip(' '),
-                                         merchant['Postcode'].strip('"').strip(' '),
+                                         merchant['Partner Name'].strip('" '),
+                                         merchant['Town/City'].strip('" '),
+                                         merchant['Postcode'].strip('" '),
                                          ])
 
         except IOError as err:
