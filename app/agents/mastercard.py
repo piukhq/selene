@@ -53,11 +53,11 @@ class MasterCard():
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
                     csv_writer.writerow(['mastercard',
-                                         merchant['MasterCard MIDs'],
-                                         merchant['Scheme'].strip('"').lower(),
-                                         merchant['Partner Name'].strip('"'),
-                                         merchant['Town/City'].strip('"'),
-                                         merchant['Postcode'].strip('"'),
+                                         merchant['MasterCard MIDs'].strip(' '),
+                                         merchant['Scheme'].strip('" ').lower(),
+                                         merchant['Partner Name'].strip('" '),
+                                         merchant['Town/City'].strip('" '),
+                                         merchant['Postcode'].strip('" '),
                                          ])
 
         except IOError as err:
