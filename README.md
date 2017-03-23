@@ -1,8 +1,10 @@
 Project for reading in Bink Merchant on-boarding file and converting to a specific format.
-The initial version of the project only outputs an Amex merchant onboarding file.
+The current version of the project supports Amex and Visa merchant onboarding files.
 
-Currently the project can only be run as a python script, there isn't an interface.
-Files to be imported/exported are added to the merchants directory. A directory
-for each payment card provider will be required. Currently the following are available:
-1. Amex
+Other options include the ability to process MasterCard handback files and validate 
+MasterCard handback files prior to processing.
 
+The project can only be run as a python script.
+Files to be imported are placed in the provider_types directory. 
+
+The output files are placed in merchants/visa, amex or MasterCard directories.
