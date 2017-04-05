@@ -93,7 +93,7 @@ def export_mastercard():
             error_output_file.write(err + '\n')
 
 
-def export():
+def export(ignore_postcode_validation):
     files = fetch_files('csv')
     start_line = 2
     pcard = SourceFormat()
@@ -124,6 +124,8 @@ def export():
                             has_mid = True
                         validated, reasons, bad_post_code = validate_row_data(row)
                         if validated and has_mid:
+                            if ignore_postcode_validation:
+                                bad_post_code = False
                             if not bad_post_code:
                                 v[1].append(row)
                             else:
@@ -258,8 +260,8 @@ def send_email(agent, partner_name, contents, attachments=None):
              ' MID files for on-boarding with ' + partner_name, contents, attachments)
 
 
-def onboard_mids(send_export_files):
-    export()
+def onboard_mids(send_export_files, ignore_postcode_validation):
+    export(ignore_postcode_validation)
 
     # Amex only requires SFTP
     url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
@@ -342,7 +344,12 @@ if __name__ == '__main__':
             send_export_files = True
         else:
             send_export_files = False
-        onboard_mids(send_export_files)
+        decision3 = input('Do you want to ignore post code validation? Yes/No\n')
+        if decision3.lower() == 'yes':
+            ignore_postcode_validation = True
+        else:
+            ignore_postcode_validation = False
+        onboard_mids(send_export_files, ignore_postcode_validation)
     elif decision1 == '2':
         process_mastercard_handback_file()
     elif decision1 == '3':
