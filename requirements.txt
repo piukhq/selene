@@ -1,6 +1,5 @@
 arrow==0.8.0
 openpyxl
-yagmail
 pysftp
 scandir
 git+ssh://git@gitlab.com/olympus-libs/bigdatalib.git

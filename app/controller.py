@@ -9,7 +9,7 @@ except ImportError:
 
 from bigdatalib.schema import Schema
 from cassandralib.client import Client
-import yagmail
+import requests
 import pysftp
 import shutil
 
@@ -230,7 +230,7 @@ def get_attachments(src_dir):
     for entry in scandir(src_dir):
         if entry.is_file(follow_symlinks=False):
             file_path = entry.path
-            if not 'INVALID' in file_path and not 'cass' in file_path:
+            if 'INVALID' not in file_path and 'cass' not in file_path:
                 attachments.append(file_path)
 
     return attachments
@@ -250,14 +250,20 @@ def copy_local(src_dir, dst_dir):
             shutil.move(entry.path, dst_dir)
 
 
-def send_email(agent, partner_name, contents, attachments=None):
-    """Send an email with MIDs"""
-    yag = yagmail.SMTP(user=settings.EMAIL_SOURCE_CONFIG[0], password=settings.EMAIL_SOURCE_CONFIG[1],
-                       host=settings.EMAIL_SOURCE_CONFIG[2], port=settings.EMAIL_SOURCE_CONFIG[3],
-                       smtp_starttls=False, smtp_skip_login=True)
-
-    yag.send(settings.EMAIL_TARGETS[agent], agent.title() +
-             ' MID files for on-boarding with ' + partner_name, contents, attachments)
+def send_email(agent, partner_name, content, attachments=[]):
+    """
+    Send an email with MIDs
+    """
+    subject = '{} MID files for on-boarding with {}'.format(agent.title(), partner_name)
+    resp = requests.post(
+        settings.MAILGUN_URL,
+        auth=('api', settings.MAILGUN_API_KEY),
+        files=[('attachment', open(file_name)) for file_name in attachments],
+        data={'from': settings.MAILGUN_FROM_ADDRESS,
+              'to': settings.EMAIL_TARGETS[agent],
+              'subject': subject,
+              'text': content})
+    resp.raise_for_status()
 
 
 def onboard_mids(send_export_files, ignore_postcode_validation):
@@ -270,14 +276,14 @@ def onboard_mids(send_export_files, ignore_postcode_validation):
         upload_sftp(url, username, password, src_dir, dst_dir)
 
     partner_name = get_partner_name()
-    contents = ['Please load the attached MIDs for ' + partner_name + ' and confirm your forecast on-boarding date.']
+    content = 'Please load the attached MIDs for {} and confirm your forecast on-boarding date.'.format(partner_name)
 
     # Visa & MasterCard
     src_dir = os.path.join(settings.APP_DIR, 'merchants/visa')
     attachments = get_attachments(src_dir)
     if send_export_files:
-        send_email('visa', partner_name, contents, attachments)
-        send_email('mastercard', partner_name, contents)
+        send_email('visa', partner_name, content, attachments)
+        send_email('mastercard', partner_name, content)
     archive_files(src_dir)
 
 
