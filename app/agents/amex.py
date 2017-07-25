@@ -157,11 +157,7 @@ class Amex():
     def has_mid(self, row):
         """return True if there is a visa mid in the row"""
         if row['American Express MIDs'] != '' and row['American Express MIDs'] is not None:
-            try:
-                mid = int(row['American Express MIDs'])
-                return True
-            except:
-                return False
+            return True
 
         return False
 
