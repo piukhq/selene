@@ -1,6 +1,7 @@
 arrow==0.8.0
 openpyxl
 pysftp
+requests==2.18.2
 scandir
 git+ssh://git@gitlab.com/olympus-libs/bigdatalib.git
 git+ssh://git@gitlab.com/olympus-libs/cassandralib.git

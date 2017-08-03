@@ -19,10 +19,10 @@ class VisaMerchantFile():
         :param header: the header to use
         :return: None
         """
-        ws1.title = "PVnnn_90523_Choice_20160101"
+        ws1.title = "visa_merchant_ID_file"
 
-        visa_header = ['CUSTOMER_MERCHANT_ID', 'ACQUIRER_CAI', 'MERCHANT_NAME', 'MERCHANT_CITY', 'POST_CODE', 'ADDRESS',
-                       'ALTERNATIVE_MERCHANT_NAME', 'STATUS', 'VISA_VALIDATION_COMMENTS', 'CUSTOMER_COMMENTS'
+        visa_header = ['CAID', 'MERCHANT_NAME', 'MERCHANT_CITY', 'POST_CODE', 'ADDRESS',
+                       'Merchant Also Known As', 'Action (On-Board/Remove/Update)'
                        ]
         ws1.append(visa_header)
 
@@ -100,12 +100,10 @@ class Visa():
 
         file = VisaMerchantFile()
 
-        reference_scheme_id = ''
         for count, merchant in enumerate(merchants):
-            reference_scheme_id = merchant['Scheme ID']
-            detail = [merchant['Scheme ID'], merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
-                      merchant['Postcode'],
-                      merchant['Address (Building Name/Number, Street)'], '', 'New', '',
+            detail = [merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
+                      merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
+                      '', 'On-Board',
                       ]
             if validated:
                 detail.append('')
@@ -114,7 +112,7 @@ class Visa():
 
             file.add_detail(detail)
 
-        file_name = self.create_file_name(validated, reference_scheme_id)
+        file_name = self.create_file_name(validated, merchant['Partner Name'])
         try:
             self.write_to_file(file, file_name)
             status = 'written'
@@ -136,19 +134,15 @@ class Visa():
         }
         # insert_file_log(log)
 
-    def create_file_name(self, validated, reference_scheme_id):
+    def create_file_name(self, validated, merchant_name):
         # e.g. PVnnn_GLBMID_BINK_yyyymmdd.xlsx
-        file_name = ''
+        # e.g. CAID_<merchant_name>_LoyaltyAngels_<date YYYYMMDD>.xlsx
 
-        pv_num = 'nnn'
-        cust_merch_id = reference_scheme_id
-        mrch_name = 'MrchName'
+        file_merchant_name = merchant_name.replace(" ", "")
 
-        file_name = '{}{}{}{}{}{}'.format(
-            'PV',
-            pv_num + '_',
-            cust_merch_id + '_',
-            'BINK_',
+        file_name = 'CAID_{}_{}_{}{}'.format(
+            file_merchant_name,
+            'LoyaltyAngels',
             arrow.now().format('YYYYMMDD'),
             '.xlsx'
         )
