@@ -284,8 +284,7 @@ class Amex():
             'sequence_number': file_num,
             'comment': 'Merchant onboarding'
         }
-        #insert_file_log(log)
-
+        # insert_file_log(log)
 
     def create_file_name(self, validated):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
