@@ -95,12 +95,15 @@ class Visa():
         :param merchants: a list of merchants to send to Visa
         :return: None
         """
-        detail_record_count = len(merchants)
         file_num = 1  # sequential_file_number() + 1
 
         file = VisaMerchantFile()
+        partner_name = ''
 
         for count, merchant in enumerate(merchants):
+            if count == 0:
+                partner_name = merchant['Partner Name']
+
             detail = [merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
                       merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
                       '', 'On-Board',
@@ -112,7 +115,7 @@ class Visa():
 
             file.add_detail(detail)
 
-        file_name = self.create_file_name(validated, merchant['Partner Name'])
+        file_name = self.create_file_name(validated, partner_name)
         try:
             self.write_to_file(file, file_name)
             status = 'written'
