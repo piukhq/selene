@@ -2,21 +2,20 @@ import csv
 import arrow
 import os
 import settings
-import random
 
 from openpyxl import Workbook
 
-from app.source_format import SourceFormat
 
-class VisaMerchantFile():
+class VisaMerchantFile:
 
     def __init__(self):
         self.visa_lines = []
 
-    def set_header(self, ws1):
+    @staticmethod
+    def set_header(ws1):
         """
         set the header record for the file
-        :param header: the header to use
+        :param ws1: the header to use
         :return: None
         """
         ws1.title = "visa_merchant_ID_file"
@@ -38,22 +37,25 @@ class VisaMerchantFile():
         self.visa_lines.append(detail)
 
 
-class Visa():
+class Visa:
     def __init__(self):
         pass
 
-    def has_mid(self, row):
+    @staticmethod
+    def has_mid(row):
         """return True if there is a visa mid in the row"""
         if row['Visa MIDs'] != '' and row['Visa MIDs'] is not None:
             return True
 
         return False
 
-    def write_transaction_matched_csv(self, merchants):
+    @staticmethod
+    def write_transaction_matched_csv(merchants):
+
+        a = arrow.utcnow()
+        filename = 'cass_inp_visa_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
+        path = os.path.join(settings.APP_DIR, 'merchants/visa', filename)
         try:
-            a = arrow.utcnow()
-            filename = 'cass_inp_visa_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-            path = os.path.join(settings.APP_DIR, 'merchants/visa', filename)
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
@@ -65,15 +67,14 @@ class Visa():
                                          merchant['Postcode'].strip('" '),
                                          ])
 
-        except IOError as err:
-            status = 'error'
+        except IOError:
             raise Exception('Error writing file:' + path)
 
     @staticmethod
     def write_to_file(input_file, file_name):
         """
         writes the given input file to a file under a given name.
-        :param visa_input_file: the file to write
+        :param input_file: the file to write
         :param file_name: the file name under which to write the data
         :return: None
         """
@@ -89,13 +90,15 @@ class Visa():
 
         wb.save(path)
 
-    def export_merchants(self, merchants, validated, reason=[]):
+    def export_merchants(self, merchants, validated, reason=None):
         """
         uses a given set of merchants to generate a file in Visa input file format
         :param merchants: a list of merchants to send to Visa
+        :param validated:
+        :param reason:
         :return: None
         """
-        file_num = 1  # sequential_file_number() + 1
+        reason = reason or []
 
         file = VisaMerchantFile()
         partner_name = ''
@@ -118,26 +121,11 @@ class Visa():
         file_name = self.create_file_name(validated, partner_name)
         try:
             self.write_to_file(file, file_name)
-            status = 'written'
-        except IOError as err:
-            status = 'error'
+        except IOError:
             raise Exception('Error writing file:' + file_name)
 
-        log = {
-            'provider': 'bink',
-            'receiver': 'visa',
-            'file_name': file_name,
-            'date': arrow.now(),
-            'process_date': arrow.now(),
-            'status': status,
-            'file_type': 'out',
-            'direction': 'out',
-            'sequence_number': file_num,
-            'comment': 'Merchant onboarding'
-        }
-        # insert_file_log(log)
-
-    def create_file_name(self, validated, merchant_name):
+    @staticmethod
+    def create_file_name(validated, merchant_name):
         # e.g. PVnnn_GLBMID_BINK_yyyymmdd.xlsx
         # e.g. CAID_<merchant_name>_LoyaltyAngels_<date YYYYMMDD>.xlsx
 

@@ -6,3 +6,9 @@
 __pycache__
 .cache/
 venv
+provider_types/*
+!README.md
+merchants/amex/*
+merchants/visa/archive/*
+.DS_Store
+merchants/mastercard/*
