@@ -3,8 +3,6 @@ import arrow
 import os
 import settings
 
-from app.source_format import SourceFormat
-
 
 class Field(object):
     def __init__(self, **kwargs):
@@ -83,7 +81,7 @@ class AmexDetail(Field):
         self.record_identifier = 'D'
 
 
-class AmexMerchantFile():
+class AmexMerchantFile:
 
     def __init__(self):
         self.header_string = ''
@@ -141,7 +139,7 @@ class AmexMerchantFile():
         })
 
 
-class Amex():
+class Amex:
     def __init__(self):
         pass
 
@@ -154,18 +152,20 @@ class Amex():
         """
         return datetime.format('MM/DD/YYYY')
 
-    def has_mid(self, row):
+    @staticmethod
+    def has_mid(row):
         """return True if there is a visa mid in the row"""
         if row['American Express MIDs'] != '' and row['American Express MIDs'] is not None:
             return True
 
         return False
 
-    def write_transaction_matched_csv(self, merchants):
+    @staticmethod
+    def write_transaction_matched_csv(merchants):
+        a = arrow.utcnow()
+        filename = 'cass_inp_amex_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
+        path = os.path.join(settings.APP_DIR, 'merchants/amex', filename)
         try:
-            a = arrow.utcnow()
-            filename = 'cass_inp_amex_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-            path = os.path.join(settings.APP_DIR, 'merchants/amex', filename)
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
@@ -177,12 +177,11 @@ class Amex():
                                          merchant['Postcode'].strip('" '),
                                          ])
 
-        except IOError as err:
-            status = 'error'
+        except IOError:
             raise Exception('Error writing file:' + path)
 
     @staticmethod
-    def write_to_file(input_file, file_name):
+    def write_to_file(amex_input_file, file_name):
         """
         writes the given input file to a file under a given name.
         :param amex_input_file: the file to write
@@ -193,17 +192,20 @@ class Amex():
         path = os.path.join(settings.APP_DIR, 'merchants/amex', file_name)
 
         with open(path, 'w+') as f:
-            f.write(input_file.get_detail())
+            f.write(amex_input_file.get_detail())
 
-
-    def export_merchants(self, merchants, validated, reason=[]):
+    def export_merchants(self, merchants, validated, reason=None):
         """
         uses a given set of merchants to generate a file in Amex input file format
         :param merchants: a list of merchants to send to Amex
+        :param validated:
+        :param reason:
         :return: None
         """
+        reason = reason or []
+
         detail_record_count = len(merchants)
-        file_num = 1#sequential_file_number() + 1
+        file_num = 1  # sequential_file_number() + 1
 
         header = Header(
             date=self.format_datetime(arrow.now()),
@@ -267,26 +269,11 @@ class Amex():
         file_name = self.create_file_name(validated)
         try:
             self.write_to_file(file, file_name)
-            status = 'written'
-        except IOError as err:
-            status = 'error'
+        except IOError:
             raise Exception('Error writing file:' + file_name)
 
-        log = {
-            'provider': 'bink',
-            'receiver': 'amex',
-            'file_name': file_name,
-            'date': arrow.now(),
-            'process_date': arrow.now(),
-            'status': status,
-            'file_type': 'out',
-            'direction': 'out',
-            'sequence_number': file_num,
-            'comment': 'Merchant onboarding'
-        }
-        # insert_file_log(log)
-
-    def create_file_name(self, validated):
+    @staticmethod
+    def create_file_name(validated):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
         # TODO: Change BINK to suitable name
         file_name = '{}{}{}{}'.format(

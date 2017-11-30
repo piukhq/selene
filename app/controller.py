@@ -39,9 +39,9 @@ def get_agent(partner_slug):
         agent_class = resolve_agent(partner_slug)
         return agent_class()
     except KeyError:
-        raise('No such agent')
+        raise 'No such agent:' + partner_slug
     except Exception as ex:
-        raise(ex)
+        raise ex
 
 
 def export_mastercard():
@@ -77,7 +77,7 @@ def export_mastercard():
     if len(merchants):
         prepped_merchants = []
         for merc in merchants:
-            merc_dict = {}
+            merc_dict = dict()
             merc_dict['MasterCard MIDs'] = merc[0]
             merc_dict['Partner Name'] = merc[1]
             merc_dict['Town/City'] = merc[2]
@@ -93,7 +93,7 @@ def export_mastercard():
             error_output_file.write(err + '\n')
 
 
-def export(ignore_postcode_validation):
+def export(ignore_postcode):
     files = fetch_files('csv')
     start_line = 2
     pcard = SourceFormat()
@@ -124,7 +124,7 @@ def export(ignore_postcode_validation):
                             has_mid = True
                         validated, reasons, bad_post_code = validate_row_data(row)
                         if validated and has_mid:
-                            if ignore_postcode_validation:
+                            if ignore_postcode:
                                 bad_post_code = False
                             if not bad_post_code:
                                 v[1].append(row)
@@ -250,10 +250,11 @@ def copy_local(src_dir, dst_dir):
             shutil.move(entry.path, dst_dir)
 
 
-def send_email(agent, partner_name, content, attachments=[]):
+def send_email(agent, partner_name, content, attachments=None):
     """
     Send an email with MIDs
     """
+    attachments = attachments or []
     subject = '{} MID files for on-boarding with {}'.format(agent.title(), partner_name)
     resp = requests.post(
         settings.MAILGUN_URL,
@@ -266,13 +267,13 @@ def send_email(agent, partner_name, content, attachments=[]):
     resp.raise_for_status()
 
 
-def onboard_mids(send_export_files, ignore_postcode_validation):
-    export(ignore_postcode_validation)
+def onboard_mids(send_export, ignore_postcode):
+    export(ignore_postcode)
 
     # Amex only requires SFTP
     url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
     src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
-    if send_export_files:
+    if send_export:
         upload_sftp(url, username, password, src_dir, dst_dir)
 
     partner_name = get_partner_name()
@@ -281,7 +282,7 @@ def onboard_mids(send_export_files, ignore_postcode_validation):
     # Visa & MasterCard
     src_dir = os.path.join(settings.APP_DIR, 'merchants/visa')
     attachments = get_attachments(src_dir)
-    if send_export_files:
+    if send_export:
         send_email('visa', partner_name, content, attachments)
         send_email('mastercard', partner_name, content)
     archive_files(src_dir)
@@ -291,7 +292,7 @@ def process_mastercard_handback_file():
     export_mastercard()
 
 
-def handle_duplicate_MIDs_in_mastercard_handback_files():
+def handle_duplicate_mids_in_mastercard_handback_files():
     files = fetch_files('psv')
     agent_instance = get_agent('mastercard')
     footer_id = 30
@@ -322,7 +323,7 @@ def handle_duplicate_MIDs_in_mastercard_handback_files():
             if i != j:
                 if found:
                     break
-                if (mids[i][0] == mids[j][0]):
+                if mids[i][0] == mids[j][0]:
                     found = True
 
         if found:
@@ -345,20 +346,22 @@ if __name__ == '__main__':
                       '2) Process Mastercard handback file(s)\n'
                       '3) Find duplicate MIDs in Mastercard handback file(s)\n')
     if decision1 == '1':
-        decision2 = input('Do you want to send the export files now? Yes/No\n')
-        if decision2.lower() == 'yes':
-            send_export_files = True
-        else:
-            send_export_files = False
-        decision3 = input('Do you want to ignore post code validation? Yes/No\n')
-        if decision3.lower() == 'yes':
-            ignore_postcode_validation = True
-        else:
-            ignore_postcode_validation = False
+        send_export_files = False
+        if settings.ASK_TO_SEND_MAIL:
+            decision2 = input('Do you want to send the export files now? Yes/No\n')
+            if decision2.lower() == 'yes':
+                send_export_files = True
+
+        ignore_postcode_validation = True
+        if settings.ASK_POSTCODE_VALIDATION:
+            decision3 = input('Do you want to ignore post code validation? Yes/No\n')
+            if decision3.lower() == 'no':
+                ignore_postcode_validation = False
+
         onboard_mids(send_export_files, ignore_postcode_validation)
     elif decision1 == '2':
         process_mastercard_handback_file()
     elif decision1 == '3':
-        handle_duplicate_MIDs_in_mastercard_handback_files()
+        handle_duplicate_mids_in_mastercard_handback_files()
     else:
         print("Invalid choice, you must select 1, 2, or 3.  Exiting program.")
