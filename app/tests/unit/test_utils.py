@@ -2,6 +2,7 @@ import unittest
 
 from app.utils import validate_uk_postcode
 
+
 class TestUtils(unittest.TestCase):
 
     def test_uk_postcode_validator(self):

@@ -101,14 +101,13 @@ def export(ignore_postcode):
 
     card_data = {}
     for k, v in AGENTS.items():
-        if k != 'mastercard':
-            agent_instance = get_agent(k)
-            valid_merchants = []
-            invalid_merchants = []
-            transaction_matched_merchants = []
-            reasons = []
-            card_data.update({k: [agent_instance, valid_merchants, invalid_merchants, transaction_matched_merchants,
-                                  reasons]})
+        agent_instance = get_agent(k)
+        valid_merchants = []
+        invalid_merchants = []
+        transaction_matched_merchants = []
+        reasons = []
+        card_data.update({k: [agent_instance, valid_merchants, invalid_merchants, transaction_matched_merchants,
+                              reasons]})
 
     for txt_file in files:
         current_line = 0
@@ -119,34 +118,32 @@ def export(ignore_postcode):
             if current_line >= start_line:
                 for k, v in card_data.items():
                     has_mid = False
-                    if k != 'mastercard':
-                        if v[0].has_mid(row):
-                            has_mid = True
-                        validated, reasons, bad_post_code = validate_row_data(row)
-                        if validated and has_mid:
-                            if ignore_postcode:
-                                bad_post_code = False
-                            if not bad_post_code:
-                                v[1].append(row)
-                            else:
-                                reasons += 'Line no. {} of file {}'.format(current_line, txt_file)
-                                v[2].append(row)
-                                v[4].append(reasons)
-                            v[3].append(row)
+                    if v[0].has_mid(row):
+                        has_mid = True
+                    validated, reasons, bad_post_code = validate_row_data(row)
+                    if validated and has_mid:
+                        if ignore_postcode:
+                            bad_post_code = False
+                        if not bad_post_code:
+                            v[1].append(row)
                         else:
-                            if not has_mid:
-                                reasons += 'Missing MID. '
                             reasons += 'Line no. {} of file {}'.format(current_line, txt_file)
                             v[2].append(row)
                             v[4].append(reasons)
+                        v[3].append(row)
+                    else:
+                        if not has_mid:
+                            reasons += 'Missing MID. '
+                        reasons += 'Line no. {} of file {}'.format(current_line, txt_file)
+                        v[2].append(row)
+                        v[4].append(reasons)
 
     for k, v in card_data.items():
-        if k != 'mastercard':
-            v[0].export_merchants(v[1], True)
-            v[0].export_merchants(v[2], False, v[4])
+        v[0].export_merchants(v[1], True)
+        v[0].export_merchants(v[2], False, v[4])
 
-            if len(v[1]):
-                v[0].write_transaction_matched_csv(v[3])
+        if len(v[1]):
+            v[0].write_transaction_matched_csv(v[3])
 
 
 def validate_row_data(row):
@@ -337,31 +334,3 @@ def handle_duplicate_mids_in_mastercard_handback_files():
         agent_instance.write_duplicates_file(duplicates)
     else:
         print("No duplicates found.")
-
-
-if __name__ == '__main__':
-
-    decision1 = input('Selene asks that you choose your fate from our funky laser display board:\n'
-                      '1) Onboard MIDs\n'
-                      '2) Process Mastercard handback file(s)\n'
-                      '3) Find duplicate MIDs in Mastercard handback file(s)\n')
-    if decision1 == '1':
-        send_export_files = False
-        if settings.ASK_TO_SEND_MAIL:
-            decision2 = input('Do you want to send the export files now? Yes/No\n')
-            if decision2.lower() == 'yes':
-                send_export_files = True
-
-        ignore_postcode_validation = True
-        if settings.ASK_POSTCODE_VALIDATION:
-            decision3 = input('Do you want to ignore post code validation? Yes/No\n')
-            if decision3.lower() == 'no':
-                ignore_postcode_validation = False
-
-        onboard_mids(send_export_files, ignore_postcode_validation)
-    elif decision1 == '2':
-        process_mastercard_handback_file()
-    elif decision1 == '3':
-        handle_duplicate_mids_in_mastercard_handback_files()
-    else:
-        print("Invalid choice, you must select 1, 2, or 3.  Exiting program.")
