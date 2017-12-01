@@ -10,12 +10,12 @@ class TestControllerFile(unittest.TestCase):
     def test_write_to_file(self, mock_write_to_file1, mock_write_to_file2):
         mock_write_to_file1.return_value = True
         mock_write_to_file2.return_value = True
-        app.controller.export()
+        app.controller.export(True)
         assert mock_write_to_file1.called
         assert mock_write_to_file2.called
 
     def test_output_write_to_file(self):
-        app.controller.export()
+        app.controller.export(True)
         self.assertTrue(True)
 
     def test_sequential_file_number(self):

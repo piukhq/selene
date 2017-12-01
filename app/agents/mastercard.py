@@ -8,14 +8,25 @@ class MastercardMerchantFile:
 
     def __init__(self):
         self.mastercard_lines = []
+        self.project_id = "BINK"
 
-    def set_header(self, ws1):
+    def set_header(self, writer):
         """
-        set the header record for the file
-        :param ws1: the header to use
-        :return: None
+        write headers of csv file for mastercard
+        :param writer: csv writer
+        :return:
         """
-        pass
+
+        row = [
+            10,
+            self.project_id,
+            arrow.utcnow().format("YYYYMMDDHHmmss")
+        ]
+
+        writer.writerow(row)
+
+    def set_data(self, writer):
+        writer.writerows(self.mastercard_lines)
 
     def get_data(self):
         """Retrieve a list of lines of mastercard data"""
@@ -26,7 +37,29 @@ class MastercardMerchantFile:
         :param detail: the detail to add
         :return: None
         """
-        self.mastercard_lines.append(detail)
+        row = [""] * 38
+        today = arrow.utcnow().format("MM/DD/YYYY")
+
+        row[0] = 20
+        row[2] = "A"
+        row[7] = detail[1]  # Merchant Name
+        row[10] = detail[4]  # Merchant Address
+        row[12] = detail[2]  # Merchant City
+        row[14] = detail[5]  # Merchant State/Province
+        row[16] = detail[3]  # Merchant Postcode
+        row[18] = "UK"
+        row[37] = row[28] = today
+
+        self.mastercard_lines.append(row)
+
+    def set_trailer(self, writer):
+        row = [
+            30,
+            self.project_id,
+            len(self.mastercard_lines)
+        ]
+
+        writer.writerow(row)
 
 
 class MasterCard:
@@ -77,10 +110,58 @@ class MasterCard:
             raise Exception('Error writing file:' + path)
 
     @staticmethod
-    def create_file_name(validated):
-        # e.g. ???
+    def write_to_file(input_file, file_name):
+        """
+        writes the given input file to a file under a given name.
+        :param input_file: the file to write
+        :param file_name: the file name under which to write the data
+        :return: None
+        """
 
-        file_name = ''
+        path = os.path.join(settings.APP_DIR, 'merchants/mastercard', file_name)
+
+        with open(path, 'w') as file:
+            writer = csv.writer(file, delimiter=',', quotechar='"')
+
+            input_file.set_header(writer)
+            input_file.set_data(writer)
+            input_file.set_trailer(writer)
+
+    def export_merchants(self, merchants, validated, reason=None):
+        """
+        uses a given set of merchants to generate a file in Mastercard input file format
+        :param merchants: a list of merchants to send to Mastercard
+        :param validated:
+        :param reason:
+        :return: None
+        """
+        reason = reason or []
+
+        file = MastercardMerchantFile()
+
+        for count, merchant in enumerate(merchants):
+
+            detail = [merchant['MasterCard MIDs'], merchant['Partner Name'], merchant['Town/City'],
+                      merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
+                      '', 'On-Board',
+                      ]
+            if validated:
+                detail.append('')
+            else:
+                detail.append(reason[count])
+
+            file.add_detail(detail)
+
+        file_name = self.create_file_name(validated)
+        try:
+            self.write_to_file(file, file_name)
+        except IOError:
+            raise Exception('Error writing file:' + file_name)
+
+    @staticmethod
+    def create_file_name(validated):
+
+        file_name = 'MAS_INPUT_BINK.csv'
 
         if not validated:
             file_name = 'INVALID_' + file_name
