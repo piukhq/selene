@@ -1,5 +1,7 @@
 import re
 import importlib
+import json
+import csv
 
 from app.active import AGENTS
 
@@ -24,3 +26,13 @@ def validate_uk_postcode(postcode):
         return False
 
     return True
+
+
+def csv_to_json(csv_file):
+    data = []
+    with open(csv_file, "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            data.append(row)
+
+    return json.dumps(data)
