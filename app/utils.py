@@ -36,3 +36,8 @@ def csv_to_json(csv_file):
             data.append(row)
 
     return json.dumps(data)
+
+
+def wipe_output_folders():
+    # todo fill wipe folders function
+    pass

@@ -1,6 +1,7 @@
 import os
-from flask_testing import TestCase
 import json
+from flask_testing import TestCase
+
 from app import create_app
 from app.utils import csv_to_json
 
@@ -13,4 +14,4 @@ class TestViews(TestCase):
         file = csv_to_json(os.getcwd() + "/fixture/test_data.csv")
 
         response = self.client.post("/test", data=file, content_type="application/json")
-        self.assertEqual(response.json, json.loads(file))
+        self.assertEqual(response.json.get('processed_file'), file)

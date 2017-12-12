@@ -93,11 +93,11 @@ def export_mastercard():
             error_output_file.write(err + '\n')
 
 
-def export(ignore_postcode):
-    files = fetch_files('csv')
-    start_line = 2
+def export(file, ignore_postcode):
+    # files = fetch_files('csv')
+    # start_line = 2
     pcard = SourceFormat()
-    reader = CSVReader(pcard.column_names, pcard.delimiter, pcard.column_keep)
+    # reader = CSVReader(pcard.column_names, pcard.delimiter, pcard.column_keep)
 
     card_data = {}
     for k, v in AGENTS.items():
@@ -109,34 +109,32 @@ def export(ignore_postcode):
         card_data.update({k: [agent_instance, valid_merchants, invalid_merchants, transaction_matched_merchants,
                               reasons]})
 
-    for txt_file in files:
-        current_line = 0
+    # for txt_file in files:
+    #     current_line = 0
 
-        for row in reader(txt_file):
-            current_line += 1
+    for row in file:
 
-            if current_line >= start_line:
-                for k, v in card_data.items():
-                    has_mid = False
-                    if v[0].has_mid(row):
-                        has_mid = True
-                    validated, reasons, bad_post_code = validate_row_data(row)
-                    if validated and has_mid:
-                        if ignore_postcode:
-                            bad_post_code = False
-                        if not bad_post_code:
-                            v[1].append(row)
-                        else:
-                            reasons += 'Line no. {} of file {}'.format(current_line, txt_file)
-                            v[2].append(row)
-                            v[4].append(reasons)
-                        v[3].append(row)
-                    else:
-                        if not has_mid:
-                            reasons += 'Missing MID. '
-                        reasons += 'Line no. {} of file {}'.format(current_line, txt_file)
-                        v[2].append(row)
-                        v[4].append(reasons)
+        for k, v in card_data.items():
+            has_mid = False
+            if v[0].has_mid(row):
+                has_mid = True
+            validated, reasons, bad_post_code = validate_row_data(row)
+            if validated and has_mid:
+                if ignore_postcode:
+                    bad_post_code = False
+                if not bad_post_code:
+                    v[1].append(row)
+                else:
+                    reasons += ''
+                    v[2].append(row)
+                    v[4].append(reasons)
+                v[3].append(row)
+            else:
+                if not has_mid:
+                    reasons += 'Missing MID. '
+                reasons += ''
+                v[2].append(row)
+                v[4].append(reasons)
 
     for k, v in card_data.items():
         v[0].export_merchants(v[1], True)
@@ -264,8 +262,8 @@ def send_email(agent, partner_name, content, attachments=None):
     resp.raise_for_status()
 
 
-def onboard_mids(send_export, ignore_postcode):
-    export(ignore_postcode)
+def onboard_mids(file, send_export, ignore_postcode):
+    export(file, ignore_postcode)
 
     # Amex only requires SFTP
     url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
