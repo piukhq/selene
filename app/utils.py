@@ -1,7 +1,9 @@
+import os
 import re
 import importlib
 import json
 import csv
+from settings import APP_DIR
 
 from app.active import AGENTS
 
@@ -38,6 +40,19 @@ def csv_to_json(csv_file):
     return json.dumps(data)
 
 
+def empty_folder(path):
+    folder = APP_DIR + path
+    for the_file in os.listdir(folder):
+        file_path = os.path.join(folder, the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print(e)
+
+
 def wipe_output_folders():
-    # todo fill wipe folders function
-    pass
+    empty_folder('/merchants/visa')
+    empty_folder('/merchants/amex')
+    empty_folder('/merchants/mastercard')
+    empty_folder('/merchants/visa/archive')
