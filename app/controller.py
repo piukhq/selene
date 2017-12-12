@@ -19,6 +19,7 @@ from app.utils import resolve_agent
 
 from app.source_format import SourceFormat
 from app.active import AGENTS
+from app.utils import format_json_input
 
 
 def upload_sftp(url, username, password, src_dir, dst_dir):
@@ -94,10 +95,6 @@ def export_mastercard():
 
 
 def export(file, ignore_postcode):
-    # files = fetch_files('csv')
-    # start_line = 2
-    pcard = SourceFormat()
-    # reader = CSVReader(pcard.column_names, pcard.delimiter, pcard.column_keep)
 
     card_data = {}
     for k, v in AGENTS.items():
@@ -109,11 +106,8 @@ def export(file, ignore_postcode):
         card_data.update({k: [agent_instance, valid_merchants, invalid_merchants, transaction_matched_merchants,
                               reasons]})
 
-    # for txt_file in files:
-    #     current_line = 0
-
+    file = format_json_input(file)
     for row in file:
-
         for k, v in card_data.items():
             has_mid = False
             if v[0].has_mid(row):

@@ -7,7 +7,7 @@ from app.utils import wipe_output_folders
 api = Api()
 
 
-@api.resource('/test')
+@api.resource('/import_mids')
 class ImportMids(Resource):
     @staticmethod
     def post():

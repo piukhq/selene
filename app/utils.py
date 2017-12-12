@@ -40,6 +40,32 @@ def csv_to_json(csv_file):
     return json.dumps(data)
 
 
+def csv_to_weird_json(csv_file):
+    data = []
+    with open(csv_file, "r") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            data.append(row)
+    return json.dumps(data)
+
+
+def list_json_to_dict_json(file):
+    data = list()
+    for i in range(1, len(file)):
+        data.append(dict(zip(file[0], file[i])))
+    return data
+
+
+def format_json_input(json_file):
+    try:
+        file = json.loads(json_file) if isinstance(json_file, str) else json_file
+        if isinstance(file[0], list):
+            return list_json_to_dict_json(file)
+        return file
+    except Exception as e:
+        return "wrong file format, exception: {}".format(e)
+
+
 def empty_folder(path):
     folder = APP_DIR + path
     for the_file in os.listdir(folder):
