@@ -46,7 +46,7 @@ def csv_to_weird_json(csv_file):
         reader = csv.reader(f)
         for row in reader:
             data.append(row)
-    return json.dumps(data)
+    return data
 
 
 def list_json_to_dict_json(file):
@@ -81,4 +81,4 @@ def wipe_output_folders():
     empty_folder('/merchants/visa')
     empty_folder('/merchants/amex')
     empty_folder('/merchants/mastercard')
-    empty_folder('/merchants/visa/archive')
+    # empty_folder('/merchants/visa/archive')

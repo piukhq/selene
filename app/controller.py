@@ -1,6 +1,7 @@
 import os
 import settings
 import csv
+import arrow
 
 try:
     from os import scandir
@@ -225,9 +226,10 @@ def get_attachments(src_dir):
     return attachments
 
 
-def archive_files(src_dir):
+def archive_files(src_dir, now):
     """Archive generated files"""
-    dst_dir = src_dir + '/archive'
+    dst_dir = os.path.join(settings.APP_DIR, 'merchants', src_dir, now)
+    src_dir = os.path.join(settings.APP_DIR, 'merchants', src_dir)
     os.makedirs(dst_dir, exist_ok=True)
     copy_local(src_dir, dst_dir)
 
@@ -269,12 +271,13 @@ def onboard_mids(file, send_export, ignore_postcode):
     content = 'Please load the attached MIDs for {} and confirm your forecast on-boarding date.'.format(partner_name)
 
     # Visa & MasterCard
-    src_dir = os.path.join(settings.APP_DIR, 'merchants/visa')
     attachments = get_attachments(src_dir)
     if send_export:
         send_email('visa', partner_name, content, attachments)
         send_email('mastercard', partner_name, content)
-    archive_files(src_dir)
+    now = arrow.utcnow().format('DD-MM-YY_hhmmss')
+    for src_dir in ['visa', 'mastercard', 'amex']:
+        archive_files(src_dir, now)
 
 
 def process_mastercard_handback_file():
