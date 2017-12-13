@@ -3,4 +3,4 @@ omit = *test*
 branch = True
 
 [report]
-fail_under = 80
+fail_under = 85
