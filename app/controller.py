@@ -93,8 +93,7 @@ def export_mastercard():
 #             error_output_file.write(err + '\n')
 
 
-def export(file, ignore_postcode):
-
+def initialize_card_data():
     card_data = {}
     for k, v in AGENTS.items():
         agent_instance = get_agent(k)
@@ -104,6 +103,12 @@ def export(file, ignore_postcode):
         reasons = []
         card_data.update({k: [agent_instance, valid_merchants, invalid_merchants, transaction_matched_merchants,
                               reasons]})
+
+    return card_data
+
+
+def populate_card_data(file, ignore_postcode):
+    card_data = initialize_card_data()
 
     for row in file:
         for k, v in card_data.items():
@@ -127,6 +132,11 @@ def export(file, ignore_postcode):
                 reasons += ''
                 v[2].append(row)
                 v[4].append(reasons)
+    return card_data
+
+
+def export(file, ignore_postcode):
+    card_data = populate_card_data(file, ignore_postcode)
 
     for k, v in card_data.items():
         v[0].export_merchants(v[1], True)
