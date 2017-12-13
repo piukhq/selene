@@ -81,4 +81,3 @@ def wipe_output_folders():
     empty_folder('/merchants/visa')
     empty_folder('/merchants/amex')
     empty_folder('/merchants/mastercard')
-    # empty_folder('/merchants/visa/archive')

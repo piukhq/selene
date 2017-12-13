@@ -8,8 +8,6 @@ try:
 except ImportError:
     from scandir import scandir
 
-from bigdatalib.schema import Schema
-from cassandralib.client import Client
 import requests
 import pysftp
 import shutil
@@ -173,25 +171,6 @@ def file_list(file_path, file_ext):
     if not os.path.isdir(file_path):
         return []
     return [os.path.join(file_path, fn) for fn in next(os.walk(file_path))[2] if fn.endswith(file_ext)]
-
-
-def sequential_file_number():
-    db_client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
-    # Get the currently logged files. This could be just the last file logged.
-    # If returns nothing, then must be first file, so need to create the name.
-    logged_files = db_client.select('file_logging', provider='amex', file_type='out')
-
-    db_client.close()
-    return len(logged_files.current_rows)
-
-
-def insert_file_log(log):
-    db_client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
-    # Get the currently logged files. This could be just the last file logged.
-    # If returns nothing, then must be first file, so need to create the name.
-    db_client.insert('file_logging', [log])
-
-    db_client.close()
 
 
 def get_partner_name():
