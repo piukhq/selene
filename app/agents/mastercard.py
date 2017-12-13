@@ -69,7 +69,7 @@ class MasterCard:
     @staticmethod
     def has_mid(element):
         """return True if there is a mastercard mid in the row"""
-        selected = element.get("MasterCard MIDs")
+        selected = element if isinstance(element, str) else element.get("MasterCard MIDs")
         if str(selected).isdigit():
             return True
 

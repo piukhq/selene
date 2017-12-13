@@ -50,7 +50,7 @@ def csv_to_json(csv_file):
     return json.dumps(data)
 
 
-def csv_to_weird_json(csv_file):
+def csv_to_list_json(csv_file):
     data = []
     with open(csv_file, "r") as f:
         reader = csv.reader(f)
