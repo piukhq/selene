@@ -1,5 +1,4 @@
 import os
-# import csv
 import settings
 from app.utils import validate_uk_postcode, get_agent
 
@@ -26,6 +25,8 @@ def collect_merchants(file, agent_instance):
 
 def export_mastercard(file):
     agent_instance = get_agent('mastercard')
+    agent_instance.write_path = os.path.join(agent_instance.write_path, 'handback')
+    os.makedirs(agent_instance.write_path, exist_ok=True)
 
     # remove header and footer from file
     merchants, errors = collect_merchants(file[1:-1], agent_instance)
@@ -54,50 +55,3 @@ def export_mastercard(file):
     with open(path, 'w') as error_output_file:
         for err in errors:
             error_output_file.write(err + '\n')
-
-
-# todo implement mastercard duplicate
-# def handle_duplicate_mids_in_mastercard_handback_files(files):
-#     agent_instance = get_agent('mastercard')
-#     footer_id = 30
-#     mids = []
-#
-#     for txt_file in files:
-#         with open(txt_file, newline='') as csvfile:
-#             mcardreader = csv.reader(csvfile, delimiter='|')
-#
-#             for count, row in enumerate(mcardreader):
-#                 if count == 0:
-#                     continue
-#                 elif footer_id == int(row[0]):
-#                     # EOF
-#                     break
-#                 else:
-#                     if agent_instance.has_mid(row[23]):
-#                         mids.append([row[23], count, txt_file])
-#                     else:
-#                         print("Invalid MID, row: {}, file: {}".format(count, txt_file))
-#
-#     duplicates = set()
-#     dup_mids = set()
-#     for i in range(0, len(mids)):
-#         found = False
-#
-#         for j in range(0, len(mids)):
-#             if i != j:
-#                 if found:
-#                     break
-#                 if mids[i][0] == mids[j][0]:
-#                     found = True
-#
-#         if found:
-#             msg = "Duplicate MID: {} found on line number {} in file {}".format(mids[i][0], mids[i][1], mids[i][2])
-#             duplicates.add(msg)
-#             dup_mids.add(mids[i][0])
-#
-#     if len(dup_mids):
-#         print(dup_mids)
-#
-#         agent_instance.write_duplicates_file(duplicates)
-#     else:
-#         print("No duplicates found.")

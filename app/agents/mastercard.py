@@ -63,8 +63,7 @@ class MastercardMerchantFile:
 
 
 class MasterCard:
-    def __init__(self):
-        pass
+    write_path = os.path.join(settings.APP_DIR, 'merchants', 'mastercard')
 
     @staticmethod
     def has_mid(element):
@@ -75,11 +74,10 @@ class MasterCard:
 
         return False
 
-    @staticmethod
-    def write_transaction_matched_csv(merchants):
+    def write_transaction_matched_csv(self, merchants):
         a = arrow.utcnow()
         filename = 'cass_inp_mastercard_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(settings.APP_DIR, 'merchants/mastercard', filename)
+        path = os.path.join(self.write_path, filename)
         try:
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
@@ -95,11 +93,10 @@ class MasterCard:
         except IOError:
             raise Exception('Error writing file:' + path)
 
-    @staticmethod
-    def write_duplicates_file(duplicates):
+    def write_duplicates_file(self, duplicates):
         a = arrow.utcnow()
         filename = 'duplicates_mastercard_{}.txt'.format(a.format('DD-MM-YYYY'))
-        path = os.path.join(settings.APP_DIR, 'merchants/mastercard', filename)
+        path = os.path.join(self.write_path, filename)
         try:
             with open(path, 'w') as dup_file:
                 dup_file.write('Date of file creation: {}\n'.format(a.format('DD-MM-YYYY')))
@@ -109,8 +106,7 @@ class MasterCard:
         except IOError:
             raise Exception('Error writing file:' + path)
 
-    @staticmethod
-    def write_to_file(input_file, file_name):
+    def write_to_file(self, input_file, file_name):
         """
         writes the given input file to a file under a given name.
         :param input_file: the file to write
@@ -118,7 +114,7 @@ class MasterCard:
         :return: None
         """
 
-        path = os.path.join(settings.APP_DIR, 'merchants/mastercard', file_name)
+        path = os.path.join(self.write_path, file_name)
 
         with open(path, 'w') as file:
             writer = csv.writer(file, delimiter=',', quotechar='"')
@@ -153,6 +149,7 @@ class MasterCard:
             file.add_detail(detail)
 
         file_name = self.create_file_name(validated)
+
         try:
             self.write_to_file(file, file_name)
         except IOError:

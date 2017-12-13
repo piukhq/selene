@@ -30,5 +30,11 @@ class TestViews(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_handback_duplicates(self):
-        response = self.client.post("/mids/handback_duplicates", data="", content_type="application/json")
+        response = self.client.post("/mids/handback_duplicates", data="test wrong content",
+                                    content_type="application/json")
+        self.assertEqual(response.status_code, 500)
+
+        file = csv_to_list_json(APP_DIR + "/app/tests/fixture/test_handback_duplicates.csv")
+        response = self.client.post("/mids/handback_duplicates", data=json.dumps(file), content_type="application/json")
+
         self.assertEqual(response.status_code, 200)
