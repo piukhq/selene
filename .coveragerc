@@ -1,0 +1,6 @@
+[run]
+omit = *test*
+branch = True
+
+[report]
+fail_under = 85

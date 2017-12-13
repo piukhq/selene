@@ -1,0 +1,6 @@
+#!/usr/bin/with-contenv /bin/bash
+
+ENVFILE="/usr/local/src/selene/.env"
+
+touch $ENVFILE
+chown apps:apps $ENVFILE
