@@ -1,4 +1,3 @@
-import settings
 from flask import Flask
 
 
