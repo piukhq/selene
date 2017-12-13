@@ -19,7 +19,7 @@ flake8:
   tags:
     - docker
 
-deploy-dev:
+deploy:
   stage: deploy
   script:
     - docker build -t olympus.azurecr.io/selene:latest .
@@ -29,34 +29,7 @@ deploy-dev:
     - docker logout olympus.azurecr.io
   environment: dev
   only:
-    - master
+    - add_flask 
   tags:
     - shell
 
-deploy-staging:
-  stage: deploy
-  script:
-    - docker build -t olympus.azurecr.io/selene:staging .
-    - docker login olympus.azurecr.io -u $AZURE_LOGIN -p $AZURE_PASS
-    - docker push olympus.azurecr.io/selene:staging
-    - docker rmi olympus.azurecr.io/selene:staging
-    - docker logout olympus.azurecr.io
-  environment: staging
-  only:
-    - staging
-  tags:
-    - shell
-
-deploy-production:
-  stage: deploy
-  script:
-    - docker build -t olympus.azurecr.io/selene:production .
-    - docker login olympus.azurecr.io -u $AZURE_LOGIN -p $AZURE_PASS
-    - docker push olympus.azurecr.io/selene:production
-    - docker rmi olympus.azurecr.io/selene:production
-    - docker logout olympus.azurecr.io
-  environment: production
-  only:
-    - production
-  tags:
-    - shell
