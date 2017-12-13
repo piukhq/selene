@@ -3,8 +3,8 @@ import re
 import importlib
 import json
 import csv
-from settings import APP_DIR
 
+from settings import APP_DIR
 from app.active import AGENTS
 
 
@@ -28,6 +28,16 @@ def validate_uk_postcode(postcode):
         return False
 
     return True
+
+
+def get_agent(partner_slug):
+    try:
+        agent_class = resolve_agent(partner_slug)
+        return agent_class()
+    except KeyError:
+        raise 'No such agent:' + partner_slug
+    except Exception as ex:
+        raise ex
 
 
 def csv_to_json(csv_file):

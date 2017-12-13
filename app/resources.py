@@ -1,13 +1,12 @@
-from flask import request, send_from_directory, jsonify
+from flask import request, jsonify
 from flask_restful import Resource, Api
-from app.controller import onboard_mids
+from app.onboard_mids import onboard_mids
 from app.utils import wipe_output_folders, format_json_input
-from settings import APP_DIR
 
 api = Api()
 
 
-@api.resource('/import_mids')
+@api.resource('/mids/import_mids')
 class ImportMids(Resource):
     @staticmethod
     def post():
@@ -19,8 +18,8 @@ class ImportMids(Resource):
         return jsonify(response)
 
 
-@api.resource('/<filename>')
-class OutputFolders(Resource):
+@api.resource('/mids/mastercard_handback')
+class MastercardHandback(Resource):
     @staticmethod
-    def get(filename):
-        return send_from_directory(APP_DIR + "/app/tests/unit/fixture/", filename)
+    def post():
+        pass
