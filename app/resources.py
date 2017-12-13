@@ -3,7 +3,6 @@ from flask_restful import Resource, Api
 from app.import_mids import onboard_mids
 from app.mastercard_handback import export_mastercard
 from app.handback_duplicates import find_duplicate_mids_in_mastercard_handback_file
-from app.utils import wipe_output_folders
 
 api = Api()
 
@@ -14,7 +13,6 @@ class ImportMids(Resource):
     def post():
         try:
             file = request.get_json()
-            wipe_output_folders()
             onboard_mids(file, False, True)
             response = jsonify(success=True, error=None)
 

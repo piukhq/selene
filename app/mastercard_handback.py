@@ -47,7 +47,7 @@ def export_mastercard(file):
 
     err_filename = 'mastercard_errors.txt'
 
-    path = os.path.join(settings.APP_DIR, 'merchants', 'mastercard', 'handback')
+    path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard', 'handback')
     os.makedirs(path, exist_ok=True)
 
     path = os.path.join(path, err_filename)

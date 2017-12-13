@@ -132,8 +132,8 @@ def get_attachments(src_dir):
 
 def archive_files(src_dir, now):
     """Archive generated files"""
-    dst_dir = os.path.join(settings.APP_DIR, 'merchants', src_dir, now)
-    src_dir = os.path.join(settings.APP_DIR, 'merchants', src_dir)
+    dst_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', src_dir, now)
+    src_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', src_dir)
     os.makedirs(dst_dir, exist_ok=True)
     copy_local(src_dir, dst_dir)
 
@@ -169,7 +169,7 @@ def onboard_mids(file, send_export, ignore_postcode):
 
     # Amex only requires SFTP
     url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
-    src_dir = os.path.join(settings.APP_DIR, 'merchants/amex')
+    src_dir = os.path.join(settings.WRITE_FOLDER, 'merchants/amex')
     if send_export:
         upload_sftp(url, username, password, src_dir, dst_dir)
 

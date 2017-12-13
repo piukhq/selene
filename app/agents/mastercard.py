@@ -63,7 +63,7 @@ class MastercardMerchantFile:
 
 
 class MasterCard:
-    write_path = os.path.join(settings.APP_DIR, 'merchants', 'mastercard')
+    write_path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard')
 
     @staticmethod
     def has_mid(element):

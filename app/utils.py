@@ -4,7 +4,7 @@ import importlib
 import json
 import csv
 
-from settings import APP_DIR
+from settings import WRITE_FOLDER
 from app.active import AGENTS
 
 
@@ -67,7 +67,7 @@ def format_json_input(json_file):
 
 
 def empty_folder(path):
-    folder = APP_DIR + path
+    folder = WRITE_FOLDER + path
     for the_file in os.listdir(folder):
         file_path = os.path.join(folder, the_file)
         try:

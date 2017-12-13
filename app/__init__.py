@@ -6,7 +6,7 @@ from flask import Flask
 def create_app(config_name='settings'):
     from app.resources import api
 
-    path = os.path.join(settings.APP_DIR, 'merchants')
+    path = os.path.join(settings.WRITE_FOLDER, 'merchants')
 
     os.makedirs(path, exist_ok=True)
     os.makedirs(path + '/visa', exist_ok=True)

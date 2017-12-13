@@ -3,12 +3,12 @@ import unittest
 
 from app.utils import validate_uk_postcode, list_json_to_dict_json, empty_folder, get_agent
 from app.agents.mastercard import MasterCard
-from settings import APP_DIR
+from settings import WRITE_FOLDER
 
 
 class TestUtils(unittest.TestCase):
     relative_path = "/app/tests/unit/test_dir"
-    full_path = APP_DIR + relative_path
+    full_path = WRITE_FOLDER + relative_path
 
     def setUp(self):
         os.makedirs(self.full_path, exist_ok=True)

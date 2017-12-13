@@ -5,6 +5,8 @@ read_env()
 
 APP_DIR = os.path.abspath(os.path.dirname(__file__))
 
+WRITE_FOLDER = env_var("WRITE_FOLDER", APP_DIR)
+
 CASSANDRA_CLUSTER = ('192.168.1.60', '192.168.1.61',  '192.168.1.62')
 
 CASSANDRA_TRANSACTION_KEYSPACE = 'lakeyspace'

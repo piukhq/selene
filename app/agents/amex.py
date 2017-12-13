@@ -165,7 +165,7 @@ class Amex:
     def write_transaction_matched_csv(merchants):
         a = arrow.utcnow()
         filename = 'cass_inp_amex_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(settings.APP_DIR, 'merchants/amex', filename)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants/amex', filename)
         try:
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
@@ -190,7 +190,7 @@ class Amex:
         :return: None
         """
 
-        path = os.path.join(settings.APP_DIR, 'merchants/amex', file_name)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants/amex', file_name)
 
         with open(path, 'w+') as f:
             f.write(amex_input_file.get_detail())

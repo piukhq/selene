@@ -54,7 +54,7 @@ class Visa:
 
         a = arrow.utcnow()
         filename = 'cass_inp_visa_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(settings.APP_DIR, 'merchants/visa', filename)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants/visa', filename)
         try:
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
@@ -79,7 +79,7 @@ class Visa:
         :return: None
         """
 
-        path = os.path.join(settings.APP_DIR, 'merchants/visa', file_name)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants/visa', file_name)
 
         wb = Workbook()
         ws1 = wb.active
