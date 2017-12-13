@@ -7,10 +7,6 @@ APP_DIR = os.path.abspath(os.path.dirname(__file__))
 
 WRITE_FOLDER = env_var("WRITE_FOLDER", APP_DIR)
 
-CASSANDRA_CLUSTER = ('192.168.1.60', '192.168.1.61',  '192.168.1.62')
-
-CASSANDRA_TRANSACTION_KEYSPACE = 'lakeyspace'
-
 TRANSACTION_MATCHING_FILES_CONFIG = ['sftp', 'amex', '192.168.1.13', 'amexsftp', 'am3xr00lz', 'inbox']
 
 MAILGUN_URL = None  # 'https://api.mailgun.net/v3/uk.bink.com/messages'
@@ -27,7 +23,7 @@ ASK_POSTCODE_VALIDATION = env_var('ASK_POSTCODE_VALIDATION', True)
 
 SECRET_KEY = '3456hk3465hj345jh6jk456j45lk-0'
 PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
-DEBUG = env_var("SELENE_DEBUG", True)
+DEBUG = env_var("SELENE_DEBUG", False)
 TOKEN_SECRET = "8vA/fjVA83(n05LWh7R4'$3dWmVCU"
 
 DEV_PORT = env_var('DEV_PORT', '5000')
