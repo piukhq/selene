@@ -38,3 +38,11 @@ class MastercardHandback(Resource):
             response.status_code = 500
 
         return response
+
+
+@api.resource('/mids/handback_duplicates')
+class FindDuplicatesInHandback(Resource):
+    @staticmethod
+    def post():
+        response = jsonify(success=True, error=None)
+        return response

@@ -28,3 +28,7 @@ class TestViews(TestCase):
         response = self.client.post("/mids/mastercard_handback", data=json.dumps(file), content_type="application/json")
 
         self.assertEqual(response.status_code, 200)
+
+    def test_handback_duplicates(self):
+        response = self.client.post("/mids/handback_duplicates", data="", content_type="application/json")
+        self.assertEqual(response.status_code, 200)
