@@ -1,6 +1,6 @@
 import os
 import settings
-import csv
+# import csv
 import arrow
 
 try:
@@ -12,11 +12,9 @@ import requests
 import pysftp
 import shutil
 
-from app.csvfile import CSVReader
 from app.utils import validate_uk_postcode
 from app.utils import resolve_agent
 
-from app.source_format import SourceFormat
 from app.active import AGENTS
 from app.utils import format_json_input
 
@@ -44,53 +42,55 @@ def get_agent(partner_slug):
         raise ex
 
 
+# todo implement mastercard handback files
 def export_mastercard():
-    files = fetch_files('psv')
-    agent_instance = get_agent('mastercard')
-    merchants = set()
-    footer_id = 30
-
-    errors = []
-    for txt_file in files:
-        with open(txt_file, newline='') as csvfile:
-            mcardreader = csv.reader(csvfile, delimiter='|')
-
-            for count, row in enumerate(mcardreader):
-                if count == 0:
-                    continue
-                elif footer_id == int(row[0]):
-                    # EOF
-                    break
-                elif agent_instance.has_mid(row[23]):
-                    if not validate_uk_postcode(row[17].strip('"')):
-                        error = "Invalid post code, post code='{}', row: {}, file: {}".format(row[17].strip('"'),
-                                                                                              count, txt_file)
-                        print(error)
-                        errors.append(error)
-                    merchant = (row[23], row[7], row[13], row[45], row[17],)
-                    merchants.add(merchant)
-                else:
-                    error = "Invalid MID, MID='{}', row: {}, file: {}".format(row[23], count, txt_file)
-                    print(error)
-                    errors.append(error)
-
-    if len(merchants):
-        prepped_merchants = []
-        for merc in merchants:
-            merc_dict = dict()
-            merc_dict['MasterCard MIDs'] = merc[0]
-            merc_dict['Partner Name'] = merc[1]
-            merc_dict['Town/City'] = merc[2]
-            merc_dict['Scheme'] = merc[3]
-            merc_dict['Postcode'] = merc[4]
-            prepped_merchants.append(merc_dict)
-        agent_instance.write_transaction_matched_csv(prepped_merchants)
-
-    err_filename = 'mastercard_errors.txt'
-    path = os.path.join(settings.APP_DIR, 'merchants/mastercard', err_filename)
-    with open(path, 'w') as error_output_file:
-        for err in errors:
-            error_output_file.write(err + '\n')
+    pass
+#     files = fetch_files('psv')
+#     agent_instance = get_agent('mastercard')
+#     merchants = set()
+#     footer_id = 30
+#
+#     errors = []
+#     for txt_file in files:
+#         with open(txt_file, newline='') as csvfile:
+#             mcardreader = csv.reader(csvfile, delimiter='|')
+#
+#             for count, row in enumerate(mcardreader):
+#                 if count == 0:
+#                     continue
+#                 elif footer_id == int(row[0]):
+#                     # EOF
+#                     break
+#                 elif agent_instance.has_mid(row[23]):
+#                     if not validate_uk_postcode(row[17].strip('"')):
+#                         error = "Invalid post code, post code='{}', row: {}, file: {}".format(row[17].strip('"'),
+#                                                                                               count, txt_file)
+#                         print(error)
+#                         errors.append(error)
+#                     merchant = (row[23], row[7], row[13], row[45], row[17],)
+#                     merchants.add(merchant)
+#                 else:
+#                     error = "Invalid MID, MID='{}', row: {}, file: {}".format(row[23], count, txt_file)
+#                     print(error)
+#                     errors.append(error)
+#
+#     if len(merchants):
+#         prepped_merchants = []
+#         for merc in merchants:
+#             merc_dict = dict()
+#             merc_dict['MasterCard MIDs'] = merc[0]
+#             merc_dict['Partner Name'] = merc[1]
+#             merc_dict['Town/City'] = merc[2]
+#             merc_dict['Scheme'] = merc[3]
+#             merc_dict['Postcode'] = merc[4]
+#             prepped_merchants.append(merc_dict)
+#         agent_instance.write_transaction_matched_csv(prepped_merchants)
+#
+#     err_filename = 'mastercard_errors.txt'
+#     path = os.path.join(settings.APP_DIR, 'merchants/mastercard', err_filename)
+#     with open(path, 'w') as error_output_file:
+#         for err in errors:
+#             error_output_file.write(err + '\n')
 
 
 def export(file, ignore_postcode):
@@ -105,7 +105,6 @@ def export(file, ignore_postcode):
         card_data.update({k: [agent_instance, valid_merchants, invalid_merchants, transaction_matched_merchants,
                               reasons]})
 
-    file = format_json_input(file)
     for row in file:
         for k, v in card_data.items():
             has_mid = False
@@ -161,35 +160,13 @@ def validate_row_data(row):
     return validated, reasons, bad_post_code
 
 
-def fetch_files(file_extension):
-    file_path = settings.APP_DIR + '/provider_types'
-    merchant_files = file_list(file_path, file_extension)
-    return merchant_files
-
-
-def file_list(file_path, file_ext):
-    if not os.path.isdir(file_path):
-        return []
-    return [os.path.join(file_path, fn) for fn in next(os.walk(file_path))[2] if fn.endswith(file_ext)]
-
-
-def get_partner_name():
+def get_partner_name(file):
     """Retrieve the partner name from the input csv file"""
-    csv_files = fetch_files('csv')
-    start_line = 2
-    pcard = SourceFormat()
-    reader = CSVReader(pcard.column_names, pcard.delimiter, pcard.column_keep)
+    p_name = []
+    for row in file:
+            p_name.append(row['Partner Name'])
 
-    pname = []
-    for txt_file in csv_files:
-        current_line = 0
-        for row in reader(txt_file):
-            current_line += 1
-            if current_line >= start_line:
-                pname.append(row['Partner Name'])
-
-    partner_name = ', '.join(set(pname))
-
+    partner_name = ', '.join(set(p_name))
     return partner_name
 
 
@@ -238,6 +215,8 @@ def send_email(agent, partner_name, content, attachments=None):
 
 
 def onboard_mids(file, send_export, ignore_postcode):
+    file = format_json_input(file)
+
     export(file, ignore_postcode)
 
     # Amex only requires SFTP
@@ -246,7 +225,7 @@ def onboard_mids(file, send_export, ignore_postcode):
     if send_export:
         upload_sftp(url, username, password, src_dir, dst_dir)
 
-    partner_name = get_partner_name()
+    partner_name = get_partner_name(file)
     content = 'Please load the attached MIDs for {} and confirm your forecast on-boarding date.'.format(partner_name)
 
     # Visa & MasterCard
@@ -263,48 +242,49 @@ def process_mastercard_handback_file():
     export_mastercard()
 
 
-def handle_duplicate_mids_in_mastercard_handback_files():
-    files = fetch_files('psv')
-    agent_instance = get_agent('mastercard')
-    footer_id = 30
-    mids = []
-
-    for txt_file in files:
-        with open(txt_file, newline='') as csvfile:
-            mcardreader = csv.reader(csvfile, delimiter='|')
-
-            for count, row in enumerate(mcardreader):
-                if count == 0:
-                    continue
-                elif footer_id == int(row[0]):
-                    # EOF
-                    break
-                else:
-                    if agent_instance.has_mid(row[23]):
-                        mids.append([row[23], count, txt_file])
-                    else:
-                        print("Invalid MID, row: {}, file: {}".format(count, txt_file))
-
-    duplicates = set()
-    dup_mids = set()
-    for i in range(0, len(mids)):
-        found = False
-
-        for j in range(0, len(mids)):
-            if i != j:
-                if found:
-                    break
-                if mids[i][0] == mids[j][0]:
-                    found = True
-
-        if found:
-            msg = "Duplicate MID: {} found on line number {} in file {}".format(mids[i][0], mids[i][1], mids[i][2])
-            duplicates.add(msg)
-            dup_mids.add(mids[i][0])
-
-    if len(dup_mids):
-        print(dup_mids)
-
-        agent_instance.write_duplicates_file(duplicates)
-    else:
-        print("No duplicates found.")
+# todo implement mastercard duplicate
+# def handle_duplicate_mids_in_mastercard_handback_files():
+#     files = fetch_files('psv')
+#     agent_instance = get_agent('mastercard')
+#     footer_id = 30
+#     mids = []
+#
+#     for txt_file in files:
+#         with open(txt_file, newline='') as csvfile:
+#             mcardreader = csv.reader(csvfile, delimiter='|')
+#
+#             for count, row in enumerate(mcardreader):
+#                 if count == 0:
+#                     continue
+#                 elif footer_id == int(row[0]):
+#                     # EOF
+#                     break
+#                 else:
+#                     if agent_instance.has_mid(row[23]):
+#                         mids.append([row[23], count, txt_file])
+#                     else:
+#                         print("Invalid MID, row: {}, file: {}".format(count, txt_file))
+#
+#     duplicates = set()
+#     dup_mids = set()
+#     for i in range(0, len(mids)):
+#         found = False
+#
+#         for j in range(0, len(mids)):
+#             if i != j:
+#                 if found:
+#                     break
+#                 if mids[i][0] == mids[j][0]:
+#                     found = True
+#
+#         if found:
+#             msg = "Duplicate MID: {} found on line number {} in file {}".format(mids[i][0], mids[i][1], mids[i][2])
+#             duplicates.add(msg)
+#             dup_mids.add(mids[i][0])
+#
+#     if len(dup_mids):
+#         print(dup_mids)
+#
+#         agent_instance.write_duplicates_file(duplicates)
+#     else:
+#         print("No duplicates found.")
