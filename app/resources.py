@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from flask_restful import Resource, Api
-from app.onboard_mids import onboard_mids
+from app.import_mids import onboard_mids
 from app.mastercard_handback import export_mastercard
 from app.utils import wipe_output_folders
 
