@@ -35,19 +35,9 @@ def get_agent(partner_slug):
         agent_class = resolve_agent(partner_slug)
         return agent_class()
     except KeyError:
-        raise 'No such agent:' + partner_slug
+        raise KeyError
     except Exception as ex:
         raise ex
-
-
-def csv_to_json(csv_file):
-    data = []
-    with open(csv_file, "r") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            data.append(row)
-
-    return json.dumps(data)
 
 
 def csv_to_list_json(csv_file):

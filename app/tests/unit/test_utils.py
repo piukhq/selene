@@ -1,7 +1,8 @@
 import os
 import unittest
 
-from app.utils import validate_uk_postcode, list_json_to_dict_json, empty_folder
+from app.utils import validate_uk_postcode, list_json_to_dict_json, empty_folder, get_agent
+from app.agents.mastercard import MasterCard
 from settings import APP_DIR
 
 
@@ -40,6 +41,13 @@ class TestUtils(unittest.TestCase):
 
         for p in bad_postcodes:
             self.assertFalse(validate_uk_postcode(p))
+
+    def test_get_agent(self):
+        with self.assertRaises(KeyError):
+            get_agent('test_error')
+
+        result = get_agent('mastercard')
+        self.assertTrue(isinstance(result, MasterCard))
 
     def test_empty_folder(self):
         open(self.full_path + "/test_file.txt", "w").close()
