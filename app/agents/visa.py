@@ -43,8 +43,10 @@ class Visa:
 
     @staticmethod
     def has_mid(row):
-        """return True if there is a visa mid in the row"""
-        if row['Visa MIDs'] != '' and row['Visa MIDs'] is not None:
+        """
+        return True if there is a visa mid in the row
+        """
+        if row['Visa MIDs'] and row['Visa MIDs'] is not "":
             return True
 
         return False

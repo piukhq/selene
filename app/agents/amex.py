@@ -156,7 +156,7 @@ class Amex:
     def has_mid(row):
         """return True if there is a visa mid in the row"""
         selected = row.get('American Express MIDs')
-        if str(selected).isdigit():
+        if selected and str(selected) is not "":
             return True
 
         return False
