@@ -41,7 +41,7 @@ class MastercardMerchantFile:
         today = arrow.utcnow().format("MM/DD/YYYY")
 
         row[0] = 20
-        row[2] = "A"
+        row[2] = detail[6]  # Action
         row[7] = detail[1]  # Merchant Name
         row[10] = detail[4]  # Merchant Address
         row[12] = detail[2]  # Merchant City
@@ -139,7 +139,7 @@ class MasterCard:
 
             detail = [merchant['MasterCard MIDs'], merchant['Partner Name'], merchant['Town/City'],
                       merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
-                      '', 'On-Board',
+                      '', merchant['Action'],
                       ]
             if validated:
                 detail.append('')

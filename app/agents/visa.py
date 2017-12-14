@@ -105,13 +105,21 @@ class Visa:
         file = VisaMerchantFile()
         partner_name = ''
 
+        action_translate = dict(
+            A='On-Board',
+            U='Update',
+            D='Remove'
+        )
+
         for count, merchant in enumerate(merchants):
             if count == 0:
                 partner_name = merchant['Partner Name']
 
+            action = action_translate.get(merchant['Action'])
+
             detail = [merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
                       merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
-                      '', 'On-Board',
+                      '', action,
                       ]
             if validated:
                 detail.append('')
