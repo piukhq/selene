@@ -9,7 +9,10 @@ def collect_merchants(file, agent_instance):
 
     for row_number, row in enumerate(file):
 
-        if agent_instance.has_mid(row[23]):
+        if row[0] == '30':
+            break
+
+        elif agent_instance.has_mid(row[23]):
             if not validate_uk_postcode(row[17].strip('"')):
                 error = "Invalid post code, post code='{}', row: {}".format(row[17].strip('"'), row_number)
                 errors.append(error)

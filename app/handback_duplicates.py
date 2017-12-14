@@ -7,7 +7,10 @@ def collect_mids(file, agent_instance):
 
     for count, row in enumerate(file):
 
-        if agent_instance.has_mid(row[23]):
+        if row[0] == '30':
+            break
+
+        elif agent_instance.has_mid(row[23]):
             mids.append([row[23], count])
 
     return mids
