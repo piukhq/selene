@@ -5,7 +5,7 @@ read_env()
 
 APP_DIR = os.path.abspath(os.path.dirname(__file__))
 
-WRITE_FOLDER = env_var("WRITE_FOLDER", '/tmp/mids_output')
+WRITE_FOLDER = env_var("WRITE_FOLDER", '/tmp/mids_output/')
 
 TRANSACTION_MATCHING_FILES_CONFIG = ['sftp', 'amex', '192.168.1.13', 'amexsftp', 'am3xr00lz', 'inbox']
 
