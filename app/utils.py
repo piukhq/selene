@@ -79,6 +79,7 @@ def empty_folder(path):
         except Exception as e:
             print(e)
 
+
 def wipe_output_folders():
     empty_folder('/merchants/visa')
     empty_folder('/merchants/amex')
