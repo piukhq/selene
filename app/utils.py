@@ -3,6 +3,7 @@ import re
 import importlib
 import json
 import csv
+import shutil
 
 from settings import WRITE_FOLDER
 from app.active import AGENTS
@@ -73,9 +74,10 @@ def empty_folder(path):
         try:
             if os.path.isfile(file_path):
                 os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
         except Exception as e:
             print(e)
-
 
 def wipe_output_folders():
     empty_folder('/merchants/visa')
