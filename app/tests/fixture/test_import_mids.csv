@@ -1,20 +1,13 @@
 Partner Name,American Express MIDs,MasterCard MIDs,Visa MIDs,"Address (Building Name/Number, Street)",Postcode,Town/City,County/State,Country,Action,Scheme,Scheme ID
-PizzaExpress,N/A,5415872,5415872,59 Halket Place St Helier Jersey,JE2 4WG,Jersey  St Helier,,,A,avios,133
-PizzaExpress,N/A,5415880,5415880,La Route de la Bale St Brelade Bay Jersey,JE3 8EA,Jersey  St Brelade,,,A,avios,133
-PizzaExpress,9421346362,5403068,5403068,29 Wardour Street Soho London,W1D 6PS,London Wardour Street,,,A,avios,133
-PizzaExpress,9421401878,5402821,5402821,30 Coptic Street Bloosbury London,WC1A 1NS,London  Coptic Street,,,D,avios,133
-PizzaExpress,9421399528,5409958,5409958,363 Fulham Road Chelsea London,SW10 9TN,London  Fulham Road (363),,,D,avios,133
-PizzaExpress,9421346289,5413679,5413679,137 Notting Hill Gate London,W11 3LB,London  Notting Hill Gate,,,D,avios,133
-PizzaExpress,9421164252,5409594,5409594,10 Dean Street Soho London,W1D 3RW,London  Dean Street,,,D,avios,133
-PizzaExpress,9421038316,5402888,5402888,80 Fore Street Hertford Hertfordshire,SG14 1BY,Hertford,,,D,avios,133
-PizzaExpress,9421346347,5409966,5409966,230236 Lavender Hill Battersea London,SW11 1LE,Clapham  Lavender Hill ,,,D,avios,133
-PizzaExpress,9421143785,5403266,5403266,11 Waldegrave Road Teddington,TW11 8LD,Teddington,,,D,avios,133
-PizzaExpress,9421108366,5413505,5413505,32 Earl Street Maidstone Kent,ME14 1PF,Maidstone,,,D,avios,133
-PizzaExpress,9421189440,5413240,5413240,40 Abbeygate Street Bury St Edmunds Suffolk,IP33 1LW,Bury St Edmunds,,,A,avios,133
-PizzaExpress,9421039363,5413661,5413661,30 High Street Highgate London,N6 5JG,Highgate,,,A,avios,133
-PizzaExpress,9421397050,5403126,5403126,895896 Fulham Road Fulham London,SW6 5HU,London   Fulham Road (895),,,A,avios,133
-PizzaExpress,9421423369,5410550,5410550,The Golden Cross 8 Golden Cross Cornmarket Street Oxford,OX1 3EX,Oxford  Golden Cross,,,A,avios,133
-PizzaExpress,9421516659,5409974,5409974,4654 Battersea Bridge Road Battersea London,SW11 3AG,Battersea,,,A,avios,133
-PizzaExpress,9421039157,5409784,5409784,76 High Road South Woodford London,E18 2NA,South Woodford,,,A,avios,133
-PizzaExpress,9421539594,5402854,5402854,7a Jesus Lane Cambridge,CB5 8BA,Cambridge  Jesus Lane,,,A,avios,133
+BinkTest,N/A,N/A,N/A,59 Halket Place St Helier Jersey,JE2 4WG,Jersey  St Helier,,,A,test,000
+BinkTest,,,,La Route de la Bale St Brelade Bay Jersey,JE3 8EA,Jersey  St Brelade,,,A,test,000
+BinkTest,1111111111,9999999,1111111,29 Wardour Street Soho London,W1D 6PS,London Wardour Street,,,A,test,000
+BinkTest,2222222222,8888888,2222222,30 Coptic Street Bloosbury London,WC1A 1NS,London  Coptic Street,,,D,test,000
+BinkTest,3333333333,7777777,3333333,363 Fulham Road Chelsea London,SW10 9TN,London  Fulham Road (363),,,D,test,000
+BinkTest,4444444444,6666666,4444444,137 Notting Hill Gate London,W11 3LB,London  Notting Hill Gate,,,U,test,000
+BinkTest,555MIDS555,555M555,555M555,10 Dean Street Soho London,W1D 3RW,London  Dean Street,,,U,test,000
+BinkTest,6666666666,4444444,6666666,80 Fore Street Hertford Hertfordshire,SG14 1BY,Hertford,,,U,test,000
+BinkTest,7777777777,3333333,7777777,230236 Lavender Hill Battersea London,SW11 1LE,Clapham  Lavender Hill ,,,A,test,000
+BinkTest,8888888888,2222222,8888888,11 Waldegrave Road Teddington,TW11 8LR,Teddington,,,A,test,000
+BinkTest,9999999999,1111111,9999999,32 Earl Street Maidstone Kent,ME14 1PF,Maidstone,,,A,test,000
 ,,,,,,,,,,,

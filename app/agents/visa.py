@@ -38,15 +38,20 @@ class VisaMerchantFile:
 
 
 class Visa:
-    def __init__(self):
-        pass
+
+    action_translate = dict(
+        A='On-Board',
+        U='Update',
+        D='Remove'
+    )
 
     @staticmethod
     def has_mid(row):
         """
         return True if there is a visa mid in the row
         """
-        if row['Visa MIDs'] and row['Visa MIDs'] is not "":
+        selected = row.get('Visa MIDs')
+        if selected and str(selected) != "" and str(selected) != "N/A":
             return True
 
         return False
@@ -56,7 +61,7 @@ class Visa:
 
         a = arrow.utcnow()
         filename = 'cass_inp_visa_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants/visa', filename)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', filename)
         try:
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
@@ -105,17 +110,11 @@ class Visa:
         file = VisaMerchantFile()
         partner_name = ''
 
-        action_translate = dict(
-            A='On-Board',
-            U='Update',
-            D='Remove'
-        )
-
         for count, merchant in enumerate(merchants):
             if count == 0:
                 partner_name = merchant['Partner Name']
 
-            action = action_translate.get(merchant['Action'])
+            action = self.action_translate.get(merchant['Action'])
 
             detail = [merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
                       merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],

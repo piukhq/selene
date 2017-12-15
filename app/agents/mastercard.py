@@ -22,7 +22,6 @@ class MastercardMerchantFile:
             self.project_id,
             arrow.utcnow().format("YYYYMMDDHHmmss")
         ]
-
         writer.writerow(row)
 
     def set_data(self, writer):
@@ -67,9 +66,12 @@ class MasterCard:
 
     @staticmethod
     def has_mid(element):
-        """return True if there is a mastercard mid in the row"""
+        """
+        return True if there is a mastercard mid in the row
+        """
+
         selected = element if isinstance(element, str) else element.get("MasterCard MIDs")
-        if selected and str(selected) is not "":
+        if selected and str(selected) != "" and str(selected) != "N/A":
             return True
 
         return False
@@ -82,13 +84,14 @@ class MasterCard:
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
-                    csv_writer.writerow(['mastercard',
-                                         merchant['MasterCard MIDs'].strip(' '),
-                                         merchant['Scheme'].strip('" ').lower(),
-                                         merchant['Partner Name'].strip('" '),
-                                         merchant['Town/City'].strip('" '),
-                                         merchant['Postcode'].strip('" '),
-                                         ])
+                    csv_writer.writerow([
+                        'mastercard',
+                        merchant['MasterCard MIDs'].strip(' '),
+                        merchant['Scheme'].strip('" ').lower(),
+                        merchant['Partner Name'].strip('" '),
+                        merchant['Town/City'].strip('" '),
+                        merchant['Postcode'].strip('" '),
+                    ])
 
         except IOError:
             raise Exception('Error writing file:' + path)

@@ -140,8 +140,6 @@ class AmexMerchantFile:
 
 
 class Amex:
-    def __init__(self):
-        pass
 
     @staticmethod
     def format_datetime(datetime):
@@ -154,9 +152,12 @@ class Amex:
 
     @staticmethod
     def has_mid(row):
-        """return True if there is a visa mid in the row"""
+        """
+        return True if there is a visa mid in the row
+        """
+
         selected = row.get('American Express MIDs')
-        if selected and str(selected) is not "":
+        if selected and str(selected) != "" and str(selected) != "N/A":
             return True
 
         return False
@@ -165,18 +166,19 @@ class Amex:
     def write_transaction_matched_csv(merchants):
         a = arrow.utcnow()
         filename = 'cass_inp_amex_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants/amex', filename)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', filename)
         try:
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
-                    csv_writer.writerow(['amex',
-                                         merchant['American Express MIDs'].strip(' '),
-                                         merchant['Scheme'].strip('" ').lower(),
-                                         merchant['Partner Name'].strip('" '),
-                                         merchant['Town/City'].strip('" '),
-                                         merchant['Postcode'].strip('" '),
-                                         ])
+                    csv_writer.writerow([
+                        'amex',
+                        merchant['American Express MIDs'].strip(' '),
+                        merchant['Scheme'].strip('" ').lower(),
+                        merchant['Partner Name'].strip('" '),
+                        merchant['Town/City'].strip('" '),
+                        merchant['Postcode'].strip('" '),
+                    ])
 
         except IOError:
             raise Exception('Error writing file:' + path)
@@ -276,7 +278,7 @@ class Amex:
     @staticmethod
     def create_file_name(validated):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
-        # TODO: Change BINK to suitable name
+
         file_name = '{}{}{}{}'.format(
             'CHINGS',
             '_AXP_MER_REG_',
