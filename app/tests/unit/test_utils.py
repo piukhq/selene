@@ -1,4 +1,5 @@
 import os
+import shutil
 import unittest
 
 from app.utils import validate_uk_postcode, list_json_to_dict_json, empty_folder, get_agent
@@ -7,14 +8,13 @@ from settings import WRITE_FOLDER
 
 
 class TestUtils(unittest.TestCase):
-    relative_path = "/app/tests/unit/test_dir"
-    full_path = WRITE_FOLDER + relative_path
+    path = os.path.join(WRITE_FOLDER, 'app', 'tests', 'unit', 'test_dir')
 
     def setUp(self):
-        os.makedirs(self.full_path, exist_ok=True)
+        os.makedirs(self.path, exist_ok=True)
 
     def tearDown(self):
-        os.rmdir(self.full_path)
+        shutil.rmtree(self.path)
 
     def test_uk_postcode_validator(self):
         good_postcodes = [
@@ -50,11 +50,11 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(isinstance(result, MasterCard))
 
     def test_empty_folder(self):
-        open(self.full_path + "/test_file.txt", "w").close()
-        self.assertTrue(os.listdir(self.full_path))
+        open(self.path + "/test_file.txt", "w").close()
+        self.assertTrue(os.listdir(self.path))
 
-        empty_folder(self.relative_path)
-        self.assertTrue(not os.listdir(self.full_path))
+        empty_folder(self.path)
+        self.assertTrue(not os.listdir(self.path))
 
     def test_list_json_to_dict_json(self):
         input_file = [

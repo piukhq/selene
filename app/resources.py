@@ -1,9 +1,12 @@
+import os
+import shutil
+import settings
 from flask import request, jsonify
 from flask_restful import Resource, Api
 from app.import_mids import onboard_mids
 from app.mastercard_handback import export_mastercard
 from app.handback_duplicates import find_duplicate_mids_in_mastercard_handback_file
-from app.utils import wipe_output_folders
+from app.utils import wipe_output_folders, csv_to_list_json
 
 api = Api()
 
@@ -66,4 +69,27 @@ class WipeOutputFolders(Resource):
 
         except Exception as e:
             response = jsonify(success=False, error=str(e))
+        return response
+
+
+@api.resource('/csv_to_json')
+class CsvToJson(Resource):
+    @staticmethod
+    def post():
+        try:
+            file = request.files.get('file')
+            path = os.path.join(settings.WRITE_FOLDER, 'convert')
+            file_path = os.path.join(path, 'input.csv')
+            os.makedirs(path, exist_ok=True)
+            file.save(file_path)
+
+            result = csv_to_list_json(file_path)
+            shutil.rmtree(path)
+
+            response = jsonify(success=True, error=None, result=result)
+
+        except Exception as e:
+            response = jsonify(success=False, error=str(e))
+            response.status_code = 500
+
         return response

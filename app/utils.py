@@ -18,12 +18,14 @@ def resolve_agent(name):
 
 def validate_uk_postcode(postcode):
     # validate post code using regex
-    pattern = re.compile('^[A-Z]{2}[0-9][A-Z] *?[0-9][A-Z]{2}$'
-                         '|^[A-Z][0-9][A-Z] *?[0-9][A-Z]{2}$'
-                         '|^[A-Z][0-9] *?[0-9][A-Z]{2}$'
-                         '|^[A-Z][0-9]{2} *?[0-9][A-Z]{2}$'
-                         '|^[A-Z]{2}[0-9] *?[0-9][A-Z]{2}$'
-                         '|^[A-Z]{2}[0-9]{2} *?[0-9][A-Z]{2}$')
+    pattern = re.compile(
+        '^[A-Z]{2}[0-9][A-Z] *?[0-9][A-Z]{2}$'
+        '|^[A-Z][0-9][A-Z] *?[0-9][A-Z]{2}$'
+        '|^[A-Z][0-9] *?[0-9][A-Z]{2}$'
+        '|^[A-Z][0-9]{2} *?[0-9][A-Z]{2}$'
+        '|^[A-Z]{2}[0-9] *?[0-9][A-Z]{2}$'
+        '|^[A-Z]{2}[0-9]{2} *?[0-9][A-Z]{2}$'
+    )
 
     if not re.match(pattern, postcode):
         return False
@@ -35,25 +37,27 @@ def get_agent(partner_slug):
     try:
         agent_class = resolve_agent(partner_slug)
         return agent_class()
-    except KeyError:
-        raise KeyError
+
     except Exception as ex:
         raise ex
 
 
 def csv_to_list_json(csv_file):
-    data = []
+    data = list()
     with open(csv_file, "r") as f:
         reader = csv.reader(f)
         for row in reader:
             data.append(row)
+
     return data
 
 
 def list_json_to_dict_json(file):
     data = list()
-    for i in range(1, len(file)):
-        data.append(dict(zip(file[0], file[i])))
+    header = file[0]
+    for row in file[1:]:
+        data.append(dict(zip(header, row)))
+
     return data
 
 
@@ -62,25 +66,28 @@ def format_json_input(json_file):
         file = json.loads(json_file) if isinstance(json_file, str) else json_file
         if isinstance(file[0], list):
             return list_json_to_dict_json(file)
+
         return file
+
     except Exception as e:
         return "wrong file format, exception: {}".format(e)
 
 
 def empty_folder(path):
-    folder = WRITE_FOLDER + path
-    for the_file in os.listdir(folder):
-        file_path = os.path.join(folder, the_file)
+    for the_file in os.listdir(path):
+        file_path = os.path.join(path, the_file)
         try:
             if os.path.isfile(file_path):
                 os.unlink(file_path)
+
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
+
         except Exception as e:
-            print(e)
+            raise e
 
 
 def wipe_output_folders():
-    empty_folder('/merchants/visa')
-    empty_folder('/merchants/amex')
-    empty_folder('/merchants/mastercard')
+    for folder in ['visa', 'amex', 'mastercard']:
+        path = os.path.join(WRITE_FOLDER, 'merchants', folder)
+        empty_folder(path)
