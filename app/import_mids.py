@@ -19,8 +19,10 @@ from app.utils import format_json_input
 
 
 def upload_sftp(url, username, password, src_dir, dst_dir):
-    """Upload all the files in the source directory to the sftp location url in the destination directory
-    with appropriate user credentials"""
+    """
+    Upload all the files in the source directory to the sftp location url in the destination directory
+    with appropriate user credentials
+    """
     with pysftp.Connection(url, username=username, password=password) as sftp:
         files = os.listdir(src_dir)
         for filename in files:
@@ -164,12 +166,11 @@ def send_email(agent, partner_name, content, attachments=None):
 
 def onboard_mids(file, send_export, ignore_postcode):
     file = format_json_input(file)
-
     export(file, ignore_postcode)
 
     # Amex only requires SFTP
     url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
-    src_dir = os.path.join(settings.WRITE_FOLDER, 'merchants/amex')
+    src_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex')
     if send_export:
         upload_sftp(url, username, password, src_dir, dst_dir)
 
@@ -178,9 +179,13 @@ def onboard_mids(file, send_export, ignore_postcode):
 
     # Visa & MasterCard
     attachments = get_attachments(src_dir)
+    now = arrow.utcnow().format('DD-MM-YY_hhmmss')
+
     if send_export:
         send_email('visa', partner_name, content, attachments)
         send_email('mastercard', partner_name, content)
-    now = arrow.utcnow().format('DD-MM-YY_hhmmss')
+
     for src_dir in ['visa', 'mastercard', 'amex']:
         archive_files(src_dir, now)
+
+    return now

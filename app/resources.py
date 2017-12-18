@@ -17,8 +17,8 @@ class ImportMids(Resource):
     def post():
         try:
             file = request.get_json()
-            onboard_mids(file, False, True)
-            response = jsonify(success=True, error=None)
+            folder_name = onboard_mids(file, False, True)
+            response = jsonify(success=True, error=None, folder_name=folder_name)
 
         except Exception as e:
             response = jsonify(success=False, error=str(e))

@@ -14,12 +14,9 @@ MAILGUN_API_KEY = None  # 'key-63iepgmkm8qdzs0fxm05jy0oq3c1yd42'
 MAILGUN_FROM_ADDRESS = None  # 'mids@uk.bink.com'
 
 EMAIL_TARGETS = {
-    'visa': 'mids@bink.com',
-    'mastercard': 'mids@bink.com',
+    'visa': None,  # 'mids@bink.com',
+    'mastercard': None,  # 'mids@bink.com',
 }
-
-ASK_TO_SEND_MAIL = env_var('ASK_TO_SEND_MAIL', True)
-ASK_POSTCODE_VALIDATION = env_var('ASK_POSTCODE_VALIDATION', True)
 
 SECRET_KEY = '3456hk3465hj345jh6jk456j45lk-0'
 PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
