@@ -1,10 +1,12 @@
 import os
-from flask_script import Manager, Server
+from flask_script import Manager, Server, Shell
 from app import create_app
 import settings
 
 app = create_app()
 manager = Manager(app)
+
+manager.add_command("shell", Shell(make_context=lambda: {'app': app}), use_ipython=True)
 
 manager.add_command("runserver", Server(port=settings.DEV_PORT, host=settings.DEV_HOST))
 
