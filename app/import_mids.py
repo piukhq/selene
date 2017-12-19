@@ -15,7 +15,7 @@ from app.utils import validate_uk_postcode
 from app.utils import get_agent
 
 from app.active import AGENTS
-from app.utils import format_json_input
+from app.utils import format_json_input, update_amex_sequence_number
 
 
 def upload_sftp(url, username, password, src_dir, dst_dir):
@@ -182,6 +182,7 @@ def onboard_mids(file, send_export, ignore_postcode):
     now = arrow.utcnow().format('DDMMYY_hhmmss')
 
     if send_export:
+        update_amex_sequence_number()
         send_email('visa', partner_name, content, attachments)
         send_email('mastercard', partner_name, content)
 

@@ -3,6 +3,21 @@ import arrow
 import os
 import settings
 
+from app.models import Sequence
+
+
+def get_next_file_number():
+    sequence = Sequence.query.filter(Sequence.scheme_provider == 'amex').first()
+
+    if not sequence:
+        from app.models import db
+        sequence = Sequence(scheme_provider='amex', type='ENROL', next_seq_number=1)
+        db.session.add(sequence)
+        db.session.commit()
+
+    next_number = sequence.to_dict()
+    return next_number['next_seq_number']
+
 
 class Field(object):
     def __init__(self, **kwargs):
@@ -208,7 +223,7 @@ class Amex:
         reason = reason or []
 
         detail_record_count = len(merchants)
-        file_num = 1  # sequential_file_number() + 1
+        file_num = get_next_file_number()
 
         header = Header(
             date=self.format_datetime(arrow.now()),

@@ -1,6 +1,7 @@
 import json
 
 from flask_testing import TestCase
+from unittest import mock
 
 from app import create_app
 from app.utils import csv_to_list_json
@@ -9,9 +10,13 @@ from settings import APP_DIR
 
 class TestViews(TestCase):
     def create_app(self):
+        self.SQLALCHEMY_DATABASE_URI = 'test'
+        self.SQLALCHEMY_TRACK_MODIFICATIONS = False
         return create_app(self, )
 
-    def test_import_mids(self):
+    @mock.patch('app.agents.amex.get_next_file_number')
+    def test_import_mids(self, next_sequence):
+        next_sequence.return_value = 1
         response = self.client.post("/mids/import_mids", data="test wrong content", content_type="application/json")
         self.assert500(response)
 

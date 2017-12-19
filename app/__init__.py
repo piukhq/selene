@@ -1,6 +1,8 @@
 import os
 import settings
+
 from flask import Flask
+from app.models import db
 
 
 def create_app(config_name='settings'):
@@ -15,6 +17,7 @@ def create_app(config_name='settings'):
 
     app = Flask('main')
     app.config.from_object(config_name)
+    db.init_app(app)
     api.init_app(app)
 
     return app

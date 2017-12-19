@@ -7,6 +7,7 @@ import shutil
 
 from settings import WRITE_FOLDER
 from app.active import AGENTS
+from app.models import Sequence, db
 
 
 def resolve_agent(name):
@@ -91,3 +92,9 @@ def wipe_output_folders():
     for folder in ['visa', 'amex', 'mastercard']:
         path = os.path.join(WRITE_FOLDER, 'merchants', folder)
         empty_folder(path)
+
+
+def update_amex_sequence_number():
+    sequence = Sequence.query.filter_by(scheme_provider='amex').first()
+    sequence.next_seq_number += 1
+    db.session.commit()
