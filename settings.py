@@ -21,9 +21,9 @@ EMAIL_TARGETS = {
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(
-    env_var('PONTUS_USER', 'txmatch'),
-    env_var('PONTUS_PASSWORD', 'branch4?Threw?Wet'),
-    env_var('PONTUS_HOST', '172.26.127.22'),
+    env_var('PONTUS_USER', 'pontus'),
+    env_var('PONTUS_PASSWORD', 'TJkD8GitA7NA'),
+    env_var('PONTUS_HOST', '10.0.104.22'),
     env_var('PONTUS_PORT', '5432'),
     env_var('PONTUS_DATABASE', 'pontus')
 )
