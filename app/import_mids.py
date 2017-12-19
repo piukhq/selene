@@ -179,7 +179,7 @@ def onboard_mids(file, send_export, ignore_postcode):
 
     # Visa & MasterCard
     attachments = get_attachments(src_dir)
-    now = arrow.utcnow().format('DD-MM-YY_hhmmss')
+    now = arrow.utcnow().format('DDMMYY_hhmmss')
 
     if send_export:
         send_email('visa', partner_name, content, attachments)
