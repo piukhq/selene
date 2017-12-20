@@ -15,8 +15,7 @@ def get_next_file_number():
         db.session.add(sequence)
         db.session.commit()
 
-    next_number = sequence.to_dict()
-    return next_number['next_seq_number']
+    return sequence.get_seq_number()
 
 
 class Field(object):

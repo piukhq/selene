@@ -19,3 +19,6 @@ class Sequence(db.Model):
             'next_seq_number': self.next_seq_number,
             'sequence_date': arrow.get(self.sequence_date).format("DD MMM YYYY")
         }
+
+    def get_seq_number(self):
+        return self.next_seq_number
