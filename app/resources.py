@@ -1,14 +1,10 @@
-import os
-import shutil
-import settings
-
 from flask import request, jsonify
 from flask_restful import Resource, Api
 
 from app.import_mids import onboard_mids
 from app.mastercard_handback import export_mastercard
 from app.handback_duplicates import find_duplicate_mids_in_mastercard_handback_file
-from app.utils import wipe_output_folders, csv_to_list_json
+from app.utils import wipe_output_folders
 
 api = Api()
 
