@@ -118,7 +118,7 @@ def get_partner_name(file):
 
 
 def get_attachment(folder_name):
-    path = os.path.join(settings.APP_DIR, 'merchants', 'visa', folder_name)
+    path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', folder_name)
     pattern = re.compile("^CAID_\w+_LoyaltyAngels_[0-9]{8}.xlsx$")
 
     for entry in scandir(path):
