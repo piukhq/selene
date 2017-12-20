@@ -126,7 +126,7 @@ def get_attachment(folder_name):
             attachment = os.path.join(path, entry.name)
             return attachment
 
-    return ''
+    return None
 
 
 def archive_files(src_dir, now):

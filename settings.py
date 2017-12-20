@@ -14,10 +14,10 @@ EMAIL_PASSWORD = env_var('EMAIL_PASSWORD', '$NickCisEcbeu1')
 EMAIL_HOST = env_var('EMAIL_HOST', 'smtp.office365.com')
 EMAIL_PORT = env_var('EMAIL_PORT', 587)
 
-EMAIL_TARGETS = [
-    'fmilani@bink.com',  # 'mids@bink.com',
-    # 'mastercard': 'mids@bink.com',
-]
+EMAIL_TARGETS = {
+    'visa': env_var('VISA_MAIL', 'mids@bink.com'),
+    'mastercard': env_var('MASTERCARD_MAIL', 'mids@bink.com')
+}
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 

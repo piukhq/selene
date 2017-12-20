@@ -3,10 +3,11 @@ import settings
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
 from email.encoders import encode_base64
 
 
-def send_email(agent, partner_name, content, attachments=''):
+def send_email(agent, partner_name, content, attachment=None):
     to_email = settings.EMAIL_TARGETS
     server_name = settings.EMAIL_HOST
     username = settings.EMAIL_USERNAME
@@ -15,20 +16,24 @@ def send_email(agent, partner_name, content, attachments=''):
 
     subject = '{} MID files for on-boarding with {}'.format(agent.title(), partner_name)
 
-    part = MIMEBase('application', "octet-stream")
-    part.set_payload(open(attachments, 'rb').read())
-    encode_base64(part)
-
     # Create the message
-    msg = MIMEMultipart(content)
-    msg['To'] = ", ".join(to_email)
+    msg = MIMEMultipart()
+    msg['To'] = to_email.get(agent)
     msg['From'] = username
     msg['Subject'] = subject
 
-    filename = attachments.split('/')[-1]
+    body = MIMEText(content, 'html')
+    msg.attach(body)
 
-    part.add_header('Content-Disposition', 'attachment; filename="{}"'.format(filename))
-    msg.attach(part)
+    if attachment:
+        part = MIMEBase('application', "octet-stream")
+        part.set_payload(open(attachment, 'rb').read())
+        encode_base64(part)
+
+        filename = attachment.split('/')[-1]
+        part.add_header('Content-Disposition', 'attachment; filename="{}"'.format(filename))
+
+        msg.attach(part)
 
     server = smtplib.SMTP(host=server_name, port=port)
     try:
@@ -43,6 +48,6 @@ def send_email(agent, partner_name, content, attachments=''):
             server.ehlo()  # re-identify ourselves over TLS connection
 
         server.login(username, password)
-        server.sendmail(username, to_email, msg.as_string())
+        server.sendmail(username, to_email.get(agent), msg.as_string())
     finally:
         server.quit()
