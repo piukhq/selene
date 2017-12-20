@@ -9,9 +9,10 @@ from settings import APP_DIR
 
 
 class TestViews(TestCase):
+    SQLALCHEMY_DATABASE_URI = 'test'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
     def create_app(self):
-        self.SQLALCHEMY_DATABASE_URI = 'test'
-        self.SQLALCHEMY_TRACK_MODIFICATIONS = False
         return create_app(self, )
 
     @mock.patch('app.agents.amex.get_next_file_number')

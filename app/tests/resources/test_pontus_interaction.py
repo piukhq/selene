@@ -7,9 +7,10 @@ from app.agents.amex import get_next_file_number
 
 
 class TestPontus(TestCase):
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
     def create_app(self):
-        self.SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-        self.SQLALCHEMY_TRACK_MODIFICATIONS = False
         return create_app(self, )
 
     def setUp(self):
