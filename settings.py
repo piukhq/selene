@@ -9,14 +9,15 @@ WRITE_FOLDER = env_var("WRITE_FOLDER", '/tmp/mids_output/')
 
 TRANSACTION_MATCHING_FILES_CONFIG = ['sftp', 'amex', '192.168.1.13', 'amexsftp', 'am3xr00lz', 'inbox']
 
-MAILGUN_URL = None  # 'https://api.mailgun.net/v3/uk.bink.com/messages'
-MAILGUN_API_KEY = None  # 'key-63iepgmkm8qdzs0fxm05jy0oq3c1yd42'
-MAILGUN_FROM_ADDRESS = None  # 'mids@uk.bink.com'
+EMAIL_USERNAME = env_var('EMAIL_USERNAME', 'itapps@bink.com')
+EMAIL_PASSWORD = env_var('EMAIL_PASSWORD', '$NickCisEcbeu1')
+EMAIL_HOST = env_var('EMAIL_HOST', 'smtp.office365.com')
+EMAIL_PORT = env_var('EMAIL_PORT', 587)
 
-EMAIL_TARGETS = {
-    'visa': None,  # 'mids@bink.com',
-    'mastercard': None,  # 'mids@bink.com',
-}
+EMAIL_TARGETS = [
+    'fmilani@bink.com',  # 'mids@bink.com',
+    # 'mastercard': 'mids@bink.com',
+]
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 

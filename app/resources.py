@@ -32,7 +32,7 @@ class MastercardHandback(Resource):
         try:
             file = request.get_json()
             export_mastercard(file)
-            response = jsonify(success=True, error=None)
+            response = jsonify(success=True, error=None, folder_name='handback')
 
         except Exception as e:
             response = jsonify(success=False, error=str(e))
@@ -48,7 +48,7 @@ class FindDuplicatesInHandback(Resource):
         try:
             file = request.get_json()
             find_duplicate_mids_in_mastercard_handback_file(file)
-            response = jsonify(success=True, error=None)
+            response = jsonify(success=True, error=None, folder_name='duplicates')
 
         except Exception as e:
             response = jsonify(success=False, error=str(e))

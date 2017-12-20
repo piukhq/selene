@@ -1,21 +1,18 @@
+import re
 import os
 import settings
 import arrow
+import pysftp
+import shutil
 
 try:
     from os import scandir
 except ImportError:
     from scandir import scandir
 
-import requests
-import pysftp
-import shutil
-
-from app.utils import validate_uk_postcode
-from app.utils import get_agent
-
+from app.utils import validate_uk_postcode, get_agent, format_json_input, update_amex_sequence_number
+from app.email import send_email
 from app.active import AGENTS
-from app.utils import format_json_input, update_amex_sequence_number
 
 
 def upload_sftp(url, username, password, src_dir, dst_dir):
@@ -120,16 +117,16 @@ def get_partner_name(file):
     return partner_name
 
 
-def get_attachments(src_dir):
-    """Send an email with generated MID data to each agent that requires it"""
-    attachments = []
-    for entry in scandir(src_dir):
-        if entry.is_file(follow_symlinks=False):
-            file_path = entry.path
-            if 'INVALID' not in file_path and 'cass' not in file_path:
-                attachments.append(file_path)
+def get_attachment(folder_name):
+    path = os.path.join(settings.APP_DIR, 'merchants', 'visa', folder_name)
+    pattern = re.compile("^CAID_\w+_LoyaltyAngels_[0-9]{8}.xlsx$")
 
-    return attachments
+    for entry in scandir(path):
+        if pattern.match(entry.name):
+            attachment = os.path.join(path, entry.name)
+            return attachment
+
+    return ''
 
 
 def archive_files(src_dir, now):
@@ -147,23 +144,6 @@ def copy_local(src_dir, dst_dir):
             shutil.move(entry.path, dst_dir)
 
 
-def send_email(agent, partner_name, content, attachments=None):
-    """
-    Send an email with MIDs
-    """
-    attachments = attachments or []
-    subject = '{} MID files for on-boarding with {}'.format(agent.title(), partner_name)
-    resp = requests.post(
-        settings.MAILGUN_URL,
-        auth=('api', settings.MAILGUN_API_KEY),
-        files=[('attachment', open(file_name)) for file_name in attachments],
-        data={'from': settings.MAILGUN_FROM_ADDRESS,
-              'to': settings.EMAIL_TARGETS[agent],
-              'subject': subject,
-              'text': content})
-    resp.raise_for_status()
-
-
 def onboard_mids(file, send_export, ignore_postcode):
     file = format_json_input(file)
     export(file, ignore_postcode)
@@ -178,15 +158,15 @@ def onboard_mids(file, send_export, ignore_postcode):
     content = 'Please load the attached MIDs for {} and confirm your forecast on-boarding date.'.format(partner_name)
 
     # Visa & MasterCard
-    attachments = get_attachments(src_dir)
     now = arrow.utcnow().format('DDMMYY_hhmmss')
+    for src_dir in ['visa', 'mastercard', 'amex']:
+        archive_files(src_dir, now)
+
+    attachment = get_attachment(now)
 
     if send_export:
         update_amex_sequence_number()
-        send_email('visa', partner_name, content, attachments)
+        send_email('visa', partner_name, content, attachment)
         send_email('mastercard', partner_name, content)
-
-    for src_dir in ['visa', 'mastercard', 'amex']:
-        archive_files(src_dir, now)
 
     return now

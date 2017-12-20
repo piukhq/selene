@@ -247,9 +247,11 @@ class Amex:
         for count, merchant in enumerate(merchants):
             if validated:
                 the_reason = ''
+
             else:
                 the_reason = reason[count]
-            detail = AmexDetail(
+
+            file.add_detail(AmexDetail(
                 action_code=merchant['Action'],  # A=Add, U=Update, D=Delete
                 partner_id='AADP0050',
                 version_number='1.0',
@@ -279,25 +281,21 @@ class Amex:
                 custom_field_1='',
                 custom_field_2='',
                 filler=the_reason
-            )
-
-            file.add_detail(detail)
+            ))
 
         file_name = self.create_file_name(validated)
         try:
             self.write_to_file(file, file_name)
+
         except IOError:
             raise Exception('Error writing file:' + file_name)
 
     @staticmethod
     def create_file_name(validated):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
-
-        file_name = '{}{}{}{}'.format(
-            'CHINGS',
-            '_AXP_MER_REG_',
-            arrow.now().format('YYYYMMDD_hhmmss'),
-            '.txt'
+        file_name = '{company}_AXP_MER_REG_{datetime}.txt'.format(
+            company='CHINGS',
+            datetime=arrow.now().format('YYYYMMDD_hhmmss')
         )
 
         if not validated:
