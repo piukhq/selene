@@ -44,14 +44,3 @@ class TestViews(TestCase):
         response = self.client.post("/mids/handback_duplicates", data=json.dumps(file), content_type="application/json")
 
         self.assert200(response)
-
-    def test_csv_to_json(self):
-
-        with open(APP_DIR + "/app/tests/fixture/test_import_mids.csv", 'rb') as file:
-            data = dict(file=file)
-            response = self.client.post("/csv_to_json", data=data, content_type='multipart/form-data')
-
-        expected = csv_to_list_json(APP_DIR + "/app/tests/fixture/test_import_mids.csv")
-        result = response.json.get('result')
-
-        self.assertEqual(expected, result)

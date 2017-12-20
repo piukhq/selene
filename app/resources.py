@@ -72,26 +72,3 @@ class WipeOutputFolders(Resource):
         except Exception as e:
             response = jsonify(success=False, error=str(e))
         return response
-
-
-@api.resource('/csv_to_json')
-class CsvToJson(Resource):
-    @staticmethod
-    def post():
-        try:
-            file = request.files.get('file')
-            path = os.path.join(settings.WRITE_FOLDER, 'convert')
-            file_path = os.path.join(path, 'input.csv')
-            os.makedirs(path, exist_ok=True)
-            file.save(file_path)
-
-            result = csv_to_list_json(file_path)
-            shutil.rmtree(path)
-
-            response = jsonify(success=True, error=None, result=result)
-
-        except Exception as e:
-            response = jsonify(success=False, error=str(e))
-            response.status_code = 500
-
-        return response
