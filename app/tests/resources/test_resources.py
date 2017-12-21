@@ -45,3 +45,8 @@ class TestViews(TestCase):
         response = self.client.post("/mids/handback_duplicates", data=json.dumps(file), content_type="application/json")
 
         self.assert200(response)
+
+        file = csv_to_list_json(APP_DIR + "/app/tests/fixture/test_handback.csv")
+        response = self.client.post("/mids/handback_duplicates", data=json.dumps(file), content_type="application/json")
+
+        self.assert200(response)

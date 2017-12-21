@@ -1,4 +1,5 @@
 10,2.02E+13,BINK,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+25,BINK,M,7111615,,111TEST11,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,SW1X 7RJ,,GBR,,207201857,,,3864,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test
 25,BINK,N,7111611,No Merch ID,999999999,10/29/2017,Bink Test,Bink Test,,,,,ASCOT,,,,LS1 6AZ,,GBR,,,,999999999,,,,5311,Retail,11/16/2017,,,,,,,,,11/16/2017,,,,,,,test
 25,BINK,M,7111615,,111111111,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,SW1X 7RJ,,GBR,,207201857,,111111111,1896,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test
 25,BINK,M,7111615,,222222222,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,SW1X 7RJ,,GBR,,207201857,,222222222,3864,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test
@@ -6,8 +7,9 @@
 25,BINK,M,7111615,,444444444,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,SW1X 7RJ,,GBR,,207201857,,444444444,3864,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test
 25,BINK,M,7111615,,555555555,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,SW1X 7RJ,,GBR,,207201857,,555555555,1874,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test
 25,BINK,M,7111615,,666666666,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,SW1X 7RJ,,GBR,,207201857,,666666666,1904,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test
-25,BINK,M,7111615,,777777777,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,SW1X 7RJ,,GBR,,207201857,,777777777,3864,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test
+25,BINK,M,7111615,,777777777,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,invalid_postcode,,GBR,,207201857,,777777777,3864,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test
 25,BINK,M,7111615,,888888888,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,SW1X 7RJ,,GBR,,207201857,,888888888,3864,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test
 25,BINK,M,7111615,,4444MIDS4,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,SW1X 7RJ,,GBR,,207201857,,4444MIDS4,3864,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test
 25,BINK,M,7111615,,111TEST11,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,SW1X 7RJ,,GBR,,207201857,,111TEST11,3864,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test
 30,BINK,13,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+25,BINK,M,7111615,,111TEST11,11/14/2017,Bink Test,Bink Test,,,,,ASCOT,,,,SW1X 7RJ,,GBR,,207201857,,111TEST11,3864,,,5311,Retail,11/16/2017,,,www.test.com,,,,,,11/16/2017,,,,,,,test

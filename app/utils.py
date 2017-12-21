@@ -4,8 +4,8 @@ import importlib
 import json
 import csv
 import shutil
+import settings
 
-from settings import WRITE_FOLDER
 from app.active import AGENTS
 from app.models import Sequence, db
 
@@ -77,20 +77,17 @@ def format_json_input(json_file):
 def empty_folder(path):
     for the_file in os.listdir(path):
         file_path = os.path.join(path, the_file)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
 
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
+        if os.path.isfile(file_path):
+            os.unlink(file_path)
 
-        except Exception as e:
-            raise e
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
 
 
 def wipe_output_folders():
     for folder in ['visa', 'amex', 'mastercard']:
-        path = os.path.join(WRITE_FOLDER, 'merchants', folder)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', folder)
         empty_folder(path)
 
 

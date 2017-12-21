@@ -2,32 +2,28 @@ import re
 import os
 import settings
 import arrow
-import pysftp
+# import pysftp
 import shutil
-
-try:
-    from os import scandir
-except ImportError:
-    from scandir import scandir
 
 from app.utils import validate_uk_postcode, get_agent, format_json_input, update_amex_sequence_number
 from app.email import send_email
 from app.active import AGENTS
 
 
-def upload_sftp(url, username, password, src_dir, dst_dir):
-    """
-    Upload all the files in the source directory to the sftp location url in the destination directory
-    with appropriate user credentials
-    """
-    with pysftp.Connection(url, username=username, password=password) as sftp:
-        files = os.listdir(src_dir)
-        for filename in files:
-            path = os.path.join(src_dir, filename)
-            if os.path.isfile(path):
-                src_path = path
-                dst_path = os.path.join(dst_dir, filename)
-                sftp.put(src_path, dst_path, preserve_mtime=True)
+# todo implement amex sftp
+# def upload_sftp(url, username, password, src_dir, dst_dir):
+#     """
+#     Upload all the files in the source directory to the sftp location url in the destination directory
+#     with appropriate user credentials
+#     """
+#     with pysftp.Connection(url, username=username, password=password) as sftp:
+#         files = os.listdir(src_dir)
+#         for filename in files:
+#             path = os.path.join(src_dir, filename)
+#             if os.path.isfile(path):
+#                 src_path = path
+#                 dst_path = os.path.join(dst_dir, filename)
+#                 sftp.put(src_path, dst_path, preserve_mtime=True)
 
 
 def initialize_card_data():
@@ -121,12 +117,10 @@ def get_attachment(folder_name):
     path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', folder_name)
     pattern = re.compile("^CAID_\w+_LoyaltyAngels_[0-9]{8}.xlsx$")
 
-    for entry in scandir(path):
+    for entry in os.scandir(path):
         if pattern.match(entry.name):
             attachment = os.path.join(path, entry.name)
             return attachment
-
-    return None
 
 
 def archive_files(src_dir, now):
@@ -139,7 +133,7 @@ def archive_files(src_dir, now):
 
 def copy_local(src_dir, dst_dir):
     """Copy files locally from one directory to another"""
-    for entry in scandir(src_dir):
+    for entry in os.scandir(src_dir):
         if entry.is_file(follow_symlinks=False):
             shutil.move(entry.path, dst_dir)
 
@@ -149,10 +143,8 @@ def onboard_mids(file, send_export, ignore_postcode):
     export(file, ignore_postcode)
 
     # Amex only requires SFTP
-    url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
-    src_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex')
-    if send_export:
-        upload_sftp(url, username, password, src_dir, dst_dir)
+    # url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
+    # src_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex')
 
     partner_name = get_partner_name(file)
     content = 'Please load the attached MIDs for {} and confirm your forecast on-boarding date.'.format(partner_name)
@@ -165,6 +157,7 @@ def onboard_mids(file, send_export, ignore_postcode):
     attachment = get_attachment(now)
 
     if send_export:
+        # upload_sftp(url, username, password, src_dir, dst_dir)
         update_amex_sequence_number()
         send_email('visa', partner_name, content, attachment)
         send_email('mastercard', partner_name, content)
