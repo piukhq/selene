@@ -21,6 +21,7 @@ RUN addgroup --gid 1550 apps && \
  pip3 install -r /usr/local/src/selene/requirements.txt && \
  chown apps:apps /usr/local/src -R && \
  apt-get -y remove rsync git git-core curl && \
+ apt-get -y install lftp && \
  apt-get -y autoremove && \
  apt-get clean && \
  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
