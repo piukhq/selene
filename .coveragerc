@@ -1,6 +1,5 @@
 [run]
 omit = *test*
-       *email.py
        *manage.py
 
 branch = True

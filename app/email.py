@@ -27,15 +27,17 @@ def send_email(agent, partner_name, content, attachment=None):
 
     if attachment:
         part = MIMEBase('application', "octet-stream")
-        part.set_payload(open(attachment, 'rb').read())
-        encode_base64(part)
+        with open(attachment, 'rb') as file:
+            part.set_payload(file.read())
 
+        encode_base64(part)
         filename = attachment.split('/')[-1]
         part.add_header('Content-Disposition', 'attachment; filename="{}"'.format(filename))
 
         msg.attach(part)
 
     server = smtplib.SMTP(host=server_name, port=port)
+
     try:
         server.set_debuglevel(True)
 
