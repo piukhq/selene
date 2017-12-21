@@ -1,6 +1,7 @@
 [run]
 omit = *test*
        *manage.py
+       *environment*
 
 branch = True
 

@@ -10,6 +10,15 @@ from app.active import AGENTS
 from app.models import Sequence, db
 
 
+def init_folders():
+    path = os.path.join(settings.WRITE_FOLDER, 'merchants')
+
+    os.makedirs(path, exist_ok=True)
+    os.makedirs(path + '/visa', exist_ok=True)
+    os.makedirs(path + '/amex', exist_ok=True)
+    os.makedirs(path + '/mastercard', exist_ok=True)
+
+
 def resolve_agent(name):
     class_path = AGENTS[name]
     module_name, class_name = class_path.split(".")

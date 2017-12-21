@@ -67,4 +67,6 @@ class WipeOutputFolders(Resource):
 
         except Exception as e:
             response = jsonify(success=False, error=str(e))
+            response.status_code = 500
+
         return response
