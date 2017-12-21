@@ -108,8 +108,9 @@ def update_amex_sequence_number():
 
 def get_attachment(path, provider):
     pattern = settings.GET_ATTACHMENT[provider]
-
+    attachment = None
     for entry in os.scandir(path):
         if pattern.match(entry.name):
             attachment = os.path.join(path, entry.name)
-            return attachment
+
+    return attachment

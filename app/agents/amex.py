@@ -2,8 +2,8 @@ import csv
 import arrow
 import os
 import settings
-import pysftp
 
+from plumbum import cmd
 from app.models import Sequence
 from app.utils import get_attachment
 
@@ -26,15 +26,14 @@ def upload_sftp(url, username, password, src_dir, dst_dir):
     Upload all the files in the source directory to the sftp location url in the destination directory
     with appropriate user credentials
     """
-    cnopts = pysftp.CnOpts()
-    cnopts.hostkeys = None
-    with pysftp.Connection(url, username=username, password=password, cnopts=cnopts) as sftp:
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', src_dir)
-        src_path = get_attachment(path, 'amex')
 
-        filename = src_path.split('/')[-1]
-        dst_path = os.path.join(dst_dir, filename)
-        sftp.put(src_path, dst_path)
+    path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', src_dir)
+    src_file = get_attachment(path, 'amex')
+
+    cmd.lftp(
+        'sftp://{}:{}@{}'.format(username, password, url),
+        'put -a -O {} {}; bye'.format(dst_dir, src_file)
+    )
 
 
 class Field(object):

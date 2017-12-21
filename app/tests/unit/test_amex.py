@@ -5,24 +5,16 @@ from unittest import TestCase, mock
 from app.agents.amex import upload_sftp
 
 
-class MockSftp:
-    hostkeys = None
-
-    def CnOpts(self):
-        return self
-
-    def Connection(self, url, username, password, cnopts):
-        return self
-
-    def put(self):
+class MockLftp:
+    def __init__(self, *args, **kwargs):
         pass
 
 
 class TestAmexUtils(TestCase):
 
-    @mock.patch('app.agents.amex.pysftp')
+    @mock.patch('app.agents.amex.cmd.lftp')
     def test_upload_sftp(self, sftp):
-        sftp.side_effect = MockSftp
+        sftp.side_effect = MockLftp
         path = join(settings.APP_DIR, 'app', 'tests', 'fixture')
         try:
             upload_sftp('test', 'test', 'test', path, 'test')
