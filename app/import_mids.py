@@ -1,35 +1,18 @@
-import re
 import os
 import settings
 import arrow
-# import pysftp
 import shutil
 
-from app.utils import validate_uk_postcode, get_agent, format_json_input, update_amex_sequence_number
+from app import utils
 from app.email import send_email
 from app.active import AGENTS
-
-
-# todo implement amex sftp
-# def upload_sftp(url, username, password, src_dir, dst_dir):
-#     """
-#     Upload all the files in the source directory to the sftp location url in the destination directory
-#     with appropriate user credentials
-#     """
-#     with pysftp.Connection(url, username=username, password=password) as sftp:
-#         files = os.listdir(src_dir)
-#         for filename in files:
-#             path = os.path.join(src_dir, filename)
-#             if os.path.isfile(path):
-#                 src_path = path
-#                 dst_path = os.path.join(dst_dir, filename)
-#                 sftp.put(src_path, dst_path, preserve_mtime=True)
+from app.agents.amex import upload_sftp
 
 
 def initialize_card_data():
     card_data = {}
     for k, v in AGENTS.items():
-        agent_instance = get_agent(k)
+        agent_instance = utils.get_agent(k)
         valid_merchants = []
         invalid_merchants = []
         transaction_matched_merchants = []
@@ -86,7 +69,7 @@ def validate_row_data(row):
     bad_post_code = False
     reasons = ''
 
-    if not validate_uk_postcode(row['Postcode'].strip('"')):
+    if not utils.validate_uk_postcode(row['Postcode'].strip('"')):
         reasons = "Invalid post code: '{}' ".format(row['Postcode'].strip('"'))
         bad_post_code = True
 
@@ -113,16 +96,6 @@ def get_partner_name(file):
     return partner_name
 
 
-def get_attachment(folder_name):
-    path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', folder_name)
-    pattern = re.compile("^CAID_\w+_LoyaltyAngels_[0-9]{8}.xlsx$")
-
-    for entry in os.scandir(path):
-        if pattern.match(entry.name):
-            attachment = os.path.join(path, entry.name)
-            return attachment
-
-
 def archive_files(src_dir, now):
     """Archive generated files"""
     dst_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', src_dir, now)
@@ -139,26 +112,24 @@ def copy_local(src_dir, dst_dir):
 
 
 def onboard_mids(file, send_export, ignore_postcode):
-    file = format_json_input(file)
+    file = utils.format_json_input(file)
     export(file, ignore_postcode)
-
-    # Amex only requires SFTP
-    # url, username, password, dst_dir = settings.TRANSACTION_MATCHING_FILES_CONFIG[2:]
-    # src_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex')
 
     partner_name = get_partner_name(file)
     content = 'Please load the attached MIDs for {} and confirm your forecast on-boarding date.'.format(partner_name)
 
     # Visa & MasterCard
     now = arrow.utcnow().format('DDMMYY_hhmmss')
-    for src_dir in ['visa', 'mastercard', 'amex']:
-        archive_files(src_dir, now)
+    for folder in ['visa', 'mastercard', 'amex']:
+        archive_files(folder, now)
 
-    attachment = get_attachment(now)
+    visa_path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', now)
+    attachment = utils.get_attachment(visa_path, 'visa')
+    url, username, password, dst_dir = settings.AMEX_SFTP_CONFIG
 
     if send_export:
-        # upload_sftp(url, username, password, src_dir, dst_dir)
-        update_amex_sequence_number()
+        upload_sftp(url, username, password, now, dst_dir)
+        utils.update_amex_sequence_number()
         send_email('visa', partner_name, content, attachment)
         send_email('mastercard', partner_name, content)
 

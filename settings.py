@@ -1,3 +1,4 @@
+import re
 import os
 from environment import read_env, env_var
 
@@ -22,7 +23,7 @@ TOKEN_SECRET = "8vA/fjVA83(n05LWh7R4'$3dWmVCU"
 DEV_PORT = env_var('DEV_PORT', '8000')
 DEV_HOST = env_var('DEV_HOST', '0.0.0.0')
 
-TRANSACTION_MATCHING_FILES_CONFIG = ['sftp', 'amex', '192.168.1.13', 'amexsftp', 'am3xr00lz', 'inbox']
+AMEX_SFTP_CONFIG = ['fsgatewaytest.aexp.com', 'CHINGSTST', 'Talu@6713', 'inbox']
 
 EMAIL_USERNAME = env_var('EMAIL_USERNAME', 'itapps@bink.com')
 EMAIL_PASSWORD = env_var('EMAIL_PASSWORD', '$NickCisEcbeu1')
@@ -31,4 +32,9 @@ EMAIL_PORT = env_var('EMAIL_PORT', 587)
 EMAIL_TARGETS = {
     'visa': env_var('VISA_MAIL', 'mids@bink.com'),
     'mastercard': env_var('MASTERCARD_MAIL', 'mids@bink.com')
+}
+
+GET_ATTACHMENT = {
+    'visa': re.compile('^CAID_\\w+_LoyaltyAngels_[0-9]{8}.xlsx$'),
+    'amex': re.compile('\\w+_AXP_MER_REG_[0-9]{8}_[0-9]{6}.txt$')
 }

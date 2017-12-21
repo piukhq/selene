@@ -104,3 +104,12 @@ def update_amex_sequence_number():
     sequence = Sequence.query.filter_by(scheme_provider='amex').first()
     sequence.next_seq_number += 1
     db.session.commit()
+
+
+def get_attachment(path, provider):
+    pattern = settings.GET_ATTACHMENT[provider]
+
+    for entry in os.scandir(path):
+        if pattern.match(entry.name):
+            attachment = os.path.join(path, entry.name)
+            return attachment

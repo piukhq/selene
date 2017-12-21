@@ -2,13 +2,16 @@ import csv
 import arrow
 import os
 import settings
+import pysftp
 
 from app.models import Sequence
+from app.utils import get_attachment
 
 
 def get_next_file_number():
     sequence = Sequence.query.filter(Sequence.scheme_provider == 'amex').first()
 
+    # just for the first time the database is created.
     if not sequence:
         from app.models import db
         sequence = Sequence(scheme_provider='amex', type='ENROL', next_seq_number=1)
@@ -16,6 +19,22 @@ def get_next_file_number():
         db.session.commit()
 
     return sequence.get_seq_number()
+
+
+def upload_sftp(url, username, password, src_dir, dst_dir):
+    """
+    Upload all the files in the source directory to the sftp location url in the destination directory
+    with appropriate user credentials
+    """
+    cnopts = pysftp.CnOpts()
+    cnopts.hostkeys = None
+    with pysftp.Connection(url, username=username, password=password, cnopts=cnopts) as sftp:
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', src_dir)
+        src_path = get_attachment(path, 'amex')
+
+        filename = src_path.split('/')[-1]
+        dst_path = os.path.join(dst_dir, filename)
+        sftp.put(src_path, dst_path)
 
 
 class Field(object):
