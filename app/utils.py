@@ -127,7 +127,8 @@ def prepare_cassandra_file(file, headers):
 
     data = list()
     for row in file:
-        if len(row) != len(headers) - 1:
+        # the column created_date is optional, if not present cassandra will automatically add it
+        if len(headers) != len(row) != len(headers) - 1:
             raise ValueError("Columns of the input file and columns of cassandra's table do not match.")
 
         data.append(dict(zip(headers, row)))
