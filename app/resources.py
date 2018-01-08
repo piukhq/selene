@@ -4,6 +4,7 @@ from flask_restful import Resource, Api
 from app.import_mids import onboard_mids
 from app.mastercard_handback import export_mastercard
 from app.handback_duplicates import find_duplicate_mids_in_mastercard_handback_file
+from app.cassandra_operations import load_mids_to_cassandra
 from app.utils import wipe_output_folders
 
 api = Api()
@@ -78,8 +79,9 @@ class LoadToCassandra(Resource):
     def post():
         try:
             file = request.get_json()
+            error = load_mids_to_cassandra(file)
+            response = jsonify(success=False if error else True, error=error)
 
-            response = jsonify(success=True, error=None)
         except Exception as e:
             response = jsonify(success=False, error=str(e))
             response.status_code = 500

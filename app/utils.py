@@ -112,3 +112,19 @@ def get_attachment(path, provider):
             attachment = os.path.join(path, entry.name)
 
     return attachment
+
+
+def prepare_cassandra_file(file, headers):
+    """
+    Remove trailing empty lines, and add headers.
+    :param file:
+    :return:
+    """
+    while not ''.join(file[-1]):
+        file = file[:-1]
+
+    data = list()
+    for row in file:
+        data.append(dict(zip(headers, row)))
+
+    return data
