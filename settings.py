@@ -16,7 +16,7 @@ SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{password}@{host}:{port}
     database=env_var('PONTUS_DATABASE', 'pontus')
 )
 
-CASSANDRA_CLUSTER = env_var('CASSANDRA_CLUSTER', ['127.0.0.1'])
+CASSANDRA_CLUSTER = env_var('CASSANDRA_CLUSTER', '192.168.1.60, 192.168.1.61, 192.168.1.62').split(', ')
 
 SECRET_KEY = '3456hk3465hj345jh6jk456j45lk-0'
 PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))

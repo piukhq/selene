@@ -1,7 +1,8 @@
 import os
+import settings
+
 from flask_script import Manager, Server, Shell
 from app import create_app
-import settings
 
 app = create_app()
 manager = Manager(app)
