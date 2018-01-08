@@ -87,14 +87,14 @@ class TestViews(TestCase):
 
             self.assert200(response)
 
-            missing_data = json.loads(file)
-            missing_data[0].pop(5)
+            wrong_data = json.loads(file)
+            wrong_data[0].pop(5)
 
-            response = self.client.post("/cassandra/add", data=json.dumps(missing_data), content_type="application/json")
+            response = self.client.post("/cassandra/add", data=json.dumps(wrong_data), content_type="application/json")
 
             self.assertIn('ValueError', response.json.get('error'))
 
-        wrong_type_input = "wrong data"
-        response = self.client.post("/cassandra/add", data=wrong_type_input, content_type="application/json")
+        wrong_type_data = "wrong data"
+        response = self.client.post("/cassandra/add", data=wrong_type_data, content_type="application/json")
 
         self.assert500(response)
