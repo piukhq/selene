@@ -117,14 +117,19 @@ def get_attachment(path, provider):
 def prepare_cassandra_file(file, headers):
     """
     Remove trailing empty lines, and add headers.
-    :param file:
-    :return:
+    :param file: input json file as list of lists with no headers
+    :param headers: cassandra table headers
+    :return: list of dictionaries with no trailing empty lines.
     """
+
     while not ''.join(file[-1]):
         file = file[:-1]
 
     data = list()
     for row in file:
+        if len(row) != len(headers):
+            raise IndexError("Columns of the input file and columns of cassandra's table do not match.")
+
         data.append(dict(zip(headers, row)))
 
     return data
