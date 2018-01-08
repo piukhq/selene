@@ -1,9 +1,9 @@
 import os
 import re
-import importlib
-import json
 import csv
+import json
 import shutil
+import importlib
 import settings
 
 from app.active import AGENTS
@@ -11,12 +11,10 @@ from app.models import Sequence, db
 
 
 def init_folders():
-    path = os.path.join(settings.WRITE_FOLDER, 'merchants')
 
-    os.makedirs(path, exist_ok=True)
-    os.makedirs(path + '/visa', exist_ok=True)
-    os.makedirs(path + '/amex', exist_ok=True)
-    os.makedirs(path + '/mastercard', exist_ok=True)
+    for folder in ['visa', 'amex', 'mastercard']:
+        folder_path = os.path.join(settings.WRITE_FOLDER, 'merchants', folder)
+        os.makedirs(folder_path, exist_ok=True)
 
 
 def resolve_agent(name):
