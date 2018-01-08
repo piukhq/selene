@@ -25,18 +25,14 @@ class CassandraOperations:
             return False
 
         except Exception as e:
-            return str(e)
+            return '{}: {}'.format(type(e).__name__, e)
 
 
 def load_mids_to_cassandra(file):
     cassandra = CassandraOperations()
-    rows = prepare_cassandra_file(file, cassandra.columns)
-
     try:
-        cassandra.load_row(rows)
-        error = None
+        rows = prepare_cassandra_file(file, cassandra.columns)
+        return cassandra.load_row(rows)
 
-    except Exception as e:
-        error = str(e)
-
-    return error
+    except ValueError as e:
+        return 'ValueError: {}'.format(e)

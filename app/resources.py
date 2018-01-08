@@ -20,7 +20,8 @@ class ImportMids(Resource):
             response = jsonify(success=True, error=None, folder_name=folder_name)
 
         except Exception as e:
-            response = jsonify(success=False, error=str(e))
+            error = '{}: {}'.format(type(e).__name__, e)
+            response = jsonify(success=False, error=error)
             response.status_code = 500
 
         return response
@@ -36,7 +37,8 @@ class MastercardHandback(Resource):
             response = jsonify(success=True, error=None, folder_name='handback')
 
         except Exception as e:
-            response = jsonify(success=False, error=str(e))
+            error = '{}: {}'.format(type(e).__name__, e)
+            response = jsonify(success=False, error=error)
             response.status_code = 500
 
         return response
@@ -52,7 +54,8 @@ class FindDuplicatesInHandback(Resource):
             response = jsonify(success=True, error=None, folder_name='duplicates')
 
         except Exception as e:
-            response = jsonify(success=False, error=str(e))
+            error = '{}: {}'.format(type(e).__name__, e)
+            response = jsonify(success=False, error=error)
             response.status_code = 500
 
         return response
@@ -67,7 +70,8 @@ class WipeOutputFolders(Resource):
             response = jsonify(success=True, error=None)
 
         except Exception as e:
-            response = jsonify(success=False, error=str(e))
+            error = '{}: {}'.format(type(e).__name__, e)
+            response = jsonify(success=False, error=error)
             response.status_code = 500
 
         return response
@@ -83,7 +87,8 @@ class LoadToCassandra(Resource):
             response = jsonify(success=False if error else True, error=error)
 
         except Exception as e:
-            response = jsonify(success=False, error=str(e))
+            error = '{}: {}'.format(type(e).__name__, e)
+            response = jsonify(success=False, error=error)
             response.status_code = 500
 
         return response

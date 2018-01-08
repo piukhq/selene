@@ -128,7 +128,7 @@ def prepare_cassandra_file(file, headers):
     data = list()
     for row in file:
         if len(row) != len(headers):
-            raise IndexError("Columns of the input file and columns of cassandra's table do not match.")
+            raise ValueError("Columns of the input file and columns of cassandra's table do not match.")
 
         data.append(dict(zip(headers, row)))
 
