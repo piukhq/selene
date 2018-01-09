@@ -23,7 +23,6 @@ SENTRY_DNS = env_var("SELENE_SENTRY_DNS", None)
 SECRET_KEY = '3456hk3465hj345jh6jk456j45lk-0'
 PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 DEBUG = env_var("SELENE_DEBUG", False)
-# TOKEN_SECRET = "8vA/fjVA83(n05LWh7R4'$3dWmVCU"
 DEV_PORT = env_var('DEV_PORT', '8000')
 DEV_HOST = env_var('DEV_HOST', '0.0.0.0')
 

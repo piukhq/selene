@@ -3,6 +3,7 @@ import settings
 from bigdatalib.schema import Schema
 from cassandralib.client import Client
 
+from app import sentry
 from app.utils import prepare_cassandra_file
 
 
@@ -28,4 +29,5 @@ class CassandraOperations:
             return False
 
         except Exception as e:
+            sentry.captureException()
             return '{}: {}'.format(type(e).__name__, e)

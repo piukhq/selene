@@ -13,6 +13,7 @@ requests==2.18.2
 SQLAlchemy==1.1.15
 openpyxl==2.4.9
 raven==5.8.1
+blinker==1.4
 git+ssh://git@gitlab.com/olympus-libs/bigdatalib.git
 git+ssh://git@gitlab.com/olympus-libs/handylib.git
 git+ssh://git@gitlab.com/olympus-libs/cassandralib.git

@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from flask_restful import Resource, Api
 
+from app import sentry
 from app.import_mids import onboard_mids
 from app.mastercard_handback import export_mastercard
 from app.handback_duplicates import find_duplicate_mids_in_mastercard_handback_file
@@ -20,6 +21,7 @@ class ImportMids(Resource):
             response = jsonify(success=True, error=None, folder_name=folder_name)
 
         except Exception as e:
+            sentry.captureException()
             error = '{}: {}'.format(type(e).__name__, e)
             response = jsonify(success=False, error=error)
             response.status_code = 500
@@ -37,6 +39,7 @@ class MastercardHandback(Resource):
             response = jsonify(success=True, error=None, folder_name='handback')
 
         except Exception as e:
+            sentry.captureException()
             error = '{}: {}'.format(type(e).__name__, e)
             response = jsonify(success=False, error=error)
             response.status_code = 500
@@ -54,6 +57,7 @@ class FindDuplicatesInHandback(Resource):
             response = jsonify(success=True, error=None, folder_name='duplicates')
 
         except Exception as e:
+            sentry.captureException()
             error = '{}: {}'.format(type(e).__name__, e)
             response = jsonify(success=False, error=error)
             response.status_code = 500
@@ -70,6 +74,7 @@ class WipeOutputFolders(Resource):
             response = jsonify(success=True, error=None)
 
         except Exception as e:
+            sentry.captureException()
             error = '{}: {}'.format(type(e).__name__, e)
             response = jsonify(success=False, error=error)
             response.status_code = 500
@@ -87,6 +92,7 @@ class LoadToCassandra(Resource):
             response = jsonify(success=False if error else True, error=error)
 
         except Exception as e:
+            sentry.captureException()
             error = '{}: {}'.format(type(e).__name__, e)
             response = jsonify(success=False, error=error)
             response.status_code = 500

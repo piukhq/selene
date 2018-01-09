@@ -6,6 +6,7 @@ import shutil
 import importlib
 import settings
 
+from app import sentry
 from app.active import AGENTS
 from app.models import Sequence, db
 
@@ -42,12 +43,8 @@ def validate_uk_postcode(postcode):
 
 
 def get_agent(partner_slug):
-    try:
-        agent_class = resolve_agent(partner_slug)
-        return agent_class()
-
-    except Exception as ex:
-        raise ex
+    agent_class = resolve_agent(partner_slug)
+    return agent_class()
 
 
 def csv_to_list_json(csv_file):
@@ -78,6 +75,7 @@ def format_json_input(json_file):
         return file
 
     except Exception as e:
+        sentry.captureException()
         return "wrong file format, exception: {}".format(e)
 
 
