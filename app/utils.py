@@ -6,7 +6,6 @@ import shutil
 import importlib
 import settings
 
-from app import sentry
 from app.active import AGENTS
 from app.models import Sequence, db
 
@@ -67,16 +66,11 @@ def list_json_to_dict_json(file):
 
 
 def format_json_input(json_file):
-    try:
-        file = json.loads(json_file) if isinstance(json_file, str) else json_file
-        if isinstance(file[0], list):
-            return list_json_to_dict_json(file)
+    file = json.loads(json_file) if isinstance(json_file, str) else json_file
+    if isinstance(file[0], list):
+        return list_json_to_dict_json(file)
 
-        return file
-
-    except Exception as e:
-        sentry.captureException()
-        return "wrong file format, exception: {}".format(e)
+    return file
 
 
 def empty_folder(path):
