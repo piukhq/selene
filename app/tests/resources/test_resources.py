@@ -93,14 +93,6 @@ class TestViews(TestCase):
 
             self.assert200(response)
 
-            wrong_data = json.loads(file)
-            wrong_data[0].pop(5)
-
-            response = self.client.post(api.url_for(LoadToCassandra), data=json.dumps(wrong_data),
-                                        content_type="application/json")
-
-            self.assertIn('ValueError', response.json.get('error'))
-
         wrong_type_data = "wrong data"
         response = self.client.post(api.url_for(LoadToCassandra), data=wrong_type_data, content_type="application/json")
 
