@@ -8,7 +8,6 @@ from app.utils import prepare_cassandra_file
 
 
 class CassandraOperations:
-    client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
     insert_table = 'scheme_information'
     columns = [
             'card_provider',
@@ -21,6 +20,7 @@ class CassandraOperations:
     ]
 
     def __init__(self, file):
+        self.client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
         self.rows = prepare_cassandra_file(file, self.columns)
 
     def load_mids(self):

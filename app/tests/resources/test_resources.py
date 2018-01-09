@@ -8,7 +8,6 @@ from unittest import mock
 
 from app import create_app
 from app.utils import csv_to_list_json, init_folders
-from app.cassandra_operations import CassandraOperations
 from app.resources import (api, LoadToCassandra, ImportMids, MastercardHandback, WipeOutputFolders,
                            FindDuplicatesInHandback)
 
@@ -88,7 +87,8 @@ class TestViews(TestCase):
         with open(filename, 'r') as f:
             file = f.read()
 
-        with mock.patch.object(CassandraOperations, 'client', MockClient):
+        with mock.patch('app.cassandra_operations.Client') as client:
+            client.side_effect = MockClient()
             response = self.client.post(api.url_for(LoadToCassandra), data=file, content_type="application/json")
 
             self.assert200(response)

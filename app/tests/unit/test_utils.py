@@ -86,9 +86,8 @@ class TestUtils(unittest.TestCase):
 
     def test_format_json_input(self):
         wrong_input = None
-        result = utils.format_json_input(wrong_input)
-
-        self.assertIn('wrong file format, exception:', result)
+        with self.assertRaises(TypeError):
+            utils.format_json_input(wrong_input)
 
         good_input = [
             {'test': 'good'},
