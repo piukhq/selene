@@ -5,6 +5,9 @@ from bigdatalib.schema import Schema
 from cassandralib.client import Client
 
 
+# Utility file to create required cassandra tables in case of local docker cassandra container.
+# This module is not needed to run Selene.
+
 if __name__ == '__main__':
     client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
     tables = ['payment', 'invalid_payment', 'scheme', 'recent_transactions', 'reward',
