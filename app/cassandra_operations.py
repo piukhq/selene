@@ -19,20 +19,13 @@ class CassandraOperations:
             'created_date'
     ]
 
-    def load_row(self, row):
+    def __init__(self, file):
+        self.rows = prepare_cassandra_file(file, self.columns)
+
+    def load_mids(self):
         try:
-            self.client.insert(self.insert_table, row)
+            self.client.insert(self.insert_table, self.rows)
             return False
 
         except Exception as e:
             return '{}: {}'.format(type(e).__name__, e)
-
-
-def load_mids_to_cassandra(file):
-    cassandra = CassandraOperations()
-    try:
-        rows = prepare_cassandra_file(file, cassandra.columns)
-        return cassandra.load_row(rows)
-
-    except ValueError as e:
-        return 'ValueError: {}'.format(e)

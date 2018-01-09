@@ -4,7 +4,7 @@ from flask_restful import Resource, Api
 from app.import_mids import onboard_mids
 from app.mastercard_handback import export_mastercard
 from app.handback_duplicates import find_duplicate_mids_in_mastercard_handback_file
-from app.cassandra_operations import load_mids_to_cassandra
+from app.cassandra_operations import CassandraOperations
 from app.utils import wipe_output_folders
 
 api = Api()
@@ -77,13 +77,13 @@ class WipeOutputFolders(Resource):
         return response
 
 
-@api.resource('/cassandra/add')
+@api.resource('/mids/cassandra/add')
 class LoadToCassandra(Resource):
     @staticmethod
     def post():
         try:
             file = request.get_json()
-            error = load_mids_to_cassandra(file)
+            error = CassandraOperations(file).load_mids()
             response = jsonify(success=False if error else True, error=error)
 
         except Exception as e:
