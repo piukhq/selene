@@ -1,9 +1,9 @@
 import os
 import re
-import importlib
-import json
 import csv
+import json
 import shutil
+import importlib
 import settings
 
 from app.active import AGENTS
@@ -11,12 +11,10 @@ from app.models import Sequence, db
 
 
 def init_folders():
-    path = os.path.join(settings.WRITE_FOLDER, 'merchants')
 
-    os.makedirs(path, exist_ok=True)
-    os.makedirs(path + '/visa', exist_ok=True)
-    os.makedirs(path + '/amex', exist_ok=True)
-    os.makedirs(path + '/mastercard', exist_ok=True)
+    for folder in ['visa', 'amex', 'mastercard']:
+        folder_path = os.path.join(settings.WRITE_FOLDER, 'merchants', folder)
+        os.makedirs(folder_path, exist_ok=True)
 
 
 def resolve_agent(name):
@@ -44,12 +42,8 @@ def validate_uk_postcode(postcode):
 
 
 def get_agent(partner_slug):
-    try:
-        agent_class = resolve_agent(partner_slug)
-        return agent_class()
-
-    except Exception as ex:
-        raise ex
+    agent_class = resolve_agent(partner_slug)
+    return agent_class()
 
 
 def csv_to_list_json(csv_file):
@@ -72,15 +66,11 @@ def list_json_to_dict_json(file):
 
 
 def format_json_input(json_file):
-    try:
-        file = json.loads(json_file) if isinstance(json_file, str) else json_file
-        if isinstance(file[0], list):
-            return list_json_to_dict_json(file)
+    file = json.loads(json_file) if isinstance(json_file, str) else json_file
+    if isinstance(file[0], list):
+        return list_json_to_dict_json(file)
 
-        return file
-
-    except Exception as e:
-        return "wrong file format, exception: {}".format(e)
+    return file
 
 
 def empty_folder(path):
@@ -114,3 +104,25 @@ def get_attachment(path, provider):
             attachment = os.path.join(path, entry.name)
 
     return attachment
+
+
+def prepare_cassandra_file(file, headers):
+    """
+    Remove trailing empty lines, and add headers.
+    :param file: input json file as list of lists with no headers
+    :param headers: cassandra table headers
+    :return: list of dictionaries with no trailing empty lines.
+    """
+
+    while not ''.join(file[-1]):
+        file = file[:-1]
+
+    data = list()
+    for row in file:
+        # the column created_date is optional, if not present cassandra will automatically add it
+        if len(headers) != len(row) != len(headers) - 1:
+            raise ValueError("Columns of the input file and columns of cassandra's table do not match.")
+
+        data.append(dict(zip(headers, row)))
+
+    return data

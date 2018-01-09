@@ -85,17 +85,12 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(expected, output)
 
     def test_format_json_input(self):
-        wrong_input = None
-        result = utils.format_json_input(wrong_input)
-
-        self.assertIn('wrong file format, exception:', result)
-
-        good_input = [
+        file = [
             {'test': 'good'},
             {'test': 'still good'}
         ]
-        result = utils.format_json_input(good_input)
-        self.assertEqual(good_input, result)
+        result = utils.format_json_input(file)
+        self.assertEqual(file, result)
 
 
 if __name__ == '__main__':

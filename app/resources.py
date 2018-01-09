@@ -1,12 +1,22 @@
 from flask import request, jsonify
 from flask_restful import Resource, Api
 
+from app import sentry
 from app.import_mids import onboard_mids
 from app.mastercard_handback import export_mastercard
 from app.handback_duplicates import find_duplicate_mids_in_mastercard_handback_file
+from app.cassandra_operations import CassandraOperations
 from app.utils import wipe_output_folders
 
 api = Api()
+
+
+def handle_exception(e):
+    sentry.captureException()
+    error = '{}: {}'.format(type(e).__name__, e)
+    response = jsonify(success=False, error=error)
+    response.status_code = 500
+    return response
 
 
 @api.resource('/mids/import_mids')
@@ -19,8 +29,7 @@ class ImportMids(Resource):
             response = jsonify(success=True, error=None, folder_name=folder_name)
 
         except Exception as e:
-            response = jsonify(success=False, error=str(e))
-            response.status_code = 500
+            response = handle_exception(e)
 
         return response
 
@@ -35,8 +44,7 @@ class MastercardHandback(Resource):
             response = jsonify(success=True, error=None, folder_name='handback')
 
         except Exception as e:
-            response = jsonify(success=False, error=str(e))
-            response.status_code = 500
+            response = handle_exception(e)
 
         return response
 
@@ -51,8 +59,7 @@ class FindDuplicatesInHandback(Resource):
             response = jsonify(success=True, error=None, folder_name='duplicates')
 
         except Exception as e:
-            response = jsonify(success=False, error=str(e))
-            response.status_code = 500
+            response = handle_exception(e)
 
         return response
 
@@ -66,7 +73,21 @@ class WipeOutputFolders(Resource):
             response = jsonify(success=True, error=None)
 
         except Exception as e:
-            response = jsonify(success=False, error=str(e))
-            response.status_code = 500
+            response = handle_exception(e)
+
+        return response
+
+
+@api.resource('/mids/cassandra/add')
+class LoadToCassandra(Resource):
+    @staticmethod
+    def post():
+        try:
+            file = request.get_json()
+            error = CassandraOperations(file).load_mids()
+            response = jsonify(success=False if error else True, error=error)
+
+        except Exception as e:
+            response = handle_exception(e)
 
         return response
