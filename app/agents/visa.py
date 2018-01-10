@@ -72,6 +72,7 @@ class Visa:
                                          merchant['Partner Name'].strip('" '),
                                          merchant['Town/City'].strip('" '),
                                          merchant['Postcode'].strip('" '),
+                                         merchant['Action']
                                          ])
 
         except IOError:

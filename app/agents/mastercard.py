@@ -91,6 +91,7 @@ class MasterCard:
                         merchant['Partner Name'].strip('" '),
                         merchant['Town/City'].strip('" '),
                         merchant['Postcode'].strip('" '),
+                        'A'
                     ])
 
         except IOError:

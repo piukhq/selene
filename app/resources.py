@@ -78,14 +78,20 @@ class WipeOutputFolders(Resource):
         return response
 
 
-@api.resource('/mids/cassandra/add')
-class LoadToCassandra(Resource):
+@api.resource('/mids/cassandra')
+class CassandraDatabaseOperations(Resource):
     @staticmethod
     def post():
         try:
-            file = request.get_json()
-            error = CassandraOperations(file).load_mids()
-            response = jsonify(success=False if error else True, error=error)
+            received = request.get_json()
+            if 'merchant' in received:
+                merchant, file = received.get('merchant'), None
+
+            else:
+                merchant, file = None, received
+
+            CassandraOperations(file=file, merchant=merchant).run_operations()
+            response = jsonify(success=True, error=None)
 
         except Exception as e:
             response = handle_exception(e)

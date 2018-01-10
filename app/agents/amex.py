@@ -210,6 +210,7 @@ class Amex:
                         merchant['Partner Name'].strip('" '),
                         merchant['Town/City'].strip('" '),
                         merchant['Postcode'].strip('" '),
+                        merchant['Action']
                     ])
 
         except IOError:
