@@ -6,26 +6,33 @@ from cassandralib.client import Client
 from app.utils import prepare_cassandra_file
 
 
+class ClientPatched(Client):
+    def execute(self, statement):
+        return self.session.execute(statement)
+
+
 class CassandraOperations:
+    keyspace = 'lakeyspace'
     insert_table = 'scheme_information'
-    columns = [
-            'card_provider',
-            'merchant_id',
-            'scheme_provider',
-            'merchant_name',
-            'location',
-            'postcode',
-            'action'
-    ]
+    columns = ('card_provider', 'merchant_id', 'scheme_provider', 'merchant_name', 'location', 'postcode', 'action')
+
+    select_query = "select * from %s.%s where %s='{}';" % (keyspace, insert_table, columns[2])
+    delete_query = "delete from %(ks)s.%(t)s where %(f1)s='{%(f1)s}' and %(f2)s='{%(f2)s}';" % \
+                   {'ks': keyspace, 't': insert_table, 'f1': columns[0], 'f2': columns[1]}
 
     def __init__(self, file, merchant=None):
-        self.client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
+        self.client = ClientPatched(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
 
         if not file and not merchant:
             raise ValueError('cassandra input file or merchant name must be provided.')
 
         self.merchant = merchant
         self.rows = prepare_cassandra_file(file, self.columns) if file else None
+
+    def select_by_provider(self):
+        result = self.client.execute(self.select_query.format(self.merchant))
+        self.merchant = None
+        self.remove_mids(result.current_rows)
 
     def run_operations(self):
         if self.merchant:
@@ -49,9 +56,9 @@ class CassandraOperations:
         self.client.insert(self.insert_table, rows)
 
     def remove_mids(self, rows=None):
-
         if self.merchant:
-            raise NotImplementedError('delete by merchant')
+            self.select_by_provider()
 
         else:
-            raise NotImplementedError('delete by cass_imp_file')
+            for row in rows:
+                self.client.execute(self.delete_query.format(**row))
