@@ -6,9 +6,14 @@ from cassandralib.client import Client
 from app.utils import prepare_cassandra_file
 
 
-class ClientPatched(Client):
-    def execute(self, statement):
-        return self.session.execute(statement)
+def execute(self, statement):
+    """
+    Override Client execute method to return query result.
+    :param self: Client object
+    :param statement: query to be executed
+    :return: query result
+    """
+    return self.session.execute(statement)
 
 
 class CassandraOperations:
@@ -21,7 +26,8 @@ class CassandraOperations:
                    {'ks': keyspace, 't': insert_table, 'f1': columns[0], 'f2': columns[1]}
 
     def __init__(self, file, merchant=None):
-        self.client = ClientPatched(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
+        Client.execute = execute
+        self.client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
 
         if not file and not merchant:
             raise ValueError('cassandra input file or merchant name must be provided.')
