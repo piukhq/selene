@@ -6,7 +6,7 @@ from cassandralib.client import Client
 from app.utils import prepare_cassandra_file
 
 
-def execute(self, statement):
+def execute_patched(self, statement):
     """
     Override Client execute method to return query result.
     :param self: Client object
@@ -26,7 +26,7 @@ class CassandraOperations:
                    {'ks': keyspace, 't': insert_table, 'f1': columns[0], 'f2': columns[1]}
 
     def __init__(self, file, merchant=None):
-        Client.execute = execute
+        Client.execute = execute_patched
         self.client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
 
         if not file and not merchant:
