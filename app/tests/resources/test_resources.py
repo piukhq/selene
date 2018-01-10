@@ -8,7 +8,7 @@ from unittest import mock
 
 from app import create_app
 from app.utils import csv_to_list_json, init_folders
-from app.resources import (api, LoadToCassandra, ImportMids, MastercardHandback, WipeOutputFolders,
+from app.resources import (api, CassandraDatabaseOperations, ImportMids, MastercardHandback, WipeOutputFolders,
                            FindDuplicatesInHandback)
 
 
@@ -89,11 +89,7 @@ class TestViews(TestCase):
 
         with mock.patch('app.cassandra_operations.Client') as client:
             client.side_effect = MockClient()
-            response = self.client.post(api.url_for(LoadToCassandra), data=file, content_type="application/json")
+            response = self.client.post(api.url_for(CassandraDatabaseOperations), data=file,
+                                        content_type="application/json")
 
             self.assert200(response)
-
-        wrong_type_data = "wrong data"
-        response = self.client.post(api.url_for(LoadToCassandra), data=wrong_type_data, content_type="application/json")
-
-        self.assert500(response)
