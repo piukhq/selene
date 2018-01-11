@@ -17,6 +17,12 @@ class MockClient(mock.Mock):
     def insert(table, rows):
         pass
 
+    @staticmethod
+    def execute(_):
+        result = mock.Mock()
+        result.current_rows = None
+        return result
+
 
 class TestViews(TestCase):
     SQLALCHEMY_DATABASE_URI = 'test'
@@ -82,14 +88,21 @@ class TestViews(TestCase):
         response = self.client.get(api.url_for(WipeOutputFolders))
         self.assert500(response)
 
-    def test_load_to_cassandra(self):
+    @mock.patch('app.cassandra_operations.Client')
+    def test_load_to_cassandra(self, client):
+        client.side_effect = MockClient()
+
         filename = os.path.join(settings.APP_DIR, 'app', 'tests', 'fixture', 'test_load_cassandra.json')
         with open(filename, 'r') as f:
             file = f.read()
 
-        with mock.patch('app.cassandra_operations.Client') as client:
-            client.side_effect = MockClient()
-            response = self.client.post(api.url_for(CassandraDatabaseOperations), data=file,
-                                        content_type="application/json")
+        response = self.client.post(api.url_for(CassandraDatabaseOperations), data=file,
+                                    content_type="application/json")
 
-            self.assert200(response)
+        self.assert200(response)
+
+        merchant = json.dumps({"merchant": "test"})
+        response = self.client.post(api.url_for(CassandraDatabaseOperations), data=merchant,
+                                    content_type="application/json")
+
+        self.assert200(response)

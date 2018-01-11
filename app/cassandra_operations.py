@@ -35,11 +35,6 @@ class CassandraOperations:
         self.merchant = merchant
         self.rows = prepare_cassandra_file(file, self.columns) if file else None
 
-    def select_by_provider(self):
-        result = self.client.execute(self.select_query.format(self.merchant))
-        self.merchant = None
-        self.remove_mids(result.current_rows)
-
     def run_operations(self):
         if self.merchant:
             self.remove_mids()
@@ -58,13 +53,18 @@ class CassandraOperations:
             if action_sorted_rows['D']:
                 self.remove_mids(action_sorted_rows['D'])
 
+    def select_by_provider(self):
+        result = self.client.execute(self.select_query.format(self.merchant))
+        if result.current_rows:
+            self.remove_mids(result.current_rows)
+
     def load_mids(self, rows):
         self.client.insert(self.insert_table, rows)
 
     def remove_mids(self, rows=None):
-        if self.merchant:
-            self.select_by_provider()
-
-        else:
+        if rows:
             for row in rows:
                 self.client.execute(self.delete_query.format(**row))
+
+        else:
+            self.select_by_provider()
