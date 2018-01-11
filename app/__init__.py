@@ -17,7 +17,7 @@ def create_app(config_name='settings'):
     app = Flask('main')
     app.config.from_object(config_name)
 
-    if settings.SENTRY_DNS:
+    if settings.USE_SENTRY:
         sentry.init_app(app, dsn=settings.SENTRY_DNS, logging=True, level=logging.ERROR)
 
     db.init_app(app)

@@ -43,7 +43,11 @@ GET `/mids/wipe_folders`
 
 POST `/mids/cassandra`
 
-### Payload
+#### Headers
+- Content-Type: 'application/json'
+- Authorization: 'service token'
+
+#### Payload
 
 Type: JSON provide one of the following
 - Cassandra input file with A for Add or D for delete in action column as list of lists

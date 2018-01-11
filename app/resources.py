@@ -1,5 +1,8 @@
+import settings
+
 from flask import request, jsonify
 from flask_restful import Resource, Api
+from functools import wraps
 
 from app import sentry
 from app.import_mids import onboard_mids
@@ -11,12 +14,26 @@ from app.utils import wipe_output_folders
 api = Api()
 
 
-def handle_exception(e):
-    sentry.captureException()
+def handle_exception(e, status_code=500, use_sentry=settings.USE_SENTRY):
+    if use_sentry:
+        sentry.captureException()
+
     error = '{}: {}'.format(type(e).__name__, e)
     response = jsonify(success=False, error=error)
-    response.status_code = 500
+    response.status_code = status_code
     return response
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if token != settings.SERVICE_TOKEN:
+            return handle_exception(ValueError('Wrong authorization token'), 401, False)
+
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 @api.resource('/mids/import_mids')
@@ -81,6 +98,7 @@ class WipeOutputFolders(Resource):
 @api.resource('/mids/cassandra')
 class CassandraDatabaseOperations(Resource):
     @staticmethod
+    @token_required
     def post():
         try:
             received = request.get_json()
