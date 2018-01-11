@@ -21,17 +21,14 @@ class CassandraOperations:
     insert_table = 'scheme_information'
     columns = ('card_provider', 'merchant_id', 'scheme_provider', 'merchant_name', 'location', 'postcode', 'action')
 
-    select_query = "select * from %s.%s where %s='{}';" % (keyspace, insert_table, columns[2])
+    get_providers_query = "select %s from %s.%s;" % (columns[2], keyspace, insert_table)
+    select_by_provider_query = "select * from %s.%s where %s='{}';" % (keyspace, insert_table, columns[2])
     delete_query = "delete from %(ks)s.%(t)s where %(f1)s='{%(f1)s}' and %(f2)s='{%(f2)s}';" % \
                    {'ks': keyspace, 't': insert_table, 'f1': columns[0], 'f2': columns[1]}
 
-    def __init__(self, file, merchant=None):
+    def __init__(self, file=None, merchant=None):
         Client.execute = execute_patched
         self.client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
-
-        if not file and not merchant:
-            raise ValueError('cassandra input file or merchant name must be provided.')
-
         self.merchant = merchant
         self.rows = prepare_cassandra_file(file, self.columns) if file else None
 
@@ -53,8 +50,13 @@ class CassandraOperations:
             if action_sorted_rows['D']:
                 self.remove_mids(action_sorted_rows['D'])
 
+    def get_providers_list(self):
+        result = self.client.execute(self.get_providers_query)
+        providers = set([row[self.columns[2]] for row in result.current_rows])
+        return list(providers)
+
     def select_by_provider(self):
-        result = self.client.execute(self.select_query.format(self.merchant))
+        result = self.client.execute(self.select_by_provider_query.format(self.merchant))
         if result.current_rows:
             self.remove_mids(result.current_rows)
 
