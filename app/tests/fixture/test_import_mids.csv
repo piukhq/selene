@@ -1,0 +1,13 @@
+Partner Name,American Express MIDs,MasterCard MIDs,Visa MIDs,"Address (Building Name/Number, Street)",Postcode,Town/City,County/State,Country,Action,Scheme,Scheme ID
+BinkTest,N/A,N/A,N/A,59 Halket Place St Helier Jersey,JE2 4WG,Jersey  St Helier,,,A,test,000
+BinkTest,,,,La Route de la Bale St Brelade Bay Jersey,JE3 8EA,Jersey  St Brelade,,,A,test,000
+BinkTest,1111111111,9999999,1111111,29 Wardour Street Soho London,W1D 6PS,London Wardour Street,,,A,test,000
+BinkTest,2222222222,8888888,2222222,30 Coptic Street Bloosbury London,WC1A 1NS,London  Coptic Street,,,D,test,000
+BinkTest,3333333333,7777777,3333333,363 Fulham Road Chelsea London,SW10 9TN,London  Fulham Road (363),,,D,test,000
+BinkTest,4444444444,6666666,4444444,137 Notting Hill Gate London,W11 3LB,London  Notting Hill Gate,,,U,test,000
+BinkTest,555MIDS555,555M555,555M555,10 Dean Street Soho London,W1D 3RW,London  Dean Street,,,U,test,000
+BinkTest,6666666666,4444444,6666666,80 Fore Street Hertford Hertfordshire,SG14 1BY,Hertford,,,U,test,000
+BinkTest,7777777777,3333333,7777777,230236 Lavender Hill Battersea London,SW11 1LE,Clapham  Lavender Hill ,,,A,test,000
+BinkTest,8888888888,2222222,8888888,11 Waldegrave Road Teddington,TW11 8LR,Teddington,,,A,test,000
+BinkTest,9999999999,1111111,9999999,32 Earl Street Maidstone Kent,ME14 1PF,Maidstone,,,A,test,000
+,,,,,,,,,,,

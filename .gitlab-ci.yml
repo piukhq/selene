@@ -1,0 +1,42 @@
+stages:
+  - tests
+  - build
+
+tests:
+  stage: tests
+  script:
+  - pip3 install -r requirements.txt
+  - py.test app/ --cov=app
+
+  tags:
+    - docker
+  services:
+
+complexity:
+  stage: tests
+  script:
+    - xenon --max-average A --max-modules B --max-absolute B .
+  tags:
+    - docker
+
+flake8:
+  stage: tests
+  script:
+    - flake8 *
+  tags:
+    - docker
+
+build-master:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  script:
+    - docker build --pull -t "$CI_REGISTRY/selene:latest" .
+    - docker push "$CI_REGISTRY/selene:latest"
+  only:
+    - master
+  tags:
+    - docker

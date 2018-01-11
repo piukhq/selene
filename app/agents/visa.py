@@ -38,13 +38,20 @@ class VisaMerchantFile:
 
 
 class Visa:
-    def __init__(self):
-        pass
+
+    action_translate = dict(
+        A='On-Board',
+        U='Update',
+        D='Remove'
+    )
 
     @staticmethod
     def has_mid(row):
-        """return True if there is a visa mid in the row"""
-        if row['Visa MIDs'] != '' and row['Visa MIDs'] is not None:
+        """
+        return True if there is a visa mid in the row
+        """
+        selected = row.get('Visa MIDs')
+        if selected and str(selected) != "" and str(selected) != "N/A":
             return True
 
         return False
@@ -54,7 +61,7 @@ class Visa:
 
         a = arrow.utcnow()
         filename = 'cass_inp_visa_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(settings.APP_DIR, 'merchants/visa', filename)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', filename)
         try:
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
@@ -65,6 +72,7 @@ class Visa:
                                          merchant['Partner Name'].strip('" '),
                                          merchant['Town/City'].strip('" '),
                                          merchant['Postcode'].strip('" '),
+                                         merchant['Action']
                                          ])
 
         except IOError:
@@ -79,7 +87,7 @@ class Visa:
         :return: None
         """
 
-        path = os.path.join(settings.APP_DIR, 'merchants/visa', file_name)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants/visa', file_name)
 
         wb = Workbook()
         ws1 = wb.active
@@ -107,9 +115,11 @@ class Visa:
             if count == 0:
                 partner_name = merchant['Partner Name']
 
+            action = self.action_translate.get(merchant['Action'])
+
             detail = [merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
                       merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
-                      '', 'On-Board',
+                      '', action,
                       ]
             if validated:
                 detail.append('')

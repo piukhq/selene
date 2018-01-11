@@ -22,7 +22,6 @@ class MastercardMerchantFile:
             self.project_id,
             arrow.utcnow().format("YYYYMMDDHHmmss")
         ]
-
         writer.writerow(row)
 
     def set_data(self, writer):
@@ -41,7 +40,7 @@ class MastercardMerchantFile:
         today = arrow.utcnow().format("MM/DD/YYYY")
 
         row[0] = 20
-        row[2] = "A"
+        row[2] = detail[6]  # Action
         row[7] = detail[1]  # Merchant Name
         row[10] = detail[4]  # Merchant Address
         row[12] = detail[2]  # Merchant City
@@ -63,43 +62,45 @@ class MastercardMerchantFile:
 
 
 class MasterCard:
-    def __init__(self):
-        pass
+    write_path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard')
 
     @staticmethod
     def has_mid(element):
-        """return True if there is a mastercard mid in the row"""
+        """
+        return True if there is a mastercard mid in the row
+        """
 
-        if len(str(element)):
+        selected = element if isinstance(element, str) else element.get("MasterCard MIDs")
+        if selected and str(selected) != "" and str(selected) != "N/A":
             return True
 
         return False
 
-    @staticmethod
-    def write_transaction_matched_csv(merchants):
+    def write_transaction_matched_csv(self, merchants):
         a = arrow.utcnow()
         filename = 'cass_inp_mastercard_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(settings.APP_DIR, 'merchants/mastercard', filename)
+        path = os.path.join(self.write_path, filename)
         try:
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
-                    csv_writer.writerow(['mastercard',
-                                         merchant['MasterCard MIDs'].strip(' '),
-                                         merchant['Scheme'].strip('" ').lower(),
-                                         merchant['Partner Name'].strip('" '),
-                                         merchant['Town/City'].strip('" '),
-                                         merchant['Postcode'].strip('" '),
-                                         ])
+                    csv_writer.writerow([
+                        'mastercard',
+                        merchant['MasterCard MIDs'].strip(' '),
+                        merchant['Scheme'].strip('" ').lower(),
+                        merchant['Partner Name'].strip('" '),
+                        merchant['Town/City'].strip('" '),
+                        merchant['Postcode'].strip('" '),
+                        'A'
+                    ])
 
         except IOError:
             raise Exception('Error writing file:' + path)
 
-    @staticmethod
-    def write_duplicates_file(duplicates):
+    def write_duplicates_file(self, duplicates):
         a = arrow.utcnow()
         filename = 'duplicates_mastercard_{}.txt'.format(a.format('DD-MM-YYYY'))
-        path = os.path.join(settings.APP_DIR, 'merchants/mastercard', filename)
+        path = os.path.join(self.write_path, filename)
         try:
             with open(path, 'w') as dup_file:
                 dup_file.write('Date of file creation: {}\n'.format(a.format('DD-MM-YYYY')))
@@ -109,8 +110,7 @@ class MasterCard:
         except IOError:
             raise Exception('Error writing file:' + path)
 
-    @staticmethod
-    def write_to_file(input_file, file_name):
+    def write_to_file(self, input_file, file_name):
         """
         writes the given input file to a file under a given name.
         :param input_file: the file to write
@@ -118,7 +118,7 @@ class MasterCard:
         :return: None
         """
 
-        path = os.path.join(settings.APP_DIR, 'merchants/mastercard', file_name)
+        path = os.path.join(self.write_path, file_name)
 
         with open(path, 'w') as file:
             writer = csv.writer(file, delimiter=',', quotechar='"')
@@ -143,7 +143,7 @@ class MasterCard:
 
             detail = [merchant['MasterCard MIDs'], merchant['Partner Name'], merchant['Town/City'],
                       merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
-                      '', 'On-Board',
+                      '', merchant['Action'],
                       ]
             if validated:
                 detail.append('')
@@ -153,6 +153,7 @@ class MasterCard:
             file.add_detail(detail)
 
         file_name = self.create_file_name(validated)
+
         try:
             self.write_to_file(file, file_name)
         except IOError:

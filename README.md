@@ -1,10 +1,80 @@
-Project for reading in Bink Merchant on-boarding file and converting to a specific format.
-The current version of the project supports Amex and Visa merchant onboarding files.
+# Mids processing
 
-Other options include the ability to process MasterCard handback files and validate 
-MasterCard handback files prior to processing.
+The current version of selene supports:
+- Amex and Visa merchant files on-boarding.
+- MasterCard handback files processing.
+- MasterCard handback files duplicates checking.
 
-The project can only be run as a python script.
-Files to be imported are placed in the provider_types directory. 
+This project is meant to be used trough the helios web interface.
 
-The output files are placed in merchants/visa, amex or MasterCard directories.
+## Amex and Visa merchants on-boarding
+
+### Request
+
+POST `/mids/import_mids`
+
+File to process as JSON
+
+## MasterCard handback
+
+### Request
+
+POST `/mids/mastercard_handbacks`
+
+File to process as JSON
+
+## MasterCard handback duplicates
+
+### Request
+
+POST `/mids/handback_duplicates`
+
+File to process as JSON
+
+## Wipe output folder
+
+### Request
+
+GET `/mids/wipe_folders`
+
+## Cassandra database operations:
+
+### Request
+
+POST `/mids/cassandra`
+
+#### Headers
+- Content-Type: 'application/json'
+- Authorization: 'service token'
+
+#### Payload
+
+Type: JSON provide one of the following
+- Cassandra input file with A for Add or D for delete in action column as list of lists
+- Merchant to be removed (slug) as `{"merchant": <merchant name>}`
+
+## Response
+
+### success
+
+code 200
+
+```json
+{
+  "success": true,
+  "error": null
+}
+```
+
+The output files are placed in the **merchants** folder in `/tmp/mids_output`
+
+### failure
+
+code 500
+
+```json
+{
+  "success": false,
+  "error": "<RETURNED EXCEPTION>"
+}
+```

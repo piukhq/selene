@@ -1,7 +1,20 @@
+import os
 import re
+import csv
+import json
+import shutil
 import importlib
+import settings
 
 from app.active import AGENTS
+from app.models import Sequence, db
+
+
+def init_folders():
+
+    for folder in ['visa', 'amex', 'mastercard']:
+        folder_path = os.path.join(settings.WRITE_FOLDER, 'merchants', folder)
+        os.makedirs(folder_path, exist_ok=True)
 
 
 def resolve_agent(name):
@@ -13,14 +26,103 @@ def resolve_agent(name):
 
 def validate_uk_postcode(postcode):
     # validate post code using regex
-    pattern = re.compile('^[A-Z]{2}[0-9][A-Z] *?[0-9][A-Z]{2}$'
-                         '|^[A-Z][0-9][A-Z] *?[0-9][A-Z]{2}$'
-                         '|^[A-Z][0-9] *?[0-9][A-Z]{2}$'
-                         '|^[A-Z][0-9]{2} *?[0-9][A-Z]{2}$'
-                         '|^[A-Z]{2}[0-9] *?[0-9][A-Z]{2}$'
-                         '|^[A-Z]{2}[0-9]{2} *?[0-9][A-Z]{2}$')
+    pattern = re.compile(
+        '^[A-Z]{2}[0-9][A-Z] *?[0-9][A-Z]{2}$'
+        '|^[A-Z][0-9][A-Z] *?[0-9][A-Z]{2}$'
+        '|^[A-Z][0-9] *?[0-9][A-Z]{2}$'
+        '|^[A-Z][0-9]{2} *?[0-9][A-Z]{2}$'
+        '|^[A-Z]{2}[0-9] *?[0-9][A-Z]{2}$'
+        '|^[A-Z]{2}[0-9]{2} *?[0-9][A-Z]{2}$'
+    )
 
     if not re.match(pattern, postcode):
         return False
 
     return True
+
+
+def get_agent(partner_slug):
+    agent_class = resolve_agent(partner_slug)
+    return agent_class()
+
+
+def csv_to_list_json(csv_file):
+    data = list()
+    with open(csv_file, "r") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            data.append(row)
+
+    return data
+
+
+def list_json_to_dict_json(file):
+    data = list()
+    header = file[0]
+    for row in file[1:]:
+        data.append(dict(zip(header, row)))
+
+    return data
+
+
+def format_json_input(json_file):
+    file = json.loads(json_file) if isinstance(json_file, str) else json_file
+    if isinstance(file[0], list):
+        return list_json_to_dict_json(file)
+
+    return file
+
+
+def empty_folder(path):
+    for the_file in os.listdir(path):
+        file_path = os.path.join(path, the_file)
+
+        if os.path.isfile(file_path):
+            os.unlink(file_path)
+
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+
+
+def wipe_output_folders():
+    for folder in ['visa', 'amex', 'mastercard']:
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', folder)
+        empty_folder(path)
+
+
+def update_amex_sequence_number():
+    sequence = Sequence.query.filter_by(scheme_provider='amex').first()
+    sequence.next_seq_number += 1
+    db.session.commit()
+
+
+def get_attachment(path, provider):
+    pattern = settings.GET_ATTACHMENT[provider]
+    attachment = None
+    for entry in os.scandir(path):
+        if pattern.match(entry.name):
+            attachment = os.path.join(path, entry.name)
+
+    return attachment
+
+
+def prepare_cassandra_file(file, headers):
+    """
+    Remove trailing empty lines, and add headers.
+    :param file: input json file as list of lists with no headers
+    :param headers: cassandra table headers
+    :return: list of dictionaries with no trailing empty lines.
+    """
+
+    while not ''.join(file[-1]):
+        file = file[:-1]
+
+    data = list()
+    for row in file:
+
+        if len(headers) != len(row):
+            raise ValueError("Columns of the input file do not match the expected value")
+
+        data.append(dict(zip(headers, row)))
+
+    return data

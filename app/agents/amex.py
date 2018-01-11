@@ -3,6 +3,38 @@ import arrow
 import os
 import settings
 
+from plumbum import cmd
+from app.models import Sequence
+from app.utils import get_attachment
+
+
+def get_next_file_number():
+    sequence = Sequence.query.filter(Sequence.scheme_provider == 'amex').first()
+
+    # just for the first time the database is created.
+    if not sequence:
+        from app.models import db
+        sequence = Sequence(scheme_provider='amex', type='ENROL', next_seq_number=1)
+        db.session.add(sequence)
+        db.session.commit()
+
+    return sequence.get_seq_number()
+
+
+def upload_sftp(url, username, password, src_dir, dst_dir):
+    """
+    Upload all the files in the source directory to the sftp location url in the destination directory
+    with appropriate user credentials
+    """
+
+    path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', src_dir)
+    src_file = get_attachment(path, 'amex')
+
+    cmd.lftp(
+        'sftp://{}:{}@{}'.format(username, password, url),
+        'put -a -O {} {}; bye'.format(dst_dir, src_file)
+    )
+
 
 class Field(object):
     def __init__(self, **kwargs):
@@ -140,8 +172,6 @@ class AmexMerchantFile:
 
 
 class Amex:
-    def __init__(self):
-        pass
 
     @staticmethod
     def format_datetime(datetime):
@@ -154,8 +184,12 @@ class Amex:
 
     @staticmethod
     def has_mid(row):
-        """return True if there is a visa mid in the row"""
-        if row['American Express MIDs'] != '' and row['American Express MIDs'] is not None:
+        """
+        return True if there is a visa mid in the row
+        """
+
+        selected = row.get('American Express MIDs')
+        if selected and str(selected) != "" and str(selected) != "N/A":
             return True
 
         return False
@@ -164,18 +198,20 @@ class Amex:
     def write_transaction_matched_csv(merchants):
         a = arrow.utcnow()
         filename = 'cass_inp_amex_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(settings.APP_DIR, 'merchants/amex', filename)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', filename)
         try:
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
-                    csv_writer.writerow(['amex',
-                                         merchant['American Express MIDs'].strip(' '),
-                                         merchant['Scheme'].strip('" ').lower(),
-                                         merchant['Partner Name'].strip('" '),
-                                         merchant['Town/City'].strip('" '),
-                                         merchant['Postcode'].strip('" '),
-                                         ])
+                    csv_writer.writerow([
+                        'amex',
+                        merchant['American Express MIDs'].strip(' '),
+                        merchant['Scheme'].strip('" ').lower(),
+                        merchant['Partner Name'].strip('" '),
+                        merchant['Town/City'].strip('" '),
+                        merchant['Postcode'].strip('" '),
+                        merchant['Action']
+                    ])
 
         except IOError:
             raise Exception('Error writing file:' + path)
@@ -189,7 +225,7 @@ class Amex:
         :return: None
         """
 
-        path = os.path.join(settings.APP_DIR, 'merchants/amex', file_name)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants/amex', file_name)
 
         with open(path, 'w+') as f:
             f.write(amex_input_file.get_detail())
@@ -205,7 +241,7 @@ class Amex:
         reason = reason or []
 
         detail_record_count = len(merchants)
-        file_num = 1  # sequential_file_number() + 1
+        file_num = get_next_file_number()
 
         header = Header(
             date=self.format_datetime(arrow.now()),
@@ -230,9 +266,11 @@ class Amex:
         for count, merchant in enumerate(merchants):
             if validated:
                 the_reason = ''
+
             else:
                 the_reason = reason[count]
-            detail = AmexDetail(
+
+            file.add_detail(AmexDetail(
                 action_code=merchant['Action'],  # A=Add, U=Update, D=Delete
                 partner_id='AADP0050',
                 version_number='1.0',
@@ -262,25 +300,21 @@ class Amex:
                 custom_field_1='',
                 custom_field_2='',
                 filler=the_reason
-            )
-
-            file.add_detail(detail)
+            ))
 
         file_name = self.create_file_name(validated)
         try:
             self.write_to_file(file, file_name)
+
         except IOError:
             raise Exception('Error writing file:' + file_name)
 
     @staticmethod
     def create_file_name(validated):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
-        # TODO: Change BINK to suitable name
-        file_name = '{}{}{}{}'.format(
-            'CHINGS',
-            '_AXP_MER_REG_',
-            arrow.now().format('YYYYMMDD_hhmmss'),
-            '.txt'
+        file_name = '{company}_AXP_MER_REG_{datetime}.txt'.format(
+            company='CHINGS',
+            datetime=arrow.now().format('YYYYMMDD_hhmmss')
         )
 
         if not validated:

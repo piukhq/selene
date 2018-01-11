@@ -6,7 +6,4 @@ __pycache__
 .cache/
 venv
 .DS_Store
-*.txt
-*.csv
-*.xlsx
-*.psv
+merchants
