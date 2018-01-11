@@ -92,17 +92,21 @@ class TestViews(TestCase):
     def test_load_to_cassandra(self, client):
         client.side_effect = MockClient()
 
+        headers = {'Content-Type': "application/json", 'Authorization': settings.SERVICE_TOKEN}
         filename = os.path.join(settings.APP_DIR, 'app', 'tests', 'fixture', 'test_load_cassandra.json')
         with open(filename, 'r') as f:
             file = f.read()
 
-        response = self.client.post(api.url_for(CassandraDatabaseOperations), data=file,
-                                    content_type="application/json")
+        response = self.client.post(api.url_for(CassandraDatabaseOperations), data=file, headers=headers)
 
         self.assert200(response)
 
         merchant = json.dumps({"merchant": "test"})
+        response = self.client.post(api.url_for(CassandraDatabaseOperations), data=merchant, headers=headers)
+
+        self.assert200(response)
+
         response = self.client.post(api.url_for(CassandraDatabaseOperations), data=merchant,
                                     content_type="application/json")
 
-        self.assert200(response)
+        self.assert401(response)
