@@ -37,6 +37,6 @@ build-master:
     - docker build --pull -t "$CI_REGISTRY/selene:latest" .
     - docker push "$CI_REGISTRY/selene:latest"
   only:
-    - add_flask
+    - master
   tags:
     - docker

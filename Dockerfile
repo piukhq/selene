@@ -9,7 +9,7 @@ RUN addgroup --gid 1550 apps && \
  echo "deb-src http://ppa.launchpad.net/nginx/stable/ubuntu xenial main" >> /etc/apt/sources.list && \
  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C300EE8C && \
  apt-get update && \
- apt-get -y install rsync git git-core python3 python3-pip python3-dev libpq-dev nginx curl && \
+ apt-get -y install rsync git git-core python3 python3-pip python3-dev libpq-dev nginx curl lftp && \
  curl -L 'https://github.com/just-containers/s6-overlay/releases/download/v1.18.1.5/s6-overlay-amd64.tar.gz' -o /tmp/s6-overlay-amd64.tar.gz && \
  tar xzf /tmp/s6-overlay-amd64.tar.gz -C / && \
  sed -i -e 's/user www-data;/user apps;/g' /etc/nginx/nginx.conf && \
@@ -22,7 +22,6 @@ RUN addgroup --gid 1550 apps && \
  pip3 install -r /usr/local/src/selene/requirements.txt && \
  chown apps:apps /usr/local/src -R && \
  apt-get -y remove rsync git git-core curl && \
- apt-get -y install lftp && \
  apt-get -y autoremove && \
  apt-get clean && \
  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
