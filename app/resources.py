@@ -115,3 +115,17 @@ class CassandraDatabaseOperations(Resource):
             response = handle_exception(e)
 
         return response
+
+
+@api.resource('/mids/cassandra/providers')
+class CassandraSchemeProviders(Resource):
+    @staticmethod
+    def get():
+        try:
+            result = CassandraOperations().get_providers_list()
+            response = jsonify(success=True, error=None, merchants=result)
+
+        except Exception as e:
+            response = handle_exception(e)
+
+        return response
