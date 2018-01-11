@@ -8,7 +8,7 @@ from unittest import mock
 
 from app import create_app
 from app.utils import csv_to_list_json, init_folders
-from app.resources import (api, LoadToCassandra, ImportMids, MastercardHandback, WipeOutputFolders,
+from app.resources import (api, CassandraDatabaseOperations, ImportMids, MastercardHandback, WipeOutputFolders,
                            FindDuplicatesInHandback)
 
 
@@ -16,6 +16,12 @@ class MockClient(mock.Mock):
     @staticmethod
     def insert(table, rows):
         pass
+
+    @staticmethod
+    def execute(_):
+        result = mock.Mock()
+        result.current_rows = None
+        return result
 
 
 class TestViews(TestCase):
@@ -82,18 +88,21 @@ class TestViews(TestCase):
         response = self.client.get(api.url_for(WipeOutputFolders))
         self.assert500(response)
 
-    def test_load_to_cassandra(self):
+    @mock.patch('app.cassandra_operations.Client')
+    def test_load_to_cassandra(self, client):
+        client.side_effect = MockClient()
+
         filename = os.path.join(settings.APP_DIR, 'app', 'tests', 'fixture', 'test_load_cassandra.json')
         with open(filename, 'r') as f:
             file = f.read()
 
-        with mock.patch('app.cassandra_operations.Client') as client:
-            client.side_effect = MockClient()
-            response = self.client.post(api.url_for(LoadToCassandra), data=file, content_type="application/json")
+        response = self.client.post(api.url_for(CassandraDatabaseOperations), data=file,
+                                    content_type="application/json")
 
-            self.assert200(response)
+        self.assert200(response)
 
-        wrong_type_data = "wrong data"
-        response = self.client.post(api.url_for(LoadToCassandra), data=wrong_type_data, content_type="application/json")
+        merchant = json.dumps({"merchant": "test"})
+        response = self.client.post(api.url_for(CassandraDatabaseOperations), data=merchant,
+                                    content_type="application/json")
 
-        self.assert500(response)
+        self.assert200(response)

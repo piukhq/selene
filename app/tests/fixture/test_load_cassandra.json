@@ -1,13 +1,13 @@
 [
-  ["mastercard", "9999999", "test", "BinkTest", "test Road (363)", "SW10 9TN"],
-  ["mastercard", "6666666", "test", "BinkTest", "London  Notting Hill Gate", "W11 3LB"],
-  ["mastercard", "555M555", "test", "BinkTest", "London  Dean Street", "W1D 3RW"],
-  ["mastercard", "4444444", "test", "BinkTest", "Hertford", "SG14 1BY"],
-  ["mastercard", "3333333", "test", "BinkTest", "Clapham  Lavender Hill", "SW11 1LE"],
-  ["mastercard", "2222222", "test", "BinkTest", "Teddington", "TW11 8LR"],
-  ["mastercard", "1111111", "test", "BinkTest", "Maidstone", "ME14 1PF"],
-  ["mastercard", "7777777", "test", "BinkTest", "London Wardour Street", "W1D 6PS"],
-  ["mastercard", "8888888", "test", "BinkTest", "London  Coptic Street", "WC1A 1NS"],
-  ["mastercard", "7777777", "test", "BinkTest", "London  Fulham", "EG3 9GB"],
-  ["", "", "", "", "", ""]
+  ["mastercard", "9999999", "test", "BinkTest", "test Road (363)", "SW10 9TN", "A"],
+  ["mastercard", "6666666", "test", "BinkTest", "London  Notting Hill Gate", "W11 3LB", "A"],
+  ["mastercard", "555M555", "test", "BinkTest", "London  Dean Street", "W1D 3RW", "A"],
+  ["mastercard", "4444444", "test", "BinkTest", "Hertford", "SG14 1BY", "A"],
+  ["mastercard", "3333333", "test", "BinkTest", "Clapham  Lavender Hill", "SW11 1LE", "D"],
+  ["mastercard", "2222222", "test", "BinkTest", "Teddington", "TW11 8LR", "D"],
+  ["mastercard", "1111111", "test", "BinkTest", "Maidstone", "ME14 1PF", "D"],
+  ["mastercard", "7777777", "test", "BinkTest", "London Wardour Street", "W1D 6PS", "A"],
+  ["mastercard", "8888888", "test", "BinkTest", "London  Coptic Street", "WC1A 1NS", "A"],
+  ["mastercard", "7777777", "test", "BinkTest", "London  Fulham", "EG3 9GB", "A"],
+  ["", "", "", "", "", "", ""]
 ]
