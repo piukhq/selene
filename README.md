@@ -37,6 +37,18 @@ File to process as JSON
 
 GET `/mids/wipe_folders`
 
+## Cassandra database operations:
+
+### Request
+
+POST `/mids/cassandra`
+
+### Payload
+
+Type: JSON provide one of the following
+- Cassandra input file with A for Add or D for delete in action column as list of lists
+- Merchant to be removed (slug) as `{"merchant": <merchant name>}`
+
 ## Response
 
 ### success
