@@ -9,7 +9,7 @@ from unittest import mock
 from app import create_app
 from app.utils import csv_to_list_json, init_folders
 from app.resources import (api, CassandraDatabaseOperations, ImportMids, MastercardHandback, WipeOutputFolders,
-                           FindDuplicatesInHandback)
+                           FindDuplicatesInHandback, CassandraSchemeProviders)
 
 
 class MockClient(mock.Mock):
@@ -20,7 +20,7 @@ class MockClient(mock.Mock):
     @staticmethod
     def execute(_):
         result = mock.Mock()
-        result.current_rows = None
+        result.current_rows = list()
         return result
 
 
@@ -110,3 +110,9 @@ class TestViews(TestCase):
                                     content_type="application/json")
 
         self.assert401(response)
+
+    @mock.patch('app.cassandra_operations.Client')
+    def test_cassandra_scheme_providers(self, client):
+        client.side_effect = MockClient()
+        response = self.client.get(api.url_for(CassandraSchemeProviders), content_type="application/json")
+        self.assert200(response)
