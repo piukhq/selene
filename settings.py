@@ -19,8 +19,8 @@ SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{password}@{host}:{port}
 
 CASSANDRA_CLUSTER = env_var('CASSANDRA_CLUSTER', '10.0.104.30, 10.0.104.31, 10.0.104.32').split(', ')
 
-SENTRY_DNS = env_var("SELENE_SENTRY_DNS", None)
-USE_SENTRY = env_var("USE_SENTRY", True if SENTRY_DNS else False)
+SENTRY_DSN = env_var("SELENE_SENTRY_DSN", None)
+USE_SENTRY = env_var("USE_SENTRY", True if SENTRY_DSN else False)
 SECRET_KEY = '3456hk3465hj345jh6jk456j45lk-0'
 PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 DEBUG = env_var("SELENE_DEBUG", False)
