@@ -11,17 +11,26 @@ from app.handback_duplicates import find_duplicate_mids_in_mastercard_handback_f
 from app.cassandra_operations import CassandraOperations
 from app.utils import wipe_output_folders
 
-api = Api()
+
+def handle_exceptions(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+
+        except Exception as e:
+            if settings.USE_SENTRY:
+                sentry.captureException()
+
+            error = '{}: {}'.format(type(e).__name__, e)
+            response = jsonify(success=False, error=error)
+            response.status_code = 500
+            return response
+
+    return decorated_function
 
 
-def handle_exception(e, status_code=500, use_sentry=settings.USE_SENTRY):
-    if use_sentry:
-        sentry.captureException()
-
-    error = '{}: {}'.format(type(e).__name__, e)
-    response = jsonify(success=False, error=error)
-    response.status_code = status_code
-    return response
+api = Api(decorators=[handle_exceptions])
 
 
 def token_required(f):
@@ -29,7 +38,9 @@ def token_required(f):
     def decorated_function(*args, **kwargs):
         token = request.headers.get('Authorization')
         if token != settings.SERVICE_TOKEN:
-            return handle_exception(ValueError('Wrong authorization token'), 401, False)
+            response = jsonify(success=False, error='Wrong token')
+            response.status_code = 401
+            return response
 
         return f(*args, **kwargs)
 
@@ -40,59 +51,35 @@ def token_required(f):
 class ImportMids(Resource):
     @staticmethod
     def post():
-        try:
-            file = request.get_json()
-            folder_name = onboard_mids(file, False, True)
-            response = jsonify(success=True, error=None, folder_name=folder_name)
-
-        except Exception as e:
-            response = handle_exception(e)
-
-        return response
+        file = request.get_json()
+        folder_name = onboard_mids(file, False, True)
+        return jsonify(success=True, error=None, folder_name=folder_name)
 
 
 @api.resource('/mids/mastercard_handback')
 class MastercardHandback(Resource):
     @staticmethod
     def post():
-        try:
-            file = request.get_json()
-            export_mastercard(file)
-            response = jsonify(success=True, error=None, folder_name='handback')
-
-        except Exception as e:
-            response = handle_exception(e)
-
-        return response
+        file = request.get_json()
+        export_mastercard(file)
+        return jsonify(success=True, error=None, folder_name='handback')
 
 
 @api.resource('/mids/handback_duplicates')
 class FindDuplicatesInHandback(Resource):
     @staticmethod
     def post():
-        try:
-            file = request.get_json()
-            find_duplicate_mids_in_mastercard_handback_file(file)
-            response = jsonify(success=True, error=None, folder_name='duplicates')
-
-        except Exception as e:
-            response = handle_exception(e)
-
-        return response
+        file = request.get_json()
+        find_duplicate_mids_in_mastercard_handback_file(file)
+        return jsonify(success=True, error=None, folder_name='duplicates')
 
 
 @api.resource('/mids/wipe_folders')
 class WipeOutputFolders(Resource):
     @staticmethod
     def get():
-        try:
-            wipe_output_folders()
-            response = jsonify(success=True, error=None)
-
-        except Exception as e:
-            response = handle_exception(e)
-
-        return response
+        wipe_output_folders()
+        return jsonify(success=True, error=None)
 
 
 @api.resource('/mids/cassandra')
@@ -100,32 +87,20 @@ class CassandraDatabaseOperations(Resource):
     @staticmethod
     @token_required
     def post():
-        try:
-            received = request.get_json()
-            if 'merchant' in received:
-                merchant, file = received.get('merchant'), None
+        received = request.get_json()
+        if 'merchant' in received:
+            merchant, file = received.get('merchant'), None
 
-            else:
-                merchant, file = None, received
+        else:
+            merchant, file = None, received
 
-            CassandraOperations(file=file, merchant=merchant).run_operations()
-            response = jsonify(success=True, error=None)
-
-        except Exception as e:
-            response = handle_exception(e)
-
-        return response
+        CassandraOperations(file=file, merchant=merchant).run_operations()
+        return jsonify(success=True, error=None)
 
 
 @api.resource('/mids/cassandra/providers')
 class CassandraSchemeProviders(Resource):
     @staticmethod
     def get():
-        try:
-            result = CassandraOperations().get_providers_list()
-            response = jsonify(success=True, error=None, merchants=result)
-
-        except Exception as e:
-            response = handle_exception(e)
-
-        return response
+        result = CassandraOperations().get_providers_list()
+        return jsonify(success=True, error=None, merchants=result)
