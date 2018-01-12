@@ -1,36 +1,22 @@
 import settings
 
-from flask import request, jsonify
-from flask_restful import Resource, Api
+from flask import request
+from flask_restplus import Resource, Api, abort
 from functools import wraps
 
-from app import sentry
 from app.import_mids import onboard_mids
 from app.mastercard_handback import export_mastercard
 from app.handback_duplicates import find_duplicate_mids_in_mastercard_handback_file
 from app.cassandra_operations import CassandraOperations
 from app.utils import wipe_output_folders
 
-
-def handle_exceptions(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        try:
-            return f(*args, **kwargs)
-
-        except Exception as e:
-            if settings.USE_SENTRY:
-                sentry.captureException()
-
-            error = '{}: {}'.format(type(e).__name__, e)
-            response = jsonify(success=False, error=error)
-            response.status_code = 500
-            return response
-
-    return decorated_function
+api = Api()
 
 
-api = Api(decorators=[handle_exceptions])
+@api.errorhandler
+def handle_exceptions(e):
+    message = '{}: {}'.format(type(e).__name__, e)
+    return dict(success=False, message=message)
 
 
 def token_required(f):
@@ -38,51 +24,49 @@ def token_required(f):
     def decorated_function(*args, **kwargs):
         token = request.headers.get('Authorization')
         if token != settings.SERVICE_TOKEN:
-            response = jsonify(success=False, error='Wrong token')
-            response.status_code = 401
-            return response
+            abort(401, 'AuthToken: Authorization token missing or incorrect.', success=False)
 
         return f(*args, **kwargs)
 
     return decorated_function
 
 
-@api.resource('/mids/import_mids')
+@api.route('/mids/import_mids', endpoint='import_mids')
 class ImportMids(Resource):
     @staticmethod
     def post():
         file = request.get_json()
         folder_name = onboard_mids(file, False, True)
-        return jsonify(success=True, error=None, folder_name=folder_name)
+        return dict(success=True, folder_name=folder_name)
 
 
-@api.resource('/mids/mastercard_handback')
+@api.route('/mids/mastercard_handback', endpoint='mastercard_handback')
 class MastercardHandback(Resource):
     @staticmethod
     def post():
         file = request.get_json()
         export_mastercard(file)
-        return jsonify(success=True, error=None, folder_name='handback')
+        return dict(success=True, folder_name='handback')
 
 
-@api.resource('/mids/handback_duplicates')
+@api.route('/mids/handback_duplicates', endpoint='handback_duplicates')
 class FindDuplicatesInHandback(Resource):
     @staticmethod
     def post():
         file = request.get_json()
         find_duplicate_mids_in_mastercard_handback_file(file)
-        return jsonify(success=True, error=None, folder_name='duplicates')
+        return dict(success=True, folder_name='duplicates')
 
 
-@api.resource('/mids/wipe_folders')
+@api.route('/mids/wipe_folders', endpoint='wipe_folders')
 class WipeOutputFolders(Resource):
     @staticmethod
     def get():
         wipe_output_folders()
-        return jsonify(success=True, error=None)
+        return dict(success=True)
 
 
-@api.resource('/mids/cassandra')
+@api.route('/mids/cassandra', endpoint='cassandra_ops')
 class CassandraDatabaseOperations(Resource):
     @staticmethod
     @token_required
@@ -95,12 +79,12 @@ class CassandraDatabaseOperations(Resource):
             merchant, file = None, received
 
         CassandraOperations(file=file, merchant=merchant).run_operations()
-        return jsonify(success=True, error=None)
+        return dict(success=True)
 
 
-@api.resource('/mids/cassandra/providers')
+@api.route('/mids/cassandra/providers', endpoint='get_providers')
 class CassandraSchemeProviders(Resource):
     @staticmethod
     def get():
         result = CassandraOperations().get_providers_list()
-        return jsonify(success=True, error=None, merchants=result)
+        return dict(success=True, merchants=result)
