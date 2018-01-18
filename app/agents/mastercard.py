@@ -81,7 +81,7 @@ class MasterCard:
         filename = 'cass_inp_mastercard_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
         path = os.path.join(self.write_path, filename)
         try:
-            with open(path, 'w', encoding='utf-8') as csv_file:
+            with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
                     csv_writer.writerow([
