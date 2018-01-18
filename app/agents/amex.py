@@ -286,7 +286,7 @@ class Amex:
                 merchant_legal_name=merchant['Partner Name'],
                 merchant_start_date=self.format_datetime(arrow.now()),
                 merchant_end_date='',
-                address_line_1='{}'.format(merchant['Address (Building Name/Number, Street)']),
+                address_line_1='{}'.format(merchant['Address (Building Name/Number Street)']),
                 address_line_2='',
                 address_line_3='',
                 address_line_4='',

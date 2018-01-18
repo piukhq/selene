@@ -114,6 +114,9 @@ def prepare_cassandra_file(file, headers):
     :return: list of dictionaries with no trailing empty lines.
     """
 
+    if set(headers) == set(file[0]):
+        file = file[1:]
+
     while not ''.join(file[-1]):
         file = file[:-1]
 

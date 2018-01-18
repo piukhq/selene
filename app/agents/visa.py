@@ -118,7 +118,7 @@ class Visa:
             action = self.action_translate.get(merchant['Action'])
 
             detail = [merchant['Visa MIDs'], merchant['Partner Name'], merchant['Town/City'],
-                      merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
+                      merchant['Postcode'], merchant['Address (Building Name/Number Street)'],
                       '', action,
                       ]
             if validated:
