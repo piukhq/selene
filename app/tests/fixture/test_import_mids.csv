@@ -1,4 +1,4 @@
-Partner Name,American Express MIDs,MasterCard MIDs,Visa MIDs,"Address (Building Name/Number, Street)",Postcode,Town/City,County/State,Country,Action,Scheme,Scheme ID
+Partner Name,American Express MIDs,MasterCard MIDs,Visa MIDs,"Address (Building Name/Number Street)",Postcode,Town/City,County/State,Country,Action,Scheme,Scheme ID
 BinkTest,N/A,N/A,N/A,59 Halket Place St Helier Jersey,JE2 4WG,Jersey  St Helier,,,A,test,000
 BinkTest,,,,La Route de la Bale St Brelade Bay Jersey,JE3 8EA,Jersey  St Brelade,,,A,test,000
 BinkTest,1111111111,9999999,1111111,29 Wardour Street Soho London,W1D 6PS,London Wardour Street,,,A,test,000
