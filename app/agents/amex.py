@@ -200,7 +200,7 @@ class Amex:
         filename = 'cass_inp_amex_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
         path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', filename)
         try:
-            with open(path, 'w', encoding='utf-8') as csv_file:
+            with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
                 for merchant in merchants:
                     csv_writer.writerow([
@@ -227,7 +227,7 @@ class Amex:
 
         path = os.path.join(settings.WRITE_FOLDER, 'merchants/amex', file_name)
 
-        with open(path, 'w+', encoding='utf-8') as f:
+        with open(path, 'w+') as f:
             f.write(amex_input_file.get_detail())
 
     def export_merchants(self, merchants, validated, reason=None):

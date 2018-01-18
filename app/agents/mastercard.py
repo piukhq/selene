@@ -102,7 +102,7 @@ class MasterCard:
         filename = 'duplicates_mastercard_{}.txt'.format(a.format('DD-MM-YYYY'))
         path = os.path.join(self.write_path, filename)
         try:
-            with open(path, 'w', encoding='utf-8') as dup_file:
+            with open(path, 'w') as dup_file:
                 dup_file.write('Date of file creation: {}\n'.format(a.format('DD-MM-YYYY')))
                 for dup in duplicates:
                     dup_file.write(dup + '\n')
@@ -120,7 +120,7 @@ class MasterCard:
 
         path = os.path.join(self.write_path, file_name)
 
-        with open(path, 'w', encoding='utf-8') as file:
+        with open(path, 'w') as file:
             writer = csv.writer(file, delimiter=',', quotechar='"')
 
             input_file.set_header(writer)
