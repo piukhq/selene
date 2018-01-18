@@ -58,7 +58,7 @@ class CassandraOperations:
     def select_by_provider(self):
         result = self.client.execute(self.select_by_provider_query.format(self.merchant))
         if result.current_rows:
-            self.remove_mids(result.current_rows)
+            self.remove_mids(result)
 
     def load_mids(self, rows):
         self.client.insert(self.insert_table, rows)
