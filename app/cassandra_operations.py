@@ -52,7 +52,7 @@ class CassandraOperations:
 
     def get_providers_list(self):
         result = self.client.execute(self.get_providers_query)
-        providers = set([row[self.columns[2]] for row in result.current_rows])
+        providers = {row[self.columns[2]] for row in result}
         return list(providers)
 
     def select_by_provider(self):
