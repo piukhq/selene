@@ -14,7 +14,7 @@ from app.utils import csv_to_list_json, init_folders
 class MockClient(mock.Mock):
     @staticmethod
     def execute(_):
-        result = mock.Mock()
+        result = mock.MagicMock()
         result.current_rows = list()
         return result
 
