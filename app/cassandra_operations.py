@@ -28,8 +28,10 @@ class CassandraOperations:
     delete_query = "delete from %(ks)s.%(t)s where %(f1)s='{%(f1)s}' and %(f2)s='{%(f2)s}';" % \
                    {'ks': keyspace, 't': insert_table, 'f1': columns[0], 'f2': columns[1]}
 
-    def __init__(self, file=None, merchant=None):
+    def __init__(self, user, file=None, merchant=None):
         Client.execute = execute_patched
+        self.user_id = str(user['id'])
+        self.user_name = str(user['name'])
         self.client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
         self.merchant = merchant
         self.rows = prepare_cassandra_file(file, self.columns) if file else None
@@ -64,16 +66,30 @@ class CassandraOperations:
 
     def load_mids(self, rows):
         self.client.insert(self.insert_table, rows)
+        self.send_audit('A', rows)
 
     def remove_mids(self, rows=None):
         if rows:
             for row in rows:
-                # self.client.execute(self.delete_query.format(**row))
-                json = dict(user_name='test_user', user_id='1', action='D')
-                json.update(**row)
-                json['when'] = arrow.get(json['created_date']).format()
-                del json['created_date']
-                requests.post(settings.EREBUS_URL, json=[json])
+                self.client.execute(self.delete_query.format(**row))
+
+            self.send_audit('D', rows)
 
         else:
             self.select_by_provider()
+
+    def send_audit(self, action, rows):
+        affected_rows = list()
+        for row in rows:
+            json = dict(user_name=self.user_name, user_id=self.user_id, action=action)
+            json.update(**row)
+
+            if json.get('created_date'):
+                json['when'] = arrow.get(json['created_date']).format()
+                del json['created_date']
+            else:
+                json['when'] = arrow.utcnow().format()
+
+            affected_rows.append(json)
+
+        requests.post(settings.EREBUS_URL, json=affected_rows)

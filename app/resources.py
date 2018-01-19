@@ -72,13 +72,15 @@ class CassandraDatabaseOperations(Resource):
     @token_required
     def post():
         received = request.get_json()
-        if 'merchant' in received:
+        user = dict(id=received['user_id'], name=received['user_name'])
+        data = received['data']
+        if 'merchant' in data:
             merchant, file = received.get('merchant'), None
 
         else:
-            merchant, file = None, received
+            merchant, file = None, data
 
-        CassandraOperations(file=file, merchant=merchant).run_operations()
+        CassandraOperations(user=user, file=file, merchant=merchant).run_operations()
         return dict(success=True)
 
 
