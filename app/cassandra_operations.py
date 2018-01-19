@@ -85,8 +85,8 @@ class CassandraOperations:
             json.update(**row)
 
             if json.get('created_date'):
-                json['when'] = arrow.get(json['created_date']).format()
-                del json['created_date']
+                json['when'] = arrow.get(json.pop('created_date')).format()
+
             else:
                 json['when'] = arrow.utcnow().format()
 
