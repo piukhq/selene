@@ -64,6 +64,6 @@ def export_mastercard(file):
         for err in errors:
             error_output_file.write(err + '\n')
 
-    now = arrow.utcnow().format('DDMMYY_hhmmss')
+    now = arrow.utcnow().format('DDMMYY_hhmmssSSS')
     archive_files(src_dir, now)
     return os.path.join('handback', now)

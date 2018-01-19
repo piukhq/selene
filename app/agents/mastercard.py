@@ -3,6 +3,7 @@ import arrow
 import os
 import settings
 
+
 class MastercardMerchantFile:
 
     def __init__(self):
@@ -109,7 +110,7 @@ class MasterCard:
         except IOError:
             raise Exception('Error writing file:' + path)
 
-        return self.write_path, a.format('DDMMYY_hhmmss')
+        return self.write_path, a.format('DDMMYY_hhmmssSSS')
 
     def write_to_file(self, input_file, file_name):
         """

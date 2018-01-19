@@ -103,7 +103,7 @@ def onboard_mids(file, send_export, ignore_postcode):
     content = 'Please load the attached MIDs for {} and confirm your forecast on-boarding date.'.format(partner_name)
 
     # Visa & MasterCard
-    now = arrow.utcnow().format('DDMMYY_hhmmss')
+    now = arrow.utcnow().format('DDMMYY_hhmmssSSS')
     for folder in ['visa', 'mastercard', 'amex']:
         utils.archive_files(folder, now)
 
