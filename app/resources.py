@@ -75,7 +75,7 @@ class CassandraDatabaseOperations(Resource):
         user = dict(id=received['user_id'], name=received['user_name'])
         data = received['data']
         if 'merchant' in data:
-            merchant, file = received.get('merchant'), None
+            merchant, file = data.get('merchant'), None
 
         else:
             merchant, file = None, data
