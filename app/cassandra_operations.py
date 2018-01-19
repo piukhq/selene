@@ -1,4 +1,6 @@
 import settings
+import requests
+import arrow
 
 from bigdatalib.schema import Schema
 from cassandralib.client import Client
@@ -66,7 +68,12 @@ class CassandraOperations:
     def remove_mids(self, rows=None):
         if rows:
             for row in rows:
-                self.client.execute(self.delete_query.format(**row))
+                # self.client.execute(self.delete_query.format(**row))
+                json = dict(user_name='test_user', user_id='1', action='D')
+                json.update(**row)
+                json['when'] = arrow.get(json['created_date']).format()
+                del json['created_date']
+                requests.post(settings.EREBUS_URL, json=[json])
 
         else:
             self.select_by_provider()
