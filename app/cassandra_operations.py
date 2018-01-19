@@ -28,10 +28,12 @@ class CassandraOperations:
     delete_query = "delete from %(ks)s.%(t)s where %(f1)s='{%(f1)s}' and %(f2)s='{%(f2)s}';" % \
                    {'ks': keyspace, 't': insert_table, 'f1': columns[0], 'f2': columns[1]}
 
-    def __init__(self, user, file=None, merchant=None):
+    def __init__(self, user=None, file=None, merchant=None):
         Client.execute = execute_patched
-        self.user_id = str(user['id'])
-        self.user_name = str(user['name'])
+        if user:
+            self.user_id = str(user['id'])
+            self.user_name = str(user['name'])
+
         self.client = Client(schema=Schema, hosts=settings.CASSANDRA_CLUSTER)
         self.merchant = merchant
         self.rows = prepare_cassandra_file(file, self.columns) if file else None
