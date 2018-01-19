@@ -60,7 +60,8 @@ def list_json_to_dict_json(file):
     data = list()
     header = file[0]
     for row in file[1:]:
-        data.append(dict(zip(header, row)))
+        if ''.join(row):
+            data.append(dict(zip(header, row)))
 
     return data
 
