@@ -1,7 +1,6 @@
 import os
 import settings
 import arrow
-import shutil
 
 from app import utils
 from app.email import send_email
@@ -96,21 +95,6 @@ def get_partner_name(file):
     return partner_name
 
 
-def archive_files(src_dir, now):
-    """Archive generated files"""
-    dst_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', src_dir, now)
-    src_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', src_dir)
-    os.makedirs(dst_dir, exist_ok=True)
-    copy_local(src_dir, dst_dir)
-
-
-def copy_local(src_dir, dst_dir):
-    """Copy files locally from one directory to another"""
-    for entry in os.scandir(src_dir):
-        if entry.is_file(follow_symlinks=False):
-            shutil.move(entry.path, dst_dir)
-
-
 def onboard_mids(file, send_export, ignore_postcode):
     file = utils.format_json_input(file)
     export(file, ignore_postcode)
@@ -121,7 +105,7 @@ def onboard_mids(file, send_export, ignore_postcode):
     # Visa & MasterCard
     now = arrow.utcnow().format('DDMMYY_hhmmss')
     for folder in ['visa', 'mastercard', 'amex']:
-        archive_files(folder, now)
+        utils.archive_files(folder, now)
 
     visa_path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', now)
     attachment = utils.get_attachment(visa_path, 'visa')

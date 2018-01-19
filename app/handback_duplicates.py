@@ -1,6 +1,6 @@
 import os
 
-from app.utils import get_agent
+from app.utils import get_agent, archive_files
 
 
 def collect_mids(file, agent_instance):
@@ -51,9 +51,10 @@ def find_duplicate_mids_in_mastercard_handback_file(file):
 
     dup_mids, duplicates = find_duplicates(file, agent_instance)
 
-    if len(dup_mids):
-        print(dup_mids)
+    if not dup_mids:
+        duplicates = ['No duplicate MIDs found.']
 
-        agent_instance.write_duplicates_file(duplicates)
-    else:
-        print("No duplicates found.")
+    src_dir, now = agent_instance.write_duplicates_file(duplicates)
+    archive_files(src_dir, now)
+
+    return os.path.join('duplicates', now)
