@@ -132,9 +132,16 @@ def prepare_cassandra_file(file, headers):
     return data
 
 
-def check_mids_input_data(data):
+def archive_files(src_dir, now):
+    """Archive generated files"""
+    dst_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', src_dir, now)
+    src_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', src_dir)
+    os.makedirs(dst_dir, exist_ok=True)
+    copy_local(src_dir, dst_dir)
 
 
-
-
-    return data
+def copy_local(src_dir, dst_dir):
+    """Copy files locally from one directory to another"""
+    for entry in os.scandir(src_dir):
+        if entry.is_file(follow_symlinks=False):
+            shutil.move(entry.path, dst_dir)
