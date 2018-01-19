@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 import settings
+import httpretty
 
 from flask import url_for
 from flask_testing import TestCase
@@ -73,25 +74,31 @@ class TestViews(TestCase):
         response = self.client.get(url_for('wipe_folders'))
         self.assert500(response)
 
+    @httpretty.activate
     @mock.patch('app.cassandra_operations.Client')
     def test_load_to_cassandra(self, client):
         client.side_effect = MockClient()
+        httpretty.register_uri(httpretty.POST, settings.EREBUS_URL,
+                               body='{"success": true}',
+                               content_type="application/json")
 
         headers = {'Content-Type': "application/json", 'Authorization': settings.SERVICE_TOKEN}
         filename = os.path.join(settings.APP_DIR, 'app', 'tests', 'fixture', 'test_load_cassandra.json')
         with open(filename, 'r') as f:
             file = f.read()
 
-        response = self.client.post(url_for('cassandra_ops'), data=file, headers=headers)
+        payload = dict(user_id='1', user_name='test', data=json.loads(file))
+        response = self.client.post(url_for('cassandra_ops'), data=json.dumps(payload), headers=headers)
 
         self.assert200(response)
 
-        merchant = json.dumps({"merchant": "test"})
-        response = self.client.post(url_for('cassandra_ops'), data=merchant, headers=headers)
+        payload['data'] = {"merchant": "test"}
+
+        response = self.client.post(url_for('cassandra_ops'), data=json.dumps(payload), headers=headers)
 
         self.assert200(response)
 
-        response = self.client.post(url_for('cassandra_ops'), data=merchant,
+        response = self.client.post(url_for('cassandra_ops'), data=json.dumps(payload),
                                     content_type="application/json")
 
         self.assert401(response)
