@@ -45,8 +45,8 @@ class MastercardHandback(Resource):
     @staticmethod
     def post():
         file = request.get_json()
-        export_mastercard(file)
-        return dict(success=True, folder_name='handback')
+        folder_name = export_mastercard(file)
+        return dict(success=True, folder_name=folder_name)
 
 
 @api.route('/mids/handback_duplicates', endpoint='handback_duplicates')
@@ -54,8 +54,8 @@ class FindDuplicatesInHandback(Resource):
     @staticmethod
     def post():
         file = request.get_json()
-        find_duplicate_mids_in_mastercard_handback_file(file)
-        return dict(success=True, folder_name='duplicates')
+        folder_name = find_duplicate_mids_in_mastercard_handback_file(file)
+        return dict(success=True, folder_name=folder_name)
 
 
 @api.route('/mids/wipe_folders', endpoint='wipe_folders')

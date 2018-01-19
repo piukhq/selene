@@ -1,7 +1,8 @@
 import os
 import settings
+import arrow
 
-from app.utils import validate_uk_postcode, get_agent
+from app.utils import validate_uk_postcode, get_agent, archive_files
 
 
 def collect_merchants(file, agent_instance):
@@ -12,6 +13,9 @@ def collect_merchants(file, agent_instance):
 
         if row[0] == '30':
             break
+
+        elif not row[0].isdigit() or row[0] == '10':
+            pass
 
         elif agent_instance.has_mid(row[23]):
             if not validate_uk_postcode(row[17].strip('"')):
@@ -51,11 +55,15 @@ def export_mastercard(file):
 
     err_filename = 'mastercard_errors.txt'
 
-    path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard', 'handback')
-    os.makedirs(path, exist_ok=True)
+    src_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard', 'handback')
+    os.makedirs(src_dir, exist_ok=True)
 
-    path = os.path.join(path, err_filename)
+    path = os.path.join(src_dir, err_filename)
 
     with open(path, 'w') as error_output_file:
         for err in errors:
             error_output_file.write(err + '\n')
+
+    now = arrow.utcnow().format('DDMMYY_hhmmssSSS')
+    archive_files(src_dir, now)
+    return os.path.join('handback', now)
