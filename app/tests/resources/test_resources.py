@@ -32,7 +32,7 @@ class TestViews(TestCase):
     def setUp(self):
         settings.WRITE_FOLDER = self.WRITE_FOLDER
         settings.EREBUS_URL = self.EREBUS_URL
-        init_folders(self.WRITE_FOLDER)
+        init_folders()
 
     def tearDown(self):
         # shutil.rmtree(self.WRITE_FOLDER)

@@ -12,8 +12,7 @@ sentry = Sentry()
 def create_app(config_name='settings'):
     from app.resources import api
 
-    base_dir = getattr(config_name, 'WRITE_FOLDER') or settings.WRITE_FOLDER
-    init_folders(base_dir)
+    init_folders()
 
     app = Flask('main')
     app.config.from_object(config_name)

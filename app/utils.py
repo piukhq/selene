@@ -10,7 +10,8 @@ from app.active import AGENTS
 from app.models import Sequence, db
 
 
-def init_folders(base_dir):
+def init_folders():
+    base_dir = settings.WRITE_FOLDER
 
     for folder in ['visa', 'amex', 'mastercard']:
         folder_path = os.path.join(base_dir, 'merchants', folder)
