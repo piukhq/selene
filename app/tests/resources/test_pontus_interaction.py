@@ -1,5 +1,7 @@
-from flask_testing import TestCase
+import os
+import settings
 
+from flask_testing import TestCase
 from app import create_app
 from app.models import Sequence, db
 from app.utils import update_amex_sequence_number
@@ -9,6 +11,7 @@ from app.agents.amex import get_next_file_number
 class TestPontus(TestCase):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    WRITE_FOLDER = os.path.join(settings.WRITE_FOLDER, 'test')
 
     def create_app(self):
         return create_app(self, )

@@ -3,9 +3,11 @@ import re
 
 from environment import read_env, env_var
 
+APP_DIR = os.path.abspath(os.path.dirname(__file__))
+
+
 read_env()
 
-APP_DIR = os.path.abspath(os.path.dirname(__file__))
 WRITE_FOLDER = env_var("WRITE_FOLDER", '/tmp/mids_output/')
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False

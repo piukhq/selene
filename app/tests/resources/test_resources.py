@@ -23,18 +23,20 @@ class MockClient(mock.Mock):
 class TestViews(TestCase):
     SQLALCHEMY_DATABASE_URI = 'test'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    EREBUS_URL = 'http://test.url/test'
+    WRITE_FOLDER = os.path.join(settings.WRITE_FOLDER, 'test')
 
     def create_app(self):
         return create_app(self, )
 
     def setUp(self):
-        self.old_write = settings.WRITE_FOLDER
-        settings.WRITE_FOLDER = os.path.join(settings.APP_DIR, 'test')
-        init_folders()
+        settings.WRITE_FOLDER = self.WRITE_FOLDER
+        settings.EREBUS_URL = self.EREBUS_URL
+        init_folders(self.WRITE_FOLDER)
 
     def tearDown(self):
-        shutil.rmtree(settings.WRITE_FOLDER)
-        settings.WRITE_FOLDER = self.old_write
+        # shutil.rmtree(self.WRITE_FOLDER)
+        pass
 
     @mock.patch('app.agents.amex.get_next_file_number')
     def test_import_mids(self, next_sequence):
@@ -68,11 +70,6 @@ class TestViews(TestCase):
     def test_wipe_output_folders(self):
         response = self.client.get(url_for('wipe_folders'))
         self.assert200(response)
-
-        shutil.rmtree(os.path.join(settings.WRITE_FOLDER, 'merchants'))
-
-        response = self.client.get(url_for('wipe_folders'))
-        self.assert500(response)
 
     @httpretty.activate
     @mock.patch('app.cassandra_operations.Client')
