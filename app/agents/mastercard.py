@@ -1,6 +1,6 @@
+import os
 import csv
 import arrow
-import os
 import settings
 
 
@@ -62,7 +62,10 @@ class MastercardMerchantFile:
 
 
 class MasterCard:
-    write_path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard')
+    write_path = None
+
+    def __init__(self):
+        self.write_path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard')
 
     @staticmethod
     def has_mid(element):
@@ -76,10 +79,10 @@ class MasterCard:
 
         return False
 
-    def write_transaction_matched_csv(self, merchants):
-        a = arrow.utcnow()
+    def write_transaction_matched_csv(self, merchants, now):
+        a = arrow.get(now, 'DDMMYY_hhmmssSSS')
         filename = 'cass_inp_mastercard_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(self.write_path, filename)
+        path = os.path.join(self.write_path, now, filename)
         try:
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
@@ -97,10 +100,10 @@ class MasterCard:
         except IOError:
             raise Exception('Error writing file:' + path)
 
-    def write_duplicates_file(self, duplicates):
-        a = arrow.utcnow()
+    def write_duplicates_file(self, duplicates, now):
+        a = arrow.get(now, 'DDMMYY_hhmmssSSS')
         filename = 'duplicates_mastercard_{}.txt'.format(a.format('DD-MM-YYYY'))
-        path = os.path.join(self.write_path, filename)
+        path = os.path.join(self.write_path, now, filename)
         try:
             with open(path, 'w') as dup_file:
                 dup_file.write('Date of file creation: {}\n'.format(a.format('DD-MM-YYYY')))
@@ -110,17 +113,16 @@ class MasterCard:
         except IOError:
             raise Exception('Error writing file:' + path)
 
-        return self.write_path, a.format('DDMMYY_hhmmssSSS')
-
-    def write_to_file(self, input_file, file_name):
+    def write_to_file(self, input_file, file_name, now):
         """
         writes the given input file to a file under a given name.
         :param input_file: the file to write
         :param file_name: the file name under which to write the data
+        :param now: string datetime
         :return: None
         """
 
-        path = os.path.join(self.write_path, file_name)
+        path = os.path.join(self.write_path, now, file_name)
 
         with open(path, 'w') as file:
             writer = csv.writer(file, delimiter=',', quotechar='"')
@@ -129,11 +131,12 @@ class MasterCard:
             input_file.set_data(writer)
             input_file.set_trailer(writer)
 
-    def export_merchants(self, merchants, validated, reason=None):
+    def export_merchants(self, merchants, validated, now, reason=None):
         """
         uses a given set of merchants to generate a file in Mastercard input file format
         :param merchants: a list of merchants to send to Mastercard
         :param validated:
+        :param now: string datetime
         :param reason:
         :return: None
         """
@@ -157,7 +160,7 @@ class MasterCard:
         file_name = self.create_file_name(validated)
 
         try:
-            self.write_to_file(file, file_name)
+            self.write_to_file(file, file_name, now)
         except IOError:
             raise Exception('Error writing file:' + file_name)
 

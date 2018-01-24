@@ -1,6 +1,7 @@
 import os
+import arrow
 
-from app.utils import get_agent, archive_files
+from app.utils import get_agent
 
 
 def collect_mids(file, agent_instance):
@@ -10,6 +11,9 @@ def collect_mids(file, agent_instance):
 
         if row[0] == '30':
             break
+
+        elif not row[0].isdigit() or row[0] == '10':
+            pass
 
         elif agent_instance.has_mid(row[23]):
             mids.append([row[23], count])
@@ -43,9 +47,11 @@ def find_duplicates(file, agent_instance):
 
 
 def find_duplicate_mids_in_mastercard_handback_file(file):
+    now = arrow.utcnow().format('DDMMYY_hhmmssSSS')
     agent_instance = get_agent('mastercard')
     agent_instance.write_path = os.path.join(agent_instance.write_path, 'duplicates')
-    os.makedirs(agent_instance.write_path, exist_ok=True)
+    src_dir = os.path.join(agent_instance.write_path, now)
+    os.makedirs(src_dir, exist_ok=True)
 
     file = file[1:-1]
 
@@ -54,7 +60,5 @@ def find_duplicate_mids_in_mastercard_handback_file(file):
     if not dup_mids:
         duplicates = ['No duplicate MIDs found.']
 
-    src_dir, now = agent_instance.write_duplicates_file(duplicates)
-    archive_files(src_dir, now)
-
+    agent_instance.write_duplicates_file(duplicates, now)
     return os.path.join('duplicates', now)
