@@ -81,17 +81,21 @@ class CassandraOperations:
             self.select_by_provider()
 
     def send_audit(self, action, rows):
+        if not settings.EREBUS_URL:
+            return None
+
         affected_rows = list()
         for row in rows:
-            json = dict(user_name=self.user_name, user_id=self.user_id, action=action)
-            json.update(**row)
+            document = dict(user_name=self.user_name, user_id=self.user_id, action=action)
+            document.update(**row)
 
-            if json.get('created_date'):
-                json['when'] = arrow.get(json.pop('created_date')).format()
+            if document.get('created_date'):
+                document['when'] = arrow.get(document.pop('created_date')).format()
 
             else:
-                json['when'] = arrow.utcnow().format()
+                document['when'] = arrow.utcnow().format()
 
-            affected_rows.append(json)
+            affected_rows.append(document)
 
         requests.post(settings.EREBUS_URL, json=affected_rows)
+

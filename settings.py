@@ -20,7 +20,7 @@ SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{password}@{host}:{port}
 )
 
 CASSANDRA_CLUSTER = env_var('CASSANDRA_CLUSTER', '10.0.104.30, 10.0.104.31, 10.0.104.32').split(', ')
-EREBUS_URL = env_var('EREBUS_URL', 'http://127.0.0.1:7000/audit/scheme_info/insert')
+EREBUS_URL = env_var('EREBUS_URL', None)
 
 SENTRY_DSN = env_var("SELENE_SENTRY_DSN", None)
 USE_SENTRY = env_var("USE_SENTRY", True if SENTRY_DSN else False)
