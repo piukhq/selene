@@ -7,7 +7,7 @@ tests:
   stage: tests
   script:
   - pipenv install --dev
-  - pipenv run python manage.py test
+  - pipenv run py.test app/ --cov=app
   tags:
     - docker
   services:

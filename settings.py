@@ -3,9 +3,12 @@ import re
 
 from environment import read_env, env_var
 
+APP_DIR = os.path.abspath(os.path.dirname(__file__))
+SECRET_KEY = '3456hk3465hj345jh6jk456j45lk-0'
+PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
+
 read_env()
 
-APP_DIR = os.path.abspath(os.path.dirname(__file__))
 WRITE_FOLDER = env_var("WRITE_FOLDER", '/tmp/mids_output/')
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -21,8 +24,6 @@ CASSANDRA_CLUSTER = env_var('CASSANDRA_CLUSTER', '10.0.104.30, 10.0.104.31, 10.0
 
 SENTRY_DSN = env_var("SELENE_SENTRY_DSN", None)
 USE_SENTRY = env_var("USE_SENTRY", True if SENTRY_DSN else False)
-SECRET_KEY = '3456hk3465hj345jh6jk456j45lk-0'
-PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 DEBUG = env_var("SELENE_DEBUG", False)
 DEV_PORT = env_var('DEV_PORT', '8000')
 DEV_HOST = env_var('DEV_HOST', '0.0.0.0')
