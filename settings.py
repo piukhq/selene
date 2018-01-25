@@ -4,7 +4,8 @@ import re
 from environment import read_env, env_var
 
 APP_DIR = os.path.abspath(os.path.dirname(__file__))
-
+SECRET_KEY = '3456hk3465hj345jh6jk456j45lk-0'
+PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 
 read_env()
 
@@ -24,8 +25,6 @@ EREBUS_URL = env_var('EREBUS_URL', None)
 
 SENTRY_DSN = env_var("SELENE_SENTRY_DSN", None)
 USE_SENTRY = env_var("USE_SENTRY", True if SENTRY_DSN else False)
-SECRET_KEY = '3456hk3465hj345jh6jk456j45lk-0'
-PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 DEBUG = env_var("SELENE_DEBUG", False)
 DEV_PORT = env_var('DEV_PORT', '8000')
 DEV_HOST = env_var('DEV_HOST', '0.0.0.0')
