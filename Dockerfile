@@ -3,6 +3,9 @@ MAINTAINER Chris Pressland <cp@bink.com>
 
 ADD . /usr/local/src/selene
 
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
 RUN addgroup --gid 1550 apps && \
  adduser --system --no-create-home --uid 1550 --gid 1550 apps && \
  echo "deb http://ppa.launchpad.net/nginx/stable/ubuntu xenial main" >> /etc/apt/sources.list && \
@@ -18,8 +21,9 @@ RUN addgroup --gid 1550 apps && \
  chmod 600 /root/.ssh/id_rsa && \
  chmod 600 /root/.ssh/config && \
  pip3 install --upgrade pip && \
- pip3 install uwsgi && \
- pip3 install -r /usr/local/src/selene/requirements.txt && \
+ pip3 install uwsgi pipenv && \
+ cd /usr/local/src/selene && \
+ pipenv install --deploy --system && \
  chown apps:apps /usr/local/src -R && \
  locale-gen en_GB.UTF-8 && \
  apt-get -y remove rsync git git-core curl && \
