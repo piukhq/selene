@@ -32,7 +32,11 @@ class TestViews(TestCase):
         init_folders()
 
     def tearDown(self):
-        shutil.rmtree(settings.WRITE_FOLDER)
+        try:
+            shutil.rmtree(settings.WRITE_FOLDER)
+        except FileNotFoundError:
+            pass
+
         settings.WRITE_FOLDER = self.old_write
 
     @mock.patch('app.agents.amex.get_next_file_number')
@@ -67,11 +71,6 @@ class TestViews(TestCase):
     def test_wipe_output_folders(self):
         response = self.client.get(url_for('wipe_folders'))
         self.assert200(response)
-
-        shutil.rmtree(os.path.join(settings.WRITE_FOLDER, 'merchants'))
-
-        response = self.client.get(url_for('wipe_folders'))
-        self.assert500(response)
 
     @mock.patch('app.cassandra_operations.Client')
     def test_load_to_cassandra(self, client):
