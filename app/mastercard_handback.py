@@ -1,8 +1,7 @@
 import os
-import settings
 import arrow
 
-from app.utils import validate_uk_postcode, get_agent, archive_files
+from app.utils import validate_uk_postcode, get_agent
 
 
 def collect_merchants(file, agent_instance):
@@ -32,9 +31,11 @@ def collect_merchants(file, agent_instance):
 
 
 def export_mastercard(file):
+    now = arrow.utcnow().format('DDMMYY_hhmmssSSS')
     agent_instance = get_agent('mastercard')
     agent_instance.write_path = os.path.join(agent_instance.write_path, 'handback')
-    os.makedirs(agent_instance.write_path, exist_ok=True)
+    src_dir = os.path.join(agent_instance.write_path, now)
+    os.makedirs(src_dir, exist_ok=True)
 
     # remove header and footer from file
     merchants, errors = collect_merchants(file[1:-1], agent_instance)
@@ -51,19 +52,13 @@ def export_mastercard(file):
             merc_dict['Postcode'] = merc[4]
             prepped_merchants.append(merc_dict)
 
-        agent_instance.write_transaction_matched_csv(prepped_merchants)
+        agent_instance.write_transaction_matched_csv(prepped_merchants, now)
 
     err_filename = 'mastercard_errors.txt'
-
-    src_dir = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard', 'handback')
-    os.makedirs(src_dir, exist_ok=True)
-
     path = os.path.join(src_dir, err_filename)
 
     with open(path, 'w') as error_output_file:
         for err in errors:
             error_output_file.write(err + '\n')
 
-    now = arrow.utcnow().format('DDMMYY_hhmmssSSS')
-    archive_files(src_dir, now)
     return os.path.join('handback', now)

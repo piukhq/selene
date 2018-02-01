@@ -50,15 +50,15 @@ def populate_card_data(file, ignore_postcode):
     return card_data
 
 
-def export(file, ignore_postcode):
+def export(file, ignore_postcode, now):
     card_data = populate_card_data(file, ignore_postcode)
 
     for k, v in card_data.items():
-        v[0].export_merchants(v[1], True)
-        v[0].export_merchants(v[2], False, v[4])
+        v[0].export_merchants(v[1], True, now)
+        v[0].export_merchants(v[2], False, now, v[4])
 
         if len(v[1]):
-            v[0].write_transaction_matched_csv(v[3])
+            v[0].write_transaction_matched_csv(v[3], now)
 
 
 def validate_row_data(row):
@@ -97,15 +97,16 @@ def get_partner_name(file):
 
 def onboard_mids(file, send_export, ignore_postcode):
     file = utils.format_json_input(file)
-    export(file, ignore_postcode)
+    now = arrow.utcnow().format('DDMMYY_hhmmssSSS')
+
+    for folder in ['visa', 'mastercard', 'amex']:
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', folder, now)
+        os.makedirs(path, exist_ok=True)
+
+    export(file, ignore_postcode, now)
 
     partner_name = get_partner_name(file)
     content = 'Please load the attached MIDs for {} and confirm your forecast on-boarding date.'.format(partner_name)
-
-    # Visa & MasterCard
-    now = arrow.utcnow().format('DDMMYY_hhmmssSSS')
-    for folder in ['visa', 'mastercard', 'amex']:
-        utils.archive_files(folder, now)
 
     visa_path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', now)
     attachment = utils.get_attachment(visa_path, 'visa')
