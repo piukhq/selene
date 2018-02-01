@@ -1,7 +1,6 @@
 stages:
   - tests
   - build
-  - deploy
 
 tests:
   stage: tests
@@ -41,58 +40,3 @@ build-latest:
     - develop
   tags:
     - docker
-
-build-release:
-  stage: build
-  image: docker:latest
-  services:
-    - docker:dind
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
-  script:
-    - docker build --pull -t "$CI_REGISTRY/selene:$CI_COMMIT_TAG" .
-    - docker push "$CI_REGISTRY/selene:$CI_COMMIT_TAG"
-  only:
-    - tags
-  tags:
-    - docker
-
-deploy-latest:
-  stage: deploy
-  image: docker:latest
-  script:
-    - echo "Would deploy $CI_REGISTRY/selene:latest to dev"
-  only:
-    - develop
-  tags:
-    - docker
-  environment:
-    name: dev
-    url: https://api.bink-dev.xyz
-
-deploy-release-staging:
-  stage: deploy
-  image: docker:latest
-  script:
-    - echo "Would deploy $CI_REGISTRY/selene:$CI_COMMIT_TAG to staging"
-  only:
-    - tags
-  tags:
-    - docker
-  environment:
-    name: staging
-    url: https://staging.api.bink.com
-
-deploy-release-prod:
-  stage: deploy
-  image: docker:latest
-  script:
-    - echo "Would deploy $CI_REGISTRY/selene:$CI_COMMIT_TAG to prod"
-  only:
-    - tags
-  tags:
-    - docker
-  when: manual
-  environment:
-    name: production
-    url: https://api.bink.com
