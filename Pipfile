@@ -27,8 +27,10 @@ cassandralib = {git = "ssh://git@gitlab.com/olympus-libs/cassandralib.git"}
 
 
 [dev-packages]
+
 pytest = "*"
 pytest-cov = "*"
+httpretty = "*"
 
 
 [requires]

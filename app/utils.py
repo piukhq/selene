@@ -11,9 +11,10 @@ from app.models import Sequence, db
 
 
 def init_folders():
+    base_dir = settings.WRITE_FOLDER
 
     for folder in ['visa', 'amex', 'mastercard']:
-        folder_path = os.path.join(settings.WRITE_FOLDER, 'merchants', folder)
+        folder_path = os.path.join(base_dir, 'merchants', folder)
         os.makedirs(folder_path, exist_ok=True)
 
 

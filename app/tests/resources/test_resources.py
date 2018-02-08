@@ -1,7 +1,7 @@
 import os
 import json
-import shutil
 import settings
+import httpretty
 
 from flask import url_for
 from flask_testing import TestCase
@@ -22,22 +22,20 @@ class MockClient(mock.Mock):
 class TestViews(TestCase):
     SQLALCHEMY_DATABASE_URI = 'test'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    EREBUS_URL = 'http://test.url/test'
+    WRITE_FOLDER = os.path.join(settings.WRITE_FOLDER, 'test')
 
     def create_app(self):
         return create_app(self, )
 
     def setUp(self):
-        self.old_write = settings.WRITE_FOLDER
-        settings.WRITE_FOLDER = os.path.join(settings.APP_DIR, 'test')
+        settings.WRITE_FOLDER = self.WRITE_FOLDER
+        settings.EREBUS_URL = self.EREBUS_URL
         init_folders()
 
     def tearDown(self):
-        try:
-            shutil.rmtree(settings.WRITE_FOLDER)
-        except FileNotFoundError:
-            pass
-
-        settings.WRITE_FOLDER = self.old_write
+        # shutil.rmtree(self.WRITE_FOLDER)
+        pass
 
     @mock.patch('app.agents.amex.get_next_file_number')
     def test_import_mids(self, next_sequence):
@@ -72,25 +70,31 @@ class TestViews(TestCase):
         response = self.client.get(url_for('wipe_folders'))
         self.assert200(response)
 
+    @httpretty.activate
     @mock.patch('app.cassandra_operations.Client')
     def test_load_to_cassandra(self, client):
         client.side_effect = MockClient()
+        httpretty.register_uri(httpretty.POST, settings.EREBUS_URL,
+                               body='{"success": true}',
+                               content_type="application/json")
 
         headers = {'Content-Type': "application/json", 'Authorization': settings.SERVICE_TOKEN}
         filename = os.path.join(settings.APP_DIR, 'app', 'tests', 'fixture', 'test_load_cassandra.json')
         with open(filename, 'r') as f:
             file = f.read()
 
-        response = self.client.post(url_for('cassandra_ops'), data=file, headers=headers)
+        payload = dict(user_id='1', user_name='test', data=json.loads(file))
+        response = self.client.post(url_for('cassandra_ops'), data=json.dumps(payload), headers=headers)
 
         self.assert200(response)
 
-        merchant = json.dumps({"merchant": "test"})
-        response = self.client.post(url_for('cassandra_ops'), data=merchant, headers=headers)
+        payload['data'] = {"merchant": "test"}
+
+        response = self.client.post(url_for('cassandra_ops'), data=json.dumps(payload), headers=headers)
 
         self.assert200(response)
 
-        response = self.client.post(url_for('cassandra_ops'), data=merchant,
+        response = self.client.post(url_for('cassandra_ops'), data=json.dumps(payload),
                                     content_type="application/json")
 
         self.assert401(response)

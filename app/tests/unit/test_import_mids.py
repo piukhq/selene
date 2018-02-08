@@ -4,6 +4,7 @@ from app.import_mids import validate_row_data
 
 
 class TestImportMids(unittest.TestCase):
+
     def test_validate_row_data(self):
         test_row = {
             'Postcode': '',
