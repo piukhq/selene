@@ -147,7 +147,7 @@ class MasterCard:
         for count, merchant in enumerate(merchants):
 
             detail = [merchant['MasterCard MIDs'], merchant['Partner Name'], merchant['Town/City'],
-                      merchant['Postcode'], merchant['Address (Building Name/Number Street)'],
+                      merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
                       '', merchant['Action'],
                       ]
             if validated:
