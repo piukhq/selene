@@ -23,8 +23,7 @@ SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{password}@{host}:{port}
 CASSANDRA_CLUSTER = env_var('CASSANDRA_CLUSTER', '10.0.104.30, 10.0.104.31, 10.0.104.32').split(', ')
 EREBUS_URL = env_var('EREBUS_URL', None)
 
-SENTRY_DSN = env_var("SELENE_SENTRY_DSN", None)
-USE_SENTRY = env_var("USE_SENTRY", True if SENTRY_DSN else False)
+SENTRY_DSN = env_var("SELENE_SENTRY_DSN")
 DEBUG = env_var("SELENE_DEBUG", False)
 DEV_PORT = env_var('DEV_PORT', '8000')
 DEV_HOST = env_var('DEV_HOST', '0.0.0.0')

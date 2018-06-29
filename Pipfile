@@ -1,12 +1,9 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 arrow = "==0.10.0"
 cassandra-driver = "==3.5.0"
 flask = "==0.12.2"
@@ -25,14 +22,12 @@ bigdatalib = {git = "ssh://git@gitlab.com/olympus-libs/bigdatalib.git"}
 handylib = {git = "ssh://git@gitlab.com/olympus-libs/handylib.git"}
 cassandralib = {git = "ssh://git@gitlab.com/olympus-libs/cassandralib.git"}
 
-
 [dev-packages]
-
 pytest = "*"
 pytest-cov = "*"
 httpretty = "*"
-
-
-[requires]
-
-python_version = "3.5"
+jedi = "*"
+importmagic = "*"
+"autopep8" = "*"
+yapf = "*"
+"flake8" = "*"
