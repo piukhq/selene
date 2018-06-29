@@ -98,4 +98,3 @@ class CassandraOperations:
             affected_rows.append(document)
 
         requests.post(settings.EREBUS_URL, json=affected_rows)
-

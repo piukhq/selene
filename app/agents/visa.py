@@ -61,7 +61,7 @@ class Visa:
 
         a = arrow.utcnow()
         filename = 'cass_inp_visa_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', now,filename)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', now, filename)
         try:
             with open(path, 'w') as csv_file:
                 csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')

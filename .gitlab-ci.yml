@@ -6,7 +6,7 @@ tests:
   stage: tests
   script:
   - pipenv install --dev
-  - pipenv run py.test app/ --cov=app
+  - pipenv run pytest app/tests --cov=app
   tags:
     - docker
   services:
@@ -21,8 +21,7 @@ complexity:
 style:
   stage: tests
   script:
-    - pipenv check
-    - pipenv check --style selene
+    - flake8
   tags:
     - docker
 
