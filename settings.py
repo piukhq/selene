@@ -44,3 +44,9 @@ GET_ATTACHMENT = {
     'visa': re.compile('^CAID_\\w+_LoyaltyAngels_[0-9]{8}.xlsx$'),
     'amex': re.compile('\\w+_AXP_MER_REG_[0-9]{8}_[0-9]{6}.txt$')
 }
+
+UPLOADED_FILES_DEST = 'static/files'
+
+AZURE_ACCOUNT_NAME = env_var('AZURE_ACCOUNT_NAME', 'bink')
+AZURE_ACCOUNT_KEY = env_var('AZURE_ACCOUNT_KEY',
+                            'xaeP9dmuYEWf/gthvteUj2utPcIM/B4dPRPoyHAd22LEI/6l/XJhYnzu2I66rI7PEdgoyvvDKJNYcmxd9vsLhA==')

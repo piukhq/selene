@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="row">
+  <div id="uploadFileFormDiv" class="col-6 text-center">
+    <div>Upload MIDs file</div>
+
+    <!-- Upload File form -->
+    <form class="form-group" id="uploadFormOnboard" action="{{ url_for('selene.index') }}" method="post" enctype="multipart/form-data">
+      <div class="input-group">
+        <label class="input-group-btn" for="inputFileOnboard">
+           <span class="btn btn-primary">
+                Browse <input class="form-control" type="file" name="input_file" required
+                              id="inputFileOnboard" accept=".csv" style="display: none;">
+           </span>
+        </label>
+        <input id="filenameOnboard" type="text" class="form-control form-input" readonly="">
+      </div>
+      <button class="btn btn-success upload-btn" id="uploadButtonOnboard" type="submit">Upload</button>
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}
