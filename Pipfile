@@ -21,6 +21,7 @@ cassandralib = {git = "ssh://git@gitlab.com/olympus-libs/cassandralib.git"}
 flask = "*"
 flask-uploads = "*"
 azure-storage-blob = "*"
+pandas = "*"
 
 [dev-packages]
 pytest = "*"
