@@ -4,7 +4,7 @@ import os
 import settings
 from app.agents.base import BaseProvider
 from app.models import Sequence
-from app.utils import save_blob_from_text
+from app.utils import save_blob
 
 
 def get_next_file_number():
@@ -232,7 +232,7 @@ class Amex(BaseProvider):
         file_name = self.create_file_name(validated=True)
 
         path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', timestamp)
-        save_blob_from_text(file.get_detail(), 'dev-media', file_name, path=path)
+        save_blob(file.get_detail(), container='dev-media', filename=file_name, path=path, type='text')
 
     @staticmethod
     def create_file_name(validated):

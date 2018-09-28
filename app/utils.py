@@ -181,3 +181,31 @@ def save_blob_from_bytes(bytes, container, filename, path=''):
         blob_name='{}{}'.format(path, filename),
         content_settings=ContentSettings(content_type='text/csv'),
         blob=bytes)
+
+
+def save_blob(content, container, filename, type='text', path=''):
+    """
+    Saves a file to the Azure Blob Storage.
+
+    :param container: string. Name of the blob storage container to save in.
+    :param path: string. Folder path to store the file within the container.
+    :return: None
+    """
+    if path:
+        if path[0] == '/':
+            path = path[1:]
+        if path[-1] != '/':
+            path = path + '/'
+
+    args = {
+        'container_name': container,
+        'blob_name': '{}{}'.format(path, filename),
+        'content_settings': ContentSettings(content_type='text/csv'),
+    }
+
+    if type == 'text':
+        args.update(text=content)
+        bbs.create_blob_from_text(**args)
+    elif type == 'bytes':
+        args.update(blob=content)
+        bbs.create_blob_from_bytes(**args)

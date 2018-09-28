@@ -6,7 +6,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 
 import settings
 from app.agents.base import BaseProvider
-from app.utils import save_blob_from_bytes
+from app.utils import save_blob
 
 
 class VisaMerchantFile:
@@ -110,4 +110,4 @@ class Visa(BaseProvider):
             ws1.append(line)
 
         virtual_wb = save_virtual_workbook(wb)
-        save_blob_from_bytes(virtual_wb, 'dev-media', file_name, path=path)
+        save_blob(virtual_wb, container='dev-media', filename=file_name, path=path, type='bytes')

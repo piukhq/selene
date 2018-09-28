@@ -1,5 +1,4 @@
 import arrow
-from azure.storage.blob import ContentSettings
 from flask import Blueprint, render_template, request, flash, redirect
 from flask_uploads import UploadSet
 import pandas as pd
@@ -62,23 +61,3 @@ def process_mids_file(file):
         except Exception as e:
             print(e)
             continue
-
-
-def save_file(file, container, path=''):
-    """
-    Saves a file to the Azure Blob Storage.
-
-    :param file: FileStorage instance.
-    :param container: string. Name of the blob storage container to save in.
-    :param path: string. Folder path to store the file within the container.
-    :return: None
-    """
-    if path[0] == '/':
-        path = path[1:]
-    if path[-1] != '/':
-        path = path + '/'
-
-    bbs.create_blob_from_stream(container_name=container,
-                                blob_name='{}{}'.format(path, file.filename),
-                                content_settings=ContentSettings(content_type='text/csv'),
-                                stream=file.stream)
