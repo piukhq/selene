@@ -5,5 +5,5 @@ class Visa(BaseProvider):
     name = 'Visa'
     col_name = 'Visa MIDs'
 
-    def export(self):
+    def export(self, timestamp):
         pass

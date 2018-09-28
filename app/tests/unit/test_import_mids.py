@@ -47,7 +47,7 @@ class TestBaseProvider(TestCase):
 
         self.assertEqual(agent_instance.initial_row_count, 12)
         self.assertEqual(agent_instance.invalid_row_count, 3)
-        self.assertEqual(agent_instance.valid_mids, 9)
+        self.assertEqual(agent_instance.valid_rows_count, 9)
         self.assertEqual(len(agent_instance.df.index), 9)
 
     @mock.patch.object(Amex, '_remove_null_rows')
@@ -59,7 +59,7 @@ class TestBaseProvider(TestCase):
         self.assertTrue(mock_remove_postcodes.called)
 
         self.assertEqual(agent_instance.initial_row_count, 12)
-        self.assertEqual(agent_instance.valid_mids, 10)
+        self.assertEqual(agent_instance.valid_rows_count, 10)
         self.assertEqual(agent_instance.duplicates_count, 2)
 
     @mock.patch.object(Amex, '_remove_null_rows')
@@ -71,13 +71,13 @@ class TestBaseProvider(TestCase):
         self.assertTrue(mock_remove_duplicates.called)
 
         self.assertEqual(agent_instance.initial_row_count, 12)
-        self.assertEqual(agent_instance.valid_mids, 9)
+        self.assertEqual(agent_instance.valid_rows_count, 9)
         self.assertEqual(agent_instance.invalid_row_count, 3)
 
     def test_clean(self):
         agent_instance = self.provider_class(self.df)
 
         self.assertEqual(agent_instance.initial_row_count, 12)
-        self.assertEqual(agent_instance.valid_mids, 7)
+        self.assertEqual(agent_instance.valid_rows_count, 7)
         self.assertEqual(agent_instance.invalid_row_count, 3)
         self.assertEqual(agent_instance.duplicates_count, 2)

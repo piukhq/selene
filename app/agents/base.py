@@ -24,7 +24,7 @@ class BaseProvider:
         return '{} - Total rows - {}'.format(self.name, self.initial_row_count)
 
     @property
-    def valid_mids(self):
+    def valid_rows_count(self):
         return self.initial_row_count - self.invalid_row_count - self.duplicates_count
 
     def _clean_dataframe(self):
@@ -67,5 +67,5 @@ class BaseProvider:
             self.df = self.df.drop(invalid_rows)
             print("Invalid postcodes - Total: {}".format(len(invalid_rows)))
 
-    def export(self):
+    def export(self, timestamp):
         raise NotImplementedError('Export method has not been implemented for {}'.format(self.name))

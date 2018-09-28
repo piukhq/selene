@@ -4,10 +4,18 @@ import csv
 import json
 import shutil
 import importlib
+from azure.storage.blob import BlockBlobService, ContentSettings
+
 import settings
 
 from app.active import AGENTS
 from app.models import Sequence, db
+
+
+bbs = BlockBlobService(
+        account_name=settings.AZURE_ACCOUNT_NAME,
+        account_key=settings.AZURE_ACCOUNT_KEY
+    )
 
 
 def init_folders():
@@ -131,3 +139,24 @@ def prepare_cassandra_file(file, headers):
         data.append(dict(zip(headers, row)))
 
     return data
+
+
+def save_blob_from_text(text, container, filename, path=''):
+    """
+    Saves a file to the Azure Blob Storage.
+
+    :param container: string. Name of the blob storage container to save in.
+    :param path: string. Folder path to store the file within the container.
+    :return: None
+    """
+    if path:
+        if path[0] == '/':
+            path = path[1:]
+        if path[-1] != '/':
+            path = path + '/'
+
+    bbs.create_blob_from_text(
+        container_name=container,
+        blob_name='{}{}'.format(path, filename),
+        content_settings=ContentSettings(content_type='text/csv'),
+        text=text)

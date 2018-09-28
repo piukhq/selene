@@ -1,19 +1,15 @@
-from azure.storage.blob import BlockBlobService, ContentSettings
+import arrow
+from azure.storage.blob import ContentSettings
 from flask import Blueprint, render_template, request, flash, redirect
 from flask_uploads import UploadSet
 import pandas as pd
 
-import settings
 from app.agents.register import PROVIDERS_MAP
 
 bp = Blueprint('selene', __name__)
 
 
 files = UploadSet('files', extensions=('csv',))
-bbs = BlockBlobService(
-        account_name=settings.AZURE_ACCOUNT_NAME,
-        account_key=settings.AZURE_ACCOUNT_KEY
-    )
 
 
 @bp.route("/", methods=['GET', 'POST'])
@@ -42,6 +38,8 @@ def index():
 
 
 def process_mids_file(file):
+    timestamp = arrow.utcnow().format('DDMMYY_hhmmssSSS')
+
     # MIDs columns default to float type which could cause issues e.g removing leading 0s
     datatype_conversion = {agent_class.col_name: str for agent_class in PROVIDERS_MAP.values()}
     datatype_conversion.update({'Scheme ID': str})
@@ -56,10 +54,10 @@ def process_mids_file(file):
         try:
             agent_instance = PROVIDERS_MAP[provider](dataframes[provider])
             print("\n{}".format(agent_instance))
-            print("Valid MIDs: {}".format(agent_instance.valid_mids))
+            print("Valid MIDs: {}".format(agent_instance.valid_rows_count))
             print("Total duplicates: {}\n".format(agent_instance.duplicates_count))
 
-            agent_instance.export()
+            agent_instance.export(timestamp)
             print('{} MIDs exported\n\n'.format(agent_instance.name))
         except Exception as e:
             print(e)
