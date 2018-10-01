@@ -171,9 +171,7 @@ class Amex(BaseProvider):
     def export(self):
         mids_dict = self.df.to_dict('records')
 
-        # file_num = get_next_file_number()
-
-        file_num = 0
+        file_num = get_next_file_number()
 
         header = Header(
             date=self.format_datetime(arrow.now()),
