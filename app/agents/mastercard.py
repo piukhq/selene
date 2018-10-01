@@ -1,7 +1,12 @@
 import os
+import io
+
 import csv
 import arrow
+
 import settings
+from app.agents.base import BaseProvider
+from app.utils import save_blob
 
 
 class MastercardMerchantFile:
@@ -61,115 +66,43 @@ class MastercardMerchantFile:
         writer.writerow(row)
 
 
-class MasterCard:
-    write_path = None
+class MasterCard(BaseProvider):
+    name = 'MasterCard'
+    col_name = 'MasterCard MIDs'
 
-    def __init__(self):
-        self.write_path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard')
-
-    @staticmethod
-    def has_mid(element):
-        """
-        return True if there is a mastercard mid in the row
-        """
-
-        selected = element if isinstance(element, str) else element.get("MasterCard MIDs")
-        if selected and str(selected) != "" and str(selected) != "N/A":
-            return True
-
-        return False
-
-    def write_transaction_matched_csv(self, merchants, now):
-        a = arrow.get(now, 'DDMMYY_hhmmssSSS')
-        filename = 'cass_inp_mastercard_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(self.write_path, now, filename)
-        try:
-            with open(path, 'w') as csv_file:
-                csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
-                for merchant in merchants:
-                    csv_writer.writerow([
-                        'mastercard',
-                        merchant['MasterCard MIDs'].strip(' '),
-                        merchant['Scheme'].strip('" ').lower(),
-                        merchant['Partner Name'].strip('" '),
-                        merchant['Town/City'].strip('" '),
-                        merchant['Postcode'].strip('" '),
-                        'A'
-                    ])
-
-        except IOError:
-            raise Exception('Error writing file:' + path)
-
-    def write_duplicates_file(self, duplicates, now):
-        a = arrow.get(now, 'DDMMYY_hhmmssSSS')
-        filename = 'duplicates_mastercard_{}.txt'.format(a.format('DD-MM-YYYY'))
-        path = os.path.join(self.write_path, now, filename)
-        try:
-            with open(path, 'w') as dup_file:
-                dup_file.write('Date of file creation: {}\n'.format(a.format('DD-MM-YYYY')))
-                for dup in duplicates:
-                    dup_file.write(dup + '\n')
-
-        except IOError:
-            raise Exception('Error writing file:' + path)
-
-    def write_to_file(self, input_file, file_name, now):
-        """
-        writes the given input file to a file under a given name.
-        :param input_file: the file to write
-        :param file_name: the file name under which to write the data
-        :param now: string datetime
-        :return: None
-        """
-
-        path = os.path.join(self.write_path, now, file_name)
-
-        with open(path, 'w') as file:
-            writer = csv.writer(file, delimiter=',', quotechar='"')
-
-            input_file.set_header(writer)
-            input_file.set_data(writer)
-            input_file.set_trailer(writer)
-
-    def export_merchants(self, merchants, validated, now, reason=None):
-        """
-        uses a given set of merchants to generate a file in Mastercard input file format
-        :param merchants: a list of merchants to send to Mastercard
-        :param validated:
-        :param now: string datetime
-        :param reason:
-        :return: None
-        """
-        reason = reason or []
+    def export(self):
+        mids_dict = self.df.to_dict('records')
 
         file = MastercardMerchantFile()
 
-        for count, merchant in enumerate(merchants):
+        for count, merchant in enumerate(mids_dict):
 
             detail = [merchant['MasterCard MIDs'], merchant['Partner Name'], merchant['Town/City'],
                       merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
                       '', merchant['Action'],
                       ]
-            if validated:
-                detail.append('')
-            else:
-                detail.append(reason[count])
 
             file.add_detail(detail)
 
-        file_name = self.create_file_name(validated)
-
-        try:
-            self.write_to_file(file, file_name, now)
-        except IOError:
-            raise Exception('Error writing file:' + file_name)
+        file_name = 'MAS_INPUT_BINK.csv'
+        self.write_to_file(file, file_name, self.timestamp)
 
     @staticmethod
-    def create_file_name(validated):
+    def write_to_file(input_file, file_name, timestamp):
+        """
+        writes the given input file to a file under a given name.
+        :param input_file: the file to write
+        :param file_name: the file name under which to write the data
+        :param timestamp: string datetime
+        :return: None
+        """
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard', timestamp)
+        file = io.StringIO()
 
-        file_name = 'MAS_INPUT_BINK.csv'
+        writer = csv.writer(file, delimiter=',', quotechar='"')
 
-        if not validated:
-            file_name = 'INVALID_' + file_name
+        input_file.set_header(writer)
+        input_file.set_data(writer)
+        input_file.set_trailer(writer)
 
-        return file_name
+        save_blob(file.getvalue(), container='dev-media', filename=file_name, path=path, type='text')

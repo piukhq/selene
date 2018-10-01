@@ -1,11 +1,10 @@
-import csv
 import arrow
 import os
-import settings
 
-from plumbum import cmd
+import settings
+from app.agents.base import BaseProvider
 from app.models import Sequence
-from app.utils import get_attachment
+from app.utils import save_blob
 
 
 def get_next_file_number():
@@ -19,21 +18,6 @@ def get_next_file_number():
         db.session.commit()
 
     return sequence.get_seq_number()
-
-
-def upload_sftp(url, username, password, src_dir, dst_dir):
-    """
-    Upload all the files in the source directory to the sftp location url in the destination directory
-    with appropriate user credentials
-    """
-
-    path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', src_dir)
-    src_file = get_attachment(path, 'amex')
-
-    cmd.lftp(
-        'sftp://{}:{}@{}'.format(username, password, url),
-        'put -a -O {} {}; bye'.format(dst_dir, src_file)
-    )
 
 
 class Field(object):
@@ -171,7 +155,9 @@ class AmexMerchantFile:
         })
 
 
-class Amex:
+class Amex(BaseProvider):
+    name = 'Amex'
+    col_name = 'American Express MIDs'
 
     @staticmethod
     def format_datetime(datetime):
@@ -182,68 +168,12 @@ class Amex:
         """
         return datetime.format('MM/DD/YYYY')
 
-    @staticmethod
-    def has_mid(row):
-        """
-        return True if there is a visa mid in the row
-        """
+    def export(self):
+        mids_dict = self.df.to_dict('records')
 
-        selected = row.get('American Express MIDs')
-        if selected and str(selected) != "" and str(selected) != "N/A":
-            return True
+        # file_num = get_next_file_number()
 
-        return False
-
-    @staticmethod
-    def write_transaction_matched_csv(merchants, now):
-        a = arrow.utcnow()
-        filename = 'cass_inp_amex_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', now, filename)
-        try:
-            with open(path, 'w') as csv_file:
-                csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
-                for merchant in merchants:
-                    csv_writer.writerow([
-                        'amex',
-                        merchant['American Express MIDs'].strip(' '),
-                        merchant['Scheme'].strip('" ').lower(),
-                        merchant['Partner Name'].strip('" '),
-                        merchant['Town/City'].strip('" '),
-                        merchant['Postcode'].strip('" '),
-                        merchant['Action']
-                    ])
-
-        except IOError:
-            raise Exception('Error writing file:' + path)
-
-    @staticmethod
-    def write_to_file(amex_input_file, file_name, now):
-        """
-        writes the given input file to a file under a given name.
-        :param amex_input_file: the file to write
-        :param file_name: the file name under which to write the data
-        :param now: string datetime
-        :return: None
-        """
-
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', now, file_name)
-
-        with open(path, 'w+') as f:
-            f.write(amex_input_file.get_detail())
-
-    def export_merchants(self, merchants, validated, now, reason=None):
-        """
-        uses a given set of merchants to generate a file in Amex input file format
-        :param merchants: a list of merchants to send to Amex
-        :param validated:
-        :param now: string datetime
-        :param reason:
-        :return: None
-        """
-        reason = reason or []
-
-        detail_record_count = len(merchants)
-        file_num = get_next_file_number()
+        file_num = 0
 
         header = Header(
             date=self.format_datetime(arrow.now()),
@@ -257,7 +187,7 @@ class Amex:
 
         footer = Footer(
             file_type='10',
-            trailer_count=str(detail_record_count).rjust(12, '0'),
+            trailer_count=str(self.valid_rows_count).rjust(12, '0'),
             filler=''
         )
 
@@ -265,12 +195,7 @@ class Amex:
         file.set_header(header)
         file.set_footer(footer)
 
-        for count, merchant in enumerate(merchants):
-            if validated:
-                the_reason = ''
-
-            else:
-                the_reason = reason[count]
+        for count, merchant in enumerate(mids_dict):
 
             file.add_detail(AmexDetail(
                 action_code=merchant['Action'],  # A=Add, U=Update, D=Delete
@@ -301,25 +226,14 @@ class Amex:
                 geographical_code_longitude='',
                 custom_field_1='',
                 custom_field_2='',
-                filler=the_reason
+                filler=''
             ))
 
-        file_name = self.create_file_name(validated)
-        try:
-            self.write_to_file(file, file_name, now)
-
-        except IOError:
-            raise Exception('Error writing file:' + file_name)
-
-    @staticmethod
-    def create_file_name(validated):
         # e.g. <Prtr>_AXP_mer_reg_yymmdd_hhmmss.txt
         file_name = '{company}_AXP_MER_REG_{datetime}.txt'.format(
             company='CHINGS',
             datetime=arrow.now().format('YYYYMMDD_hhmmss')
         )
 
-        if not validated:
-            file_name = 'INVALID_' + file_name
-
-        return file_name
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', self.name.replace(' ', '_').lower(), self.timestamp)
+        save_blob(file.get_detail(), container='dev-media', filename=file_name, path=path, type='text')

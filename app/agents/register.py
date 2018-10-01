@@ -1,6 +1,6 @@
-from app.agents.new_amex import Amex
-from app.agents.new_mastercard import MasterCard
-from app.agents.new_visa import Visa
+from app.agents.amex import Amex
+from app.agents.mastercard import MasterCard
+from app.agents.visa import Visa
 
 
 PROVIDERS_MAP = {
