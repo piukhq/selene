@@ -50,7 +50,7 @@ class Visa(BaseProvider):
         D='Remove'
     )
 
-    def export(self, timestamp):
+    def export(self):
         file = VisaMerchantFile()
         partner_name = ''
 
@@ -70,7 +70,7 @@ class Visa(BaseProvider):
             file.add_detail(detail)
 
         file_name = self.create_file_name(validated=True, merchant_name=partner_name)
-        self.write_to_file(file, file_name, timestamp)
+        self.write_to_file(file, file_name, self.timestamp)
 
     @staticmethod
     def create_file_name(validated, merchant_name):
@@ -91,8 +91,7 @@ class Visa(BaseProvider):
 
         return file_name
 
-    @staticmethod
-    def write_to_file(input_file, file_name, now):
+    def write_to_file(self, input_file, file_name, now):
         """
         writes the given input file to a file under a given name.
         :param input_file: the file to write
@@ -100,7 +99,7 @@ class Visa(BaseProvider):
         :param now: string datetime
         :return: None
         """
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', now)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', self.name.replace(' ', '_').lower(), now)
 
         wb = Workbook()
         ws1 = wb.active

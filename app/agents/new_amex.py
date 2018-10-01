@@ -168,7 +168,7 @@ class Amex(BaseProvider):
         """
         return datetime.format('MM/DD/YYYY')
 
-    def export(self, timestamp):
+    def export(self):
         mids_dict = self.df.to_dict('records')
 
         # file_num = get_next_file_number()
@@ -231,7 +231,7 @@ class Amex(BaseProvider):
 
         file_name = self.create_file_name(validated=True)
 
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'amex', timestamp)
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', self.name.replace(' ', '_').lower(), self.timestamp)
         save_blob(file.get_detail(), container='dev-media', filename=file_name, path=path, type='text')
 
     @staticmethod

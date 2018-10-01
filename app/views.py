@@ -27,9 +27,12 @@ def index():
 
         basename = files.get_basename(input_file.filename)
         if files.file_allowed(input_file, basename):
-            process_mids_file(input_file)
-
-            flash('File uploaded')
+            try:
+                process_mids_file(input_file)
+                flash('File uploaded')
+            except Exception as e:
+                flash('Error: {}'.format(e))
+                raise
         else:
             flash('Incorrect File type. Please upload a csv.')
 
@@ -50,14 +53,15 @@ def process_mids_file(file):
         columns_to_drop = [agent_class.col_name for name, agent_class in PROVIDERS_MAP.items() if name != provider]
         dataframes[provider] = original_df.drop(columns_to_drop, axis=1)
 
-        try:
-            agent_instance = PROVIDERS_MAP[provider](dataframes[provider])
-            print("\n{}".format(agent_instance))
-            print("Valid MIDs: {}".format(agent_instance.valid_rows_count))
-            print("Total duplicates: {}\n".format(agent_instance.duplicates_count))
+        agent_instance = PROVIDERS_MAP[provider](dataframes[provider], timestamp)
 
-            agent_instance.export(timestamp)
-            print('{} MIDs exported\n\n'.format(agent_instance.name))
-        except Exception as e:
-            print(e)
-            continue
+        print("\n{}".format(agent_instance))
+        print("Valid MIDs: {}".format(agent_instance.valid_rows_count))
+        print("Total duplicates: {}\n".format(agent_instance.duplicates_count))
+
+        agent_instance.export()
+        print('{} MIDs exported\n\n'.format(agent_instance.name))
+
+        agent_instance.write_transaction_matched_csv()
+        print('{} Cassandra file exported\n\n'.format(agent_instance.name))
+

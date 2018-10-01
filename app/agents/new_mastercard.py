@@ -70,7 +70,7 @@ class MasterCard(BaseProvider):
     name = 'MasterCard'
     col_name = 'MasterCard MIDs'
 
-    def export(self, timestamp):
+    def export(self):
         mids_dict = self.df.to_dict('records')
 
         file = MastercardMerchantFile()
@@ -85,7 +85,7 @@ class MasterCard(BaseProvider):
             file.add_detail(detail)
 
         file_name = self.create_file_name(validated=True)
-        self.write_to_file(file, file_name, timestamp)
+        self.write_to_file(file, file_name, self.timestamp)
 
     @staticmethod
     def create_file_name(validated):

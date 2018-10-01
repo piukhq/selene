@@ -1,4 +1,11 @@
+import csv
+import io
+
+import os
+
+import settings
 from app import utils
+from app.utils import save_blob
 
 PARTNER_NAME = 'Partner Name'
 TOWN_CITY = 'Town/City'
@@ -13,8 +20,9 @@ class BaseProvider:
     invalid_row_count = 0
     duplicates_count = 0
 
-    def __init__(self, dataframe):
+    def __init__(self, dataframe, timestamp):
         self.df = dataframe
+        self.timestamp = timestamp
         self.input_headers = self.df.columns.values
         self.initial_row_count = len(self.df[self.col_name].index)
 
@@ -67,5 +75,28 @@ class BaseProvider:
             self.df = self.df.drop(invalid_rows)
             print("Invalid postcodes - Total: {}".format(len(invalid_rows)))
 
-    def export(self, timestamp):
+    def export(self):
         raise NotImplementedError('Export method has not been implemented for {}'.format(self.name))
+
+    def write_transaction_matched_csv(self):
+        mids_dict = self.df.to_dict('records')
+        partner_name = mids_dict[0]['Partner Name'].replace(' ', '_').lower()
+        provider_name = self.name.replace(' ', '_').lower()
+        file_name = 'cass_inp_{}_{}_{}.csv'.format(provider_name, partner_name, self.timestamp)
+
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', provider_name, self.timestamp)
+        file = io.StringIO()
+
+        csv_writer = csv.writer(file, quoting=csv.QUOTE_NONE, escapechar='')
+        for row in mids_dict:
+            csv_writer.writerow([
+                provider_name,
+                row[self.col_name].strip(' '),
+                row['Scheme'].strip('" ').lower(),
+                row['Partner Name'].strip('" '),
+                row['Town/City'].strip('" '),
+                row['Postcode'].strip('" '),
+                'A'
+            ])
+
+        save_blob(file.getvalue(), container='dev-media', filename=file_name, path=path, type='text')
