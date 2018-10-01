@@ -45,13 +45,6 @@ class TestUtils(unittest.TestCase):
         for p in bad_postcodes:
             self.assertFalse(utils.validate_uk_postcode(p))
 
-    def test_get_agent(self):
-        with self.assertRaises(KeyError):
-            utils.get_agent('test_error')
-
-        result = utils.get_agent('mastercard')
-        self.assertTrue(isinstance(result, MasterCard))
-
     def test_wipe_output_folders(self):
         path = os.path.join(self.path, 'merchants')
         os.makedirs(path, exist_ok=True)

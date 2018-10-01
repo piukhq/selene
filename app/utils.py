@@ -18,14 +18,6 @@ bbs = BlockBlobService(
     )
 
 
-def init_folders():
-    base_dir = settings.WRITE_FOLDER
-
-    for folder in ['visa', 'amex', 'mastercard']:
-        folder_path = os.path.join(base_dir, 'merchants', folder)
-        os.makedirs(folder_path, exist_ok=True)
-
-
 def resolve_agent(name):
     class_path = AGENTS[name]
     module_name, class_name = class_path.split(".")
@@ -83,23 +75,6 @@ def format_json_input(json_file):
     return file
 
 
-def empty_folder(path):
-    for the_file in os.listdir(path):
-        file_path = os.path.join(path, the_file)
-
-        if os.path.isfile(file_path):
-            os.unlink(file_path)
-
-        elif os.path.isdir(file_path):
-            shutil.rmtree(file_path)
-
-
-def wipe_output_folders():
-    for folder in ['visa', 'amex', 'mastercard']:
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants', folder)
-        empty_folder(path)
-
-
 def update_amex_sequence_number():
     sequence = Sequence.query.filter_by(scheme_provider='amex').first()
     sequence.next_seq_number += 1
@@ -141,53 +116,14 @@ def prepare_cassandra_file(file, headers):
     return data
 
 
-def save_blob_from_text(text, container, filename, path=''):
-    """
-    Saves a file to the Azure Blob Storage.
-
-    :param container: string. Name of the blob storage container to save in.
-    :param path: string. Folder path to store the file within the container.
-    :return: None
-    """
-    if path:
-        if path[0] == '/':
-            path = path[1:]
-        if path[-1] != '/':
-            path = path + '/'
-
-    bbs.create_blob_from_text(
-        container_name=container,
-        blob_name='{}{}'.format(path, filename),
-        content_settings=ContentSettings(content_type='text/csv'),
-        text=text)
-
-
-def save_blob_from_bytes(bytes, container, filename, path=''):
-    """
-    Saves a file to the Azure Blob Storage.
-
-    :param container: string. Name of the blob storage container to save in.
-    :param path: string. Folder path to store the file within the container.
-    :return: None
-    """
-    if path:
-        if path[0] == '/':
-            path = path[1:]
-        if path[-1] != '/':
-            path = path + '/'
-
-    bbs.create_blob_from_bytes(
-        container_name=container,
-        blob_name='{}{}'.format(path, filename),
-        content_settings=ContentSettings(content_type='text/csv'),
-        blob=bytes)
-
-
 def save_blob(content, container, filename, type='text', path=''):
     """
     Saves a file to the Azure Blob Storage.
 
+    :param content: string or bytes to store as blob.
     :param container: string. Name of the blob storage container to save in.
+    :param filename: string. Name of file.
+    :param type: string. Must be either 'text' or 'bytes' depending on the content type.
     :param path: string. Folder path to store the file within the container.
     :return: None
     """

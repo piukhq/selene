@@ -31,15 +31,6 @@ def token_required(f):
     return decorated_function
 
 
-@api.route('/mids/import_mids', endpoint='import_mids')
-class ImportMids(Resource):
-    @staticmethod
-    def post():
-        file = request.get_json()
-        folder_name = onboard_mids(file, False, True)
-        return dict(success=True, folder_name=folder_name)
-
-
 @api.route('/mids/mastercard_handback', endpoint='mastercard_handback')
 class MastercardHandback(Resource):
     @staticmethod
@@ -56,14 +47,6 @@ class FindDuplicatesInHandback(Resource):
         file = request.get_json()
         folder_name = find_duplicate_mids_in_mastercard_handback_file(file)
         return dict(success=True, folder_name=folder_name)
-
-
-@api.route('/mids/wipe_folders', endpoint='wipe_folders')
-class WipeOutputFolders(Resource):
-    @staticmethod
-    def get():
-        wipe_output_folders()
-        return dict(success=True)
 
 
 @api.route('/mids/cassandra', endpoint='cassandra_ops')
