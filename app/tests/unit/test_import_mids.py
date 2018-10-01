@@ -1,3 +1,4 @@
+import arrow
 import os
 
 from flask_testing import TestCase
@@ -33,6 +34,7 @@ class TestBaseProvider(TestCase):
         datatype_conversion = {agent_class.col_name: str for agent_class in PROVIDERS_MAP.values()}
         datatype_conversion.update({'Scheme ID': str})
 
+        self.timestamp = arrow.utcnow().format('DDMMYY_hhmmssSSS')
         self.df = pd.read_csv(self.test_file, dtype=datatype_conversion)
 
         self.provider_class = Amex
@@ -40,7 +42,7 @@ class TestBaseProvider(TestCase):
     @mock.patch.object(Amex, '_remove_duplicate_mids')
     @mock.patch.object(Amex, '_remove_invalid_postcode_rows')
     def test_removes_null_rows(self, mock_remove_postcodes, mock_remove_duplicates):
-        agent_instance = self.provider_class(self.df)
+        agent_instance = self.provider_class(self.df, self.timestamp)
 
         self.assertTrue(mock_remove_duplicates.called)
         self.assertTrue(mock_remove_postcodes.called)
@@ -53,7 +55,7 @@ class TestBaseProvider(TestCase):
     @mock.patch.object(Amex, '_remove_null_rows')
     @mock.patch.object(Amex, '_remove_invalid_postcode_rows')
     def test_removes_duplicate_mids(self, mock_remove_postcodes, mock_remove_null):
-        agent_instance = self.provider_class(self.df)
+        agent_instance = self.provider_class(self.df, self.timestamp)
 
         self.assertTrue(mock_remove_null.called)
         self.assertTrue(mock_remove_postcodes.called)
@@ -65,7 +67,7 @@ class TestBaseProvider(TestCase):
     @mock.patch.object(Amex, '_remove_null_rows')
     @mock.patch.object(Amex, '_remove_duplicate_mids')
     def test_removes_invalid_postcode_rows(self, mock_remove_duplicates, mock_remove_null):
-        agent_instance = self.provider_class(self.df)
+        agent_instance = self.provider_class(self.df, self.timestamp)
 
         self.assertTrue(mock_remove_null.called)
         self.assertTrue(mock_remove_duplicates.called)
@@ -75,7 +77,7 @@ class TestBaseProvider(TestCase):
         self.assertEqual(agent_instance.invalid_row_count, 3)
 
     def test_clean(self):
-        agent_instance = self.provider_class(self.df)
+        agent_instance = self.provider_class(self.df, self.timestamp)
 
         self.assertEqual(agent_instance.initial_row_count, 12)
         self.assertEqual(agent_instance.valid_rows_count, 7)

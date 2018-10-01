@@ -75,9 +75,6 @@ class BaseProvider:
             self.df = self.df.drop(invalid_rows)
             print("Invalid postcodes - Total: {}".format(len(invalid_rows)))
 
-    def export(self):
-        raise NotImplementedError('Export method has not been implemented for {}'.format(self.name))
-
     def write_transaction_matched_csv(self):
         mids_dict = self.df.to_dict('records')
         partner_name = mids_dict[0]['Partner Name'].replace(' ', '_').lower()
@@ -100,3 +97,6 @@ class BaseProvider:
             ])
 
         save_blob(file.getvalue(), container='dev-media', filename=file_name, path=path, type='text')
+
+    def export(self):
+        raise NotImplementedError('Export method has not been implemented for {}'.format(self.name))

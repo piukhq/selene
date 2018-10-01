@@ -12,6 +12,7 @@ class TestPontus(TestCase):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WRITE_FOLDER = os.path.join(settings.WRITE_FOLDER, 'test')
+    UPLOADED_FILES_DEST = 'test'
 
     def create_app(self):
         return create_app(self, )
