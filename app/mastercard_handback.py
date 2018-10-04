@@ -30,15 +30,12 @@ def collect_merchants(file, agent_instance):
     return merchants, errors
 
 
-def export_mastercard(file):
-    now = arrow.utcnow().format('DDMMYY_hhmmssSSS')
-    agent_instance = get_agent('mastercard')
-    agent_instance.write_path = os.path.join(agent_instance.write_path, 'handback')
-    src_dir = os.path.join(agent_instance.write_path, now)
-    os.makedirs(src_dir, exist_ok=True)
+def export_mastercard(mc_agent_instance):
+    mc_agent_instance.write_path = os.path.join(mc_agent_instance.write_path, 'handback')
+    file = mc_agent_instance.df.to_dict('records')
 
     # remove header and footer from file
-    merchants, errors = collect_merchants(file[1:-1], agent_instance)
+    merchants, errors = collect_merchants(file, mc_agent_instance)
 
     if len(merchants):
         prepped_merchants = []
@@ -52,13 +49,13 @@ def export_mastercard(file):
             merc_dict['Postcode'] = merc[4]
             prepped_merchants.append(merc_dict)
 
-        agent_instance.write_transaction_matched_csv(prepped_merchants, now)
+        mc_agent_instance.write_transaction_matched_csv(prepped_merchants)
 
-    err_filename = 'mastercard_errors.txt'
-    path = os.path.join(src_dir, err_filename)
+    # err_filename = 'mastercard_errors.txt'
+    # path = os.path.join(src_dir, err_filename)
+    #
+    # with open(path, 'w') as error_output_file:
+    #     for err in errors:
+    #         error_output_file.write(err + '\n')
 
-    with open(path, 'w') as error_output_file:
-        for err in errors:
-            error_output_file.write(err + '\n')
-
-    return os.path.join('handback', now)
+    return errors

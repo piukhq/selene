@@ -7,7 +7,7 @@ from unittest import mock
 
 import settings
 from app import create_app
-from app.agents.new_amex import Amex
+from app.agents.amex import Amex
 from app.agents.register import PROVIDERS_MAP
 
 
@@ -31,7 +31,7 @@ class TestBaseProvider(TestCase):
         return create_app(self, )
 
     def setUp(self):
-        datatype_conversion = {agent_class.col_name: str for agent_class in PROVIDERS_MAP.values()}
+        datatype_conversion = {agent_class.mids_col_name: str for agent_class in PROVIDERS_MAP.values()}
         datatype_conversion.update({'Scheme ID': str})
 
         self.timestamp = arrow.utcnow().format('DDMMYY_hhmmssSSS')

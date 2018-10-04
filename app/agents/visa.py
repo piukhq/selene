@@ -42,7 +42,7 @@ class VisaMerchantFile:
 
 class Visa(BaseProvider):
     name = 'Visa'
-    col_name = 'Visa MIDs'
+    mids_col_name = 'Visa MIDs'
 
     action_translate = dict(
         A='On-Board',

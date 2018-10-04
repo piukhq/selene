@@ -19,6 +19,17 @@
       <button class="btn btn-success upload-btn" id="uploadButtonOnboard" type="submit">Upload</button>
     </form>
 
+      <div class="alert">
+          {% if messages %}
+              {% for message in messages %}
+                  {% for each in message %}
+                    <p>{{ each }}</p>
+                  {% endfor %}
+                  <br>
+              {% endfor %}
+          {% endif %}
+      </div>
+
   </div>
 </div>
 

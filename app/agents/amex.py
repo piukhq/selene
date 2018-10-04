@@ -157,7 +157,7 @@ class AmexMerchantFile:
 
 class Amex(BaseProvider):
     name = 'Amex'
-    col_name = 'American Express MIDs'
+    mids_col_name = 'American Express MIDs'
 
     @staticmethod
     def format_datetime(datetime):
