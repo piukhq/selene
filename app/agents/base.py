@@ -38,12 +38,12 @@ class BaseProvider:
         return self.initial_row_count - self.invalid_row_count - self.duplicates_count
 
     def _clean_dataframe(self):
-        self._remove_duplicate_mids(column=self.mids_col_name)
-
         columns_to_clean = [self.mids_col_name, self.PARTNER_NAME, self.TOWN_CITY, self.ACTION, self.POSTCODE]
 
         for column in columns_to_clean:
             self._remove_null_rows(column_name=column)
+
+        self._remove_duplicate_mids(column=self.mids_col_name)
 
         self._remove_invalid_postcode_rows(postcode_col=self.POSTCODE)
 
@@ -113,7 +113,7 @@ class BaseProvider:
         invalid_mids = "Invalid MIDs: {} - Rows: {}".format(self.invalid_row_count,
                                                             self.invalid_rows)
         total_duplicates = "Total duplicates: {}".format(self.duplicates_count)
-        total_exported = "{} {} MIDs exported".format(self.valid_rows_count, self.name)
+        total_exported = "{} MIDs exported: {}".format(self.name, self.valid_rows_count)
 
         return [total_imported, invalid_mids, total_duplicates, total_exported]
 
