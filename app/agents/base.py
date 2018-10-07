@@ -66,12 +66,13 @@ class BaseProvider:
             self.invalid_rows += list(null_rows.index.values)
             print("{} has null rows for {} - Total: {}".format(self.name, column_name, len(null_rows.index)))
 
-    def _remove_invalid_postcode_rows(self, postcode_col, index=False):
+    def _remove_invalid_postcode_rows(self, postcode_col, index_values=False):
         invalid_postcode_rows = []
-        for row in self.df.itertuples(index=False, name='Postcodes'):
+        for row in self.df.itertuples(index=True, name='Postcodes'):
 
-            if index:
-                postcode = str(row[postcode_col]).strip()
+            if index_values:
+                # +1 to postcode_col to make up for the added index column
+                postcode = str(row[postcode_col + 1]).strip()
             else:
                 postcode = str(getattr(row, postcode_col)).strip()
 

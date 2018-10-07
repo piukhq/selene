@@ -123,40 +123,15 @@ class MasterCard(BaseProvider):
     def process_handback_file(self):
         self.write_path = os.path.join(self.write_path, 'handback')
 
-        # hb_file = self.df.to_csv(index=False)
-        # data = StringIO(hb_file)
-        #
-        # self.df = pd.read_csv(data, sep='|', header=None, skipfooter=1, skiprows=1, dtype={23: str})
-
-        # remove header and footer from file
-        self.collect_merchants()
-        messages = self.create_messages()
+        self.clean_handback_data()
+        messages = [self.create_messages()]
 
         mids_dict = self.df.to_dict('records')
-
-        # prepped_merchants = []
-        #
-        # for merc in self.df.itertuples(index=False, name="MIDs"):
-        #     merc_dict = dict()
-        #     merc_dict['MasterCard MIDs'] = merc[0]
-        #     merc_dict['Partner Name'] = merc[1]
-        #     merc_dict['Town/City'] = merc[2]
-        #     merc_dict['Scheme'] = merc[3]
-        #     merc_dict['Postcode'] = merc[4]
-        #     prepped_merchants.append(merc_dict)
-
         self.write_transaction_matched_csv(mids_dict=mids_dict)
-
-        # err_filename = 'mastercard_errors.txt'
-        # path = os.path.join(src_dir, err_filename)
-        #
-        # with open(path, 'w') as error_output_file:
-        #     for err in errors:
-        #         error_output_file.write(err + '\n')
 
         return messages
 
-    def collect_merchants(self):
+    def clean_handback_data(self):
         self.SCHEME = 'Scheme'
         cols = {
             self.mids_col_name: 23,
@@ -166,16 +141,15 @@ class MasterCard(BaseProvider):
             self.POSTCODE: 17
         }
 
-        self._remove_duplicate_mids(column=23)
-
         columns_to_clean = [cols[self.mids_col_name], cols[self.POSTCODE]]
 
         for column in columns_to_clean:
             self._remove_null_rows(column_name=column)
 
-        self._remove_invalid_postcode_rows(postcode_col=cols[self.POSTCODE], index=True)
+        self._remove_duplicate_mids(column=cols[self.mids_col_name])
+        self._remove_invalid_postcode_rows(postcode_col=cols[self.POSTCODE], index_values=True)
 
-        self.df = self.df[self.df.columns[[23, 7, 13, 45, 17]]]
+        self.df = self.df[self.df.columns[[val for val in cols.values()]]]
 
         new_cols = {val: col for col, val in cols.items()}
         self.df = self.df.rename(columns=new_cols)
