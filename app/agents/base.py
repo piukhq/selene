@@ -66,11 +66,10 @@ class BaseProvider:
             self.invalid_rows += list(null_rows.index.values)
             print("{} has null rows for {} - Total: {}".format(self.name, column_name, len(null_rows.index)))
 
-    def _remove_invalid_postcode_rows(self, postcode_col, index_values=False):
+    def _remove_invalid_postcode_rows(self, postcode_col, index_value=False):
         invalid_postcode_rows = []
         for row in self.df.itertuples(index=True, name='Postcodes'):
-
-            if index_values:
+            if index_value:
                 # +1 to postcode_col to make up for the added index column
                 postcode = str(row[postcode_col + 1]).strip()
             else:
@@ -110,11 +109,11 @@ class BaseProvider:
         save_blob(file.getvalue(), container='dev-media', filename=file_name, path=path, type='text')
 
     def create_messages(self):
-        total_imported = "\n{}".format(self)
+        total_imported = "{}".format(self)
         invalid_mids = "Invalid MIDs: {} - Rows: {}".format(self.invalid_row_count,
                                                             self.invalid_rows)
-        total_duplicates = "Total duplicates: {}\n".format(self.duplicates_count)
-        total_exported = "{} {} MIDs exported\n\n".format(self.valid_rows_count, self.name)
+        total_duplicates = "Total duplicates: {}".format(self.duplicates_count)
+        total_exported = "{} {} MIDs exported".format(self.valid_rows_count, self.name)
 
         return [total_imported, invalid_mids, total_duplicates, total_exported]
 

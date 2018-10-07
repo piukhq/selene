@@ -147,7 +147,7 @@ class MasterCard(BaseProvider):
             self._remove_null_rows(column_name=column)
 
         self._remove_duplicate_mids(column=cols[self.mids_col_name])
-        self._remove_invalid_postcode_rows(postcode_col=cols[self.POSTCODE], index_values=True)
+        self._remove_invalid_postcode_rows(postcode_col=cols[self.POSTCODE], index_value=True)
 
         self.df = self.df[self.df.columns[[val for val in cols.values()]]]
 
