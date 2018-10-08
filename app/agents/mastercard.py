@@ -116,7 +116,7 @@ class MasterCard(BaseProvider):
         input_file.set_data(writer)
         input_file.set_trailer(writer)
 
-        save_blob(file.getvalue(), container='dev-media', filename=file_name, path=path, type='text')
+        save_blob(file.getvalue(), container='dev-media', filename=file_name, path=path, content_type='text')
 
     def process_handback_file(self):
         self.write_path = os.path.join(self.write_path, 'handback')

@@ -234,4 +234,4 @@ class Amex(BaseProvider):
         )
 
         path = os.path.join(settings.WRITE_FOLDER, 'merchants', self.name.replace(' ', '_').lower(), self.timestamp)
-        save_blob(file.get_detail(), container='dev-media', filename=file_name, path=path, type='text')
+        save_blob(file.get_detail(), container='dev-media', filename=file_name, path=path, content_type='text')

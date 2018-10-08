@@ -98,4 +98,4 @@ class Visa(BaseProvider):
             ws1.append(line)
 
         virtual_wb = save_virtual_workbook(wb)
-        save_blob(virtual_wb, container='dev-media', filename=file_name, path=path, type='bytes')
+        save_blob(virtual_wb, container='dev-media', filename=file_name, path=path, content_type='bytes')

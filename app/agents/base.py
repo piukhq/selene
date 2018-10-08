@@ -47,7 +47,7 @@ class BaseProvider:
 
     def _remove_duplicate_mids(self, column):
         initial_row_size = self.df[column].size
-        self.df.drop_duplicates(column, inplace=True)
+        self.df = self.df.drop_duplicates(column)
 
         self.duplicates_count = initial_row_size - self.df[column].size
 
@@ -102,7 +102,7 @@ class BaseProvider:
                 'A'
             ])
 
-        save_blob(file.getvalue(), container='dev-media', filename=file_name, path=path, type='text')
+        save_blob(file.getvalue(), container='dev-media', filename=file_name, path=path, content_type='text')
 
     def create_messages(self):
         total_imported = "{}".format(self)

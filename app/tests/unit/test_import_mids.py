@@ -81,5 +81,5 @@ class TestBaseProvider(TestCase):
 
         self.assertEqual(agent_instance.initial_row_count, 12)
         self.assertEqual(agent_instance.valid_rows_count, 7)
-        self.assertEqual(agent_instance.invalid_row_count, 3)
-        self.assertEqual(agent_instance.duplicates_count, 2)
+        self.assertEqual(agent_instance.invalid_row_count, 5)
+        self.assertEqual(agent_instance.duplicates_count, 0)
