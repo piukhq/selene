@@ -21,29 +21,12 @@ SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{password}@{host}:{port}
 )
 
 CASSANDRA_CLUSTER = env_var('CASSANDRA_CLUSTER', '10.0.104.30, 10.0.104.31, 10.0.104.32').split(', ')
-EREBUS_URL = env_var('EREBUS_URL', None)
 
 SENTRY_DSN = env_var("SELENE_SENTRY_DSN")
 DEBUG = env_var("SELENE_DEBUG", False)
 DEV_PORT = env_var('DEV_PORT', '8000')
 DEV_HOST = env_var('DEV_HOST', '0.0.0.0')
 SERVICE_TOKEN = 'Wvp*F3}<aQCAul=l]gjHu!/TD+_x=Sx8'
-
-AMEX_SFTP_CONFIG = ['fsgatewaytest.aexp.com', 'CHINGSTST', 'Talu@6713', 'inbox']
-
-EMAIL_USERNAME = env_var('EMAIL_USERNAME', 'itapps@bink.com')
-EMAIL_PASSWORD = env_var('EMAIL_PASSWORD', '$NickCisEcbeu1')
-EMAIL_HOST = env_var('EMAIL_HOST', 'smtp.office365.com')
-EMAIL_PORT = env_var('EMAIL_PORT', 587)
-EMAIL_TARGETS = {
-    'visa': env_var('VISA_MAIL', 'mids@bink.com'),
-    'mastercard': env_var('MASTERCARD_MAIL', 'mids@bink.com')
-}
-
-GET_ATTACHMENT = {
-    'visa': re.compile('^CAID_\\w+_LoyaltyAngels_[0-9]{8}.xlsx$'),
-    'amex': re.compile('\\w+_AXP_MER_REG_[0-9]{8}_[0-9]{6}.txt$')
-}
 
 UPLOADED_FILES_DEST = 'static/files'
 

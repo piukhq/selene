@@ -1,14 +1,13 @@
-import os
+from io import BytesIO
+
+import arrow
+import pandas as pd
 import re
-import csv
-import json
-import shutil
-import importlib
 from azure.storage.blob import BlockBlobService, ContentSettings
 
 import settings
-
-from app.active import AGENTS
+from app.agents.mastercard import MasterCard
+from app.agents.register import PROVIDERS_MAP
 from app.models import Sequence, db
 
 
@@ -16,13 +15,6 @@ bbs = BlockBlobService(
         account_name=settings.AZURE_ACCOUNT_NAME,
         account_key=settings.AZURE_ACCOUNT_KEY
     )
-
-
-def resolve_agent(name):
-    class_path = AGENTS[name]
-    module_name, class_name = class_path.split(".")
-    agent_module = importlib.import_module('app.agents.{}'.format(module_name))
-    return getattr(agent_module, class_name)
 
 
 def validate_uk_postcode(postcode):
@@ -42,88 +34,88 @@ def validate_uk_postcode(postcode):
     return True
 
 
-def get_agent(partner_slug):
-    agent_class = resolve_agent(partner_slug)
-    return agent_class()
-
-
-def csv_to_list_json(csv_file):
-    data = list()
-    with open(csv_file, "r") as f:
-        reader = csv.reader(f)
-        for row in reader:
-            data.append(row)
-
-    return data
-
-
-def list_json_to_dict_json(file):
-    data = list()
-    header = file[0]
-    for row in file[1:]:
-        if ''.join(row):
-            data.append(dict(zip(header, row)))
-
-    return data
-
-
-def format_json_input(json_file):
-    file = json.loads(json_file) if isinstance(json_file, str) else json_file
-    if isinstance(file[0], list):
-        return list_json_to_dict_json(file)
-
-    return file
-
-
 def update_amex_sequence_number():
     sequence = Sequence.query.filter_by(scheme_provider='amex').first()
     sequence.next_seq_number += 1
     db.session.commit()
 
 
-def get_attachment(path, provider):
-    pattern = settings.GET_ATTACHMENT[provider]
-    attachment = None
-    for entry in os.scandir(path):
-        if pattern.match(entry.name):
-            attachment = os.path.join(path, entry.name)
+def process_mids_file(file):
+    timestamp = arrow.utcnow().format('DDMMYY_hhmmssSSS')
 
-    return attachment
+    # MIDs columns default to float type which could cause issues e.g removing leading 0s
+    datatype_conversion = {agent_class.mids_col_name: str for agent_class in PROVIDERS_MAP.values()}
+    datatype_conversion.update({'Scheme ID': str})
+
+    bytes_content = file.stream.read()
+    file = BytesIO(bytes_content)
+    original_df = pd.read_csv(file, dtype=datatype_conversion)
+
+    messages = []
+    headers = list(original_df.columns.values)
+    is_valid_headers, invalid_headers = validate_headers(headers)
+
+    if is_valid_headers:
+        dataframes = {}
+
+        for provider in PROVIDERS_MAP:
+            columns_to_drop = [agent_class.mids_col_name for name, agent_class in PROVIDERS_MAP.items()
+                               if name != provider]
+
+            dataframes[provider] = original_df.drop(columns_to_drop, axis=1)
+            agent_instance = PROVIDERS_MAP[provider](dataframes[provider], timestamp)
+
+            agent_instance.export()
+            agent_instance.write_transaction_matched_csv()
+
+            message = agent_instance.create_messages()
+            messages.append(message)
+    else:
+        if is_handback_file(headers):
+            file_copy = BytesIO(bytes_content)
+            dataframe_with_footer = pd.read_csv(file_copy, sep='|', header=None, skiprows=1, dtype={23: str})
+            dataframe = dataframe_with_footer.iloc[:-1]
+
+            agent_instance = MasterCard(dataframe, timestamp, handback=True)
+            messages = agent_instance.process_handback_file()
+        else:
+            raise ValueError('Following headers are invalid/misspelled: {}'.format(invalid_headers))
+
+    return messages
 
 
-def prepare_cassandra_file(file, headers):
-    """
-    Remove trailing empty lines, and add headers.
-    :param file: input json file as list of lists with no headers
-    :param headers: cassandra table headers
-    :return: list of dictionaries with no trailing empty lines.
-    """
+def validate_headers(headers):
+    is_valid = True
+    expected_headers = ['Partner Name', 'American Express MIDs', 'MasterCard MIDs', 'Visa MIDs',
+                        'Address (Building Name/Number, Street)', 'Postcode', 'Town/City', 'County/State',
+                        'Country', 'Action', 'Scheme', 'Scheme ID']
 
-    if set(headers) == set(file[0]):
-        file = file[1:]
+    if len(headers) != len(expected_headers):
+        is_valid = False
 
-    while not ''.join(file[-1]):
-        file = file[:-1]
+    invalid_headers = []
+    for header in headers:
+        if header not in expected_headers:
+            invalid_headers.append(header)
 
-    data = list()
-    for row in file:
+    if invalid_headers:
+        is_valid = False
 
-        if len(headers) != len(row):
-            raise ValueError("Columns of the input file do not match the expected value")
-
-        data.append(dict(zip(headers, row)))
-
-    return data
+    return is_valid, invalid_headers
 
 
-def save_blob(content, container, filename, type='text', path=''):
+def is_handback_file(headers):
+    return headers[0].startswith('10') and 'BINK' in headers[0]
+
+
+def save_blob(content, container, filename, content_type='text', path=''):
     """
     Saves a file to the Azure Blob Storage.
 
     :param content: string or bytes to store as blob.
     :param container: string. Name of the blob storage container to save in.
     :param filename: string. Name of file.
-    :param type: string. Must be either 'text' or 'bytes' depending on the content type.
+    :param content_type: string. Must be either 'text' or 'bytes' depending on the content type.
     :param path: string. Folder path to store the file within the container.
     :return: None
     """
@@ -139,9 +131,9 @@ def save_blob(content, container, filename, type='text', path=''):
         'content_settings': ContentSettings(content_type='text/csv'),
     }
 
-    if type == 'text':
+    if content_type == 'text':
         args.update(text=content)
         bbs.create_blob_from_text(**args)
-    elif type == 'bytes':
+    elif content_type == 'bytes':
         args.update(blob=content)
         bbs.create_blob_from_bytes(**args)

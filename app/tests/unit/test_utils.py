@@ -4,7 +4,6 @@ import unittest
 import settings
 
 from app import utils
-from app.agents.mastercard import MasterCard
 
 
 class TestUtils(unittest.TestCase):
@@ -44,46 +43,6 @@ class TestUtils(unittest.TestCase):
 
         for p in bad_postcodes:
             self.assertFalse(utils.validate_uk_postcode(p))
-
-    def test_wipe_output_folders(self):
-        path = os.path.join(self.path, 'merchants')
-        os.makedirs(path, exist_ok=True)
-
-        for folder in ['visa', 'amex', 'mastercard']:
-            os.makedirs(os.path.join(path, folder), exist_ok=True)
-
-        path = os.path.join(path, 'visa')
-        open(path + "/test_file.txt", "w").close()
-        os.makedirs(os.path.join(path, 'test_folder'), exist_ok=True)
-
-        self.assertTrue(os.listdir(path))
-
-        utils.wipe_output_folders()
-        self.assertFalse(os.listdir(path))
-
-    def test_list_json_to_dict_json(self):
-        input_file = [
-            ['Header1', 'Header2', 'Header3'],
-            ['value1_row1', 'value2_row1', 'value3_row1'],
-            ['value1_row2', 'value2_row2', 'value3_row2']
-        ]
-
-        expected = [
-            {'Header1': 'value1_row1', 'Header2': 'value2_row1', 'Header3': 'value3_row1'},
-            {'Header1': 'value1_row2', 'Header2': 'value2_row2', 'Header3': 'value3_row2'}
-        ]
-
-        output = utils.list_json_to_dict_json(input_file)
-
-        self.assertEqual(expected, output)
-
-    def test_format_json_input(self):
-        file = [
-            {'test': 'good'},
-            {'test': 'still good'}
-        ]
-        result = utils.format_json_input(file)
-        self.assertEqual(file, result)
 
 
 if __name__ == '__main__':
