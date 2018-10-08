@@ -2,9 +2,6 @@ import csv
 import io
 import os
 
-import pandas as pd
-import numpy as np
-
 import settings
 from app import utils
 from app.utils import save_blob
@@ -15,6 +12,7 @@ class BaseProvider:
     TOWN_CITY = 'Town/City'
     ACTION = 'Action'
     POSTCODE = 'Postcode'
+    SCHEME = 'Scheme'
 
     name = None
     mids_col_name = None
@@ -90,7 +88,7 @@ class BaseProvider:
         provider_name = self.name.replace(' ', '_').lower()
         file_name = 'cass_inp_{}_{}_{}.csv'.format(provider_name, partner_name, self.timestamp)
 
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants', provider_name, self.timestamp)
+        path = path or os.path.join(settings.WRITE_FOLDER, 'merchants', provider_name, self.timestamp)
         file = io.StringIO()
 
         csv_writer = csv.writer(file, quoting=csv.QUOTE_NONE, escapechar='')

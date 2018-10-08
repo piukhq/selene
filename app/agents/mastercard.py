@@ -3,12 +3,10 @@ import io
 
 import csv
 import arrow
-from io import StringIO
-import pandas as pd
 
 import settings
 from app.agents.base import BaseProvider
-from app.utils import save_blob, validate_uk_postcode
+from app.utils import save_blob
 
 
 class MastercardMerchantFile:
@@ -133,8 +131,7 @@ class MasterCard(BaseProvider):
         return messages
 
     def clean_handback_data(self):
-        self.SCHEME = 'Scheme'
-        cols = {
+        cols_to_index = {
             self.mids_col_name: 23,
             self.PARTNER_NAME: 7,
             self.TOWN_CITY: 13,
@@ -142,16 +139,15 @@ class MasterCard(BaseProvider):
             self.POSTCODE: 17
         }
 
-        columns_to_clean = [cols[self.mids_col_name], cols[self.POSTCODE]]
+        columns_to_clean = [cols_to_index[self.mids_col_name], cols_to_index[self.POSTCODE]]
 
         for column in columns_to_clean:
             self._remove_null_rows(column_name=column)
 
-        self._remove_duplicate_mids(column=cols[self.mids_col_name])
-        self._remove_invalid_postcode_rows(postcode_col=cols[self.POSTCODE], index_value=True)
+        self._remove_duplicate_mids(column=cols_to_index[self.mids_col_name])
+        self._remove_invalid_postcode_rows(postcode_col=cols_to_index[self.POSTCODE], index_value=True)
 
-        self.df = self.df[self.df.columns[[val for val in cols.values()]]]
+        self.df = self.df[self.df.columns[[index for index in cols_to_index.values()]]]
 
-        new_cols = {val: col for col, val in cols.items()}
-        self.df = self.df.rename(columns=new_cols)
-
+        index_to_column_names = {index: col_name for col_name, index in cols_to_index.items()}
+        self.df = self.df.rename(columns=index_to_column_names)
