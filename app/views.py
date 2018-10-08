@@ -1,9 +1,8 @@
 import arrow
-import shutil
 from flask import Blueprint, render_template, request, flash, redirect
 from flask_uploads import UploadSet
 import pandas as pd
-from io import StringIO, BytesIO
+from io import BytesIO
 
 from app.agents.mastercard import MasterCard
 from app.agents.register import PROVIDERS_MAP
@@ -33,12 +32,11 @@ def index():
         if files.file_allowed(input_file, basename):
             try:
                 messages = process_mids_file(input_file)
-                flash('File uploaded')
+                flash('File uploaded', 'success')
             except Exception as e:
-                flash('Error: {}'.format(e))
-                raise
+                flash('Error: {}'.format(e), 'danger')
         else:
-            flash('Incorrect File type. Please upload a csv.')
+            flash('Incorrect File type. Please upload a csv.', 'warning')
 
     return render_template('index.html', messages=messages)
 
@@ -56,32 +54,33 @@ def process_mids_file(file):
 
     messages = []
     headers = list(original_df.columns.values)
-    valid_headers, invalid_headers = validate_headers(headers)
+    is_valid_headers, invalid_headers = validate_headers(headers)
 
-    if valid_headers:
+    if is_valid_headers:
         dataframes = {}
 
         for provider in PROVIDERS_MAP:
-            columns_to_drop = [agent_class.mids_col_name for name, agent_class in PROVIDERS_MAP.items() if name != provider]
+            columns_to_drop = [agent_class.mids_col_name for name, agent_class in PROVIDERS_MAP.items()
+                               if name != provider]
+
             dataframes[provider] = original_df.drop(columns_to_drop, axis=1)
-
             agent_instance = PROVIDERS_MAP[provider](dataframes[provider], timestamp)
-            agent_instance.export()
 
+            agent_instance.export()
             agent_instance.write_transaction_matched_csv()
-            print('{} Cassandra file exported\n\n'.format(agent_instance.name))
 
             message = agent_instance.create_messages()
             messages.append(message)
     else:
         if is_handback_file(headers):
-            b = BytesIO(bytes_content)
-            df = pd.read_csv(b, sep='|', header=None, skipfooter=1, skiprows=1, dtype={23: str})
+            file_copy = BytesIO(bytes_content)
+            dataframe_with_footer = pd.read_csv(file_copy, sep='|', header=None, skiprows=1, dtype={23: str})
+            dataframe = dataframe_with_footer.iloc[:-1]
 
-            agent_instance = MasterCard(df, timestamp, handback=True)
+            agent_instance = MasterCard(dataframe, timestamp, handback=True)
             messages = agent_instance.process_handback_file()
         else:
-            messages = 'Following headers are invalid/misspelled: {}'.format(invalid_headers)
+            raise ValueError('Following headers are invalid/misspelled: {}'.format(invalid_headers))
 
     return messages
 

@@ -52,7 +52,6 @@ class BaseProvider:
         self.duplicates_count = initial_row_size - self.df[column].size
 
     def _remove_null_rows(self, column_name):
-        self.df[column_name].replace('nan', np.nan, inplace=True)
         total_null_rows = self.df[column_name].isnull().sum()
 
         if total_null_rows > 0:
