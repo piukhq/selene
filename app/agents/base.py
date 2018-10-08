@@ -84,10 +84,9 @@ class BaseProvider:
             self.df = self.df.drop(invalid_postcode_rows)
             print("Invalid postcodes - Total: {}".format(len(invalid_postcode_rows)))
 
-    def write_transaction_matched_csv(self, mids_dict=None):
-        if mids_dict is None:
-            mids_dict = self.df.to_dict('records')
-        partner_name = mids_dict[0]['Partner Name'].replace(' ', '_').lower()
+    def write_transaction_matched_csv(self, mids_dicts=None, path=None):
+        mids_dicts = mids_dicts or self.df.to_dict('records')
+        partner_name = mids_dicts[0]['Partner Name'].replace(' ', '_').lower()
         provider_name = self.name.replace(' ', '_').lower()
         file_name = 'cass_inp_{}_{}_{}.csv'.format(provider_name, partner_name, self.timestamp)
 
@@ -95,7 +94,7 @@ class BaseProvider:
         file = io.StringIO()
 
         csv_writer = csv.writer(file, quoting=csv.QUOTE_NONE, escapechar='')
-        for row in mids_dict:
+        for row in mids_dicts:
             csv_writer.writerow([
                 provider_name,
                 row[self.mids_col_name].strip(' '),

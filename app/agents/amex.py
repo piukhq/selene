@@ -169,7 +169,7 @@ class Amex(BaseProvider):
         return datetime.format('MM/DD/YYYY')
 
     def export(self):
-        mids_dict = self.df.to_dict('records')
+        mids_dicts = self.df.to_dict('records')
 
         file_num = get_next_file_number()
 
@@ -193,7 +193,7 @@ class Amex(BaseProvider):
         file.set_header(header)
         file.set_footer(footer)
 
-        for count, merchant in enumerate(mids_dict):
+        for count, merchant in enumerate(mids_dicts):
 
             file.add_detail(AmexDetail(
                 action_code=merchant['Action'],  # A=Add, U=Update, D=Delete

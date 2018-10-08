@@ -54,9 +54,9 @@ class Visa(BaseProvider):
         file = VisaMerchantFile()
         partner_name = ''
 
-        mids_dict = self.df.to_dict('records')
+        mids_dicts = self.df.to_dict('records')
 
-        for count, merchant in enumerate(mids_dict):
+        for count, merchant in enumerate(mids_dicts):
             if count == 0:
                 partner_name = merchant['Partner Name']
 

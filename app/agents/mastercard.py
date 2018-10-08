@@ -86,11 +86,11 @@ class MasterCard(BaseProvider):
             self.duplicates_count = 0
 
     def export(self):
-        mids_dict = self.df.to_dict('records')
+        mids_dicts = self.df.to_dict('records')
 
         file = MastercardMerchantFile()
 
-        for count, merchant in enumerate(mids_dict):
+        for count, merchant in enumerate(mids_dicts):
 
             detail = [merchant['MasterCard MIDs'], merchant['Partner Name'], merchant['Town/City'],
                       merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
@@ -126,8 +126,9 @@ class MasterCard(BaseProvider):
         self.clean_handback_data()
         messages = [self.create_messages()]
 
-        mids_dict = self.df.to_dict('records')
-        self.write_transaction_matched_csv(mids_dict=mids_dict)
+        mids_dicts = self.df.to_dict('records')
+
+        self.write_transaction_matched_csv(mids_dicts=mids_dicts, path=self.write_path)
 
         return messages
 
