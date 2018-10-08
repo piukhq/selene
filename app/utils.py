@@ -1,13 +1,7 @@
-from io import BytesIO
-
-import arrow
-import pandas as pd
 import re
 from azure.storage.blob import BlockBlobService, ContentSettings
 
 import settings
-from app.agents.mastercard import MasterCard
-from app.agents.register import PROVIDERS_MAP
 from app.models import Sequence, db
 
 
@@ -38,50 +32,6 @@ def update_amex_sequence_number():
     sequence = Sequence.query.filter_by(scheme_provider='amex').first()
     sequence.next_seq_number += 1
     db.session.commit()
-
-
-def process_mids_file(file):
-    timestamp = arrow.utcnow().format('DDMMYY_hhmmssSSS')
-
-    # MIDs columns default to float type which could cause issues e.g removing leading 0s
-    datatype_conversion = {agent_class.mids_col_name: str for agent_class in PROVIDERS_MAP.values()}
-    datatype_conversion.update({'Scheme ID': str})
-
-    bytes_content = file.stream.read()
-    file = BytesIO(bytes_content)
-    original_df = pd.read_csv(file, dtype=datatype_conversion)
-
-    messages = []
-    headers = list(original_df.columns.values)
-    is_valid_headers, invalid_headers = validate_headers(headers)
-
-    if is_valid_headers:
-        dataframes = {}
-
-        for provider in PROVIDERS_MAP:
-            columns_to_drop = [agent_class.mids_col_name for name, agent_class in PROVIDERS_MAP.items()
-                               if name != provider]
-
-            dataframes[provider] = original_df.drop(columns_to_drop, axis=1)
-            agent_instance = PROVIDERS_MAP[provider](dataframes[provider], timestamp)
-
-            agent_instance.export()
-            agent_instance.write_transaction_matched_csv()
-
-            message = agent_instance.create_messages()
-            messages.append(message)
-    else:
-        if is_handback_file(headers):
-            file_copy = BytesIO(bytes_content)
-            dataframe_with_footer = pd.read_csv(file_copy, sep='|', header=None, skiprows=1, dtype={23: str})
-            dataframe = dataframe_with_footer.iloc[:-1]
-
-            agent_instance = MasterCard(dataframe, timestamp, handback=True)
-            messages = agent_instance.process_handback_file()
-        else:
-            raise ValueError('Following headers are invalid/misspelled: {}'.format(invalid_headers))
-
-    return messages
 
 
 def validate_headers(headers):
