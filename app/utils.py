@@ -34,24 +34,19 @@ def update_amex_sequence_number():
     db.session.commit()
 
 
-def validate_headers(headers):
+def validate_headers(input_headers):
     is_valid = True
     expected_headers = ['Partner Name', 'American Express MIDs', 'MasterCard MIDs', 'Visa MIDs',
                         'Address (Building Name/Number, Street)', 'Postcode', 'Town/City', 'County/State',
                         'Country', 'Action', 'Scheme', 'Scheme ID']
 
-    if len(headers) != len(expected_headers):
+    invalid_headers = [header for header in input_headers if header not in expected_headers]
+    missing_headers = [header for header in expected_headers if header not in input_headers]
+
+    if invalid_headers or missing_headers:
         is_valid = False
 
-    invalid_headers = []
-    for header in headers:
-        if header not in expected_headers:
-            invalid_headers.append(header)
-
-    if invalid_headers:
-        is_valid = False
-
-    return is_valid, invalid_headers
+    return is_valid, invalid_headers, missing_headers
 
 
 def is_handback_file(headers):

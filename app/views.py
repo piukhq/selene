@@ -54,7 +54,7 @@ def process_mids_file(file):
 
     messages = []
     headers = list(original_df.columns.values)
-    is_valid_headers, invalid_headers = validate_headers(headers)
+    is_valid_headers, invalid_headers, missing_headers = validate_headers(headers)
 
     if is_valid_headers:
         dataframes = {}
@@ -80,6 +80,16 @@ def process_mids_file(file):
             agent_instance = MasterCard(dataframe, timestamp, handback=True)
             messages = agent_instance.process_handback_file()
         else:
-            raise ValueError('Following headers are invalid/misspelled: {}'.format(invalid_headers))
+            invalid_message = ''
+            missing_message = ''
+
+            if invalid_headers:
+                invalid_message = 'Invalid headers: {}'.format(invalid_headers)
+            if missing_headers:
+                missing_message = 'Missing headers: {}'.format(missing_headers)
+
+            error_message = '<p style="margin-bottom: 0;">{}</p><p style="margin-bottom: 0;">{}</p>'
+
+            raise ValueError(error_message.format(invalid_message, missing_message))
 
     return messages
