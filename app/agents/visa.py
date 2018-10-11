@@ -43,6 +43,7 @@ class VisaMerchantFile:
 class Visa(BaseProvider):
     name = 'Visa'
     mids_col_name = 'Visa MIDs'
+    file = None
 
     action_translate = dict(
         A='On-Board',
@@ -90,12 +91,12 @@ class Visa(BaseProvider):
         """
         path = os.path.join(settings.WRITE_FOLDER, 'merchants', self.name.replace(' ', '_').lower(), now)
 
-        wb = Workbook()
-        ws1 = wb.active
+        self.file = Workbook()
+        ws1 = self.file.active
         input_file.set_header(ws1)
         visa_lines = input_file.get_data()
         for line in visa_lines:
             ws1.append(line)
 
-        virtual_wb = save_virtual_workbook(wb)
+        virtual_wb = save_virtual_workbook(self.file)
         save_blob(virtual_wb, container='dev-media', filename=file_name, path=path, content_type='bytes')
