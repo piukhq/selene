@@ -20,12 +20,12 @@ def index():
 
     if request.method == 'POST':
         if input_field_name not in request.files:
-            flash('No file part')
+            flash('No file part', 'warning')
             return redirect(request.url)
 
         input_file = request.files[input_field_name]
         if input_file.filename == '':
-            flash('No file selected')
+            flash('No file selected', 'warning')
             return redirect(request.url)
 
         basename = files.get_basename(input_file.filename)
@@ -52,10 +52,10 @@ def process_mids_file(file):
     file = BytesIO(bytes_content)
     original_df = pd.read_csv(file, dtype=datatype_conversion)
 
-    messages = []
     headers = list(original_df.columns.values)
     is_valid_headers, invalid_headers, missing_headers = validate_headers(headers)
 
+    messages = []
     if is_valid_headers:
         dataframes = {}
 

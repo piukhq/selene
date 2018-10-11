@@ -70,6 +70,7 @@ class MasterCard(BaseProvider):
     name = 'MasterCard'
     mids_col_name = 'MasterCard MIDs'
     write_path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard')
+    file = None
 
     def __init__(self, dataframe, timestamp, handback=False):
         if not handback:
@@ -108,15 +109,15 @@ class MasterCard(BaseProvider):
         :return: None
         """
         path = os.path.join(self.write_path, self.timestamp)
-        file = io.StringIO()
+        self.file = io.StringIO()
 
-        writer = csv.writer(file, delimiter=',', quotechar='"')
+        writer = csv.writer(self.file, delimiter=',', quotechar='"')
 
         input_file.set_header(writer)
         input_file.set_data(writer)
         input_file.set_trailer(writer)
 
-        save_blob(file.getvalue(), container='dev-media', filename=file_name, path=path, content_type='text')
+        save_blob(self.file.getvalue(), container='dev-media', filename=file_name, path=path, content_type='text')
 
     def process_handback_file(self):
         self.write_path = os.path.join(self.write_path, 'handback')

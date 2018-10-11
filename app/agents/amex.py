@@ -158,6 +158,7 @@ class AmexMerchantFile:
 class Amex(BaseProvider):
     name = 'Amex'
     mids_col_name = 'American Express MIDs'
+    file = None
 
     @staticmethod
     def format_datetime(datetime):
@@ -189,13 +190,13 @@ class Amex(BaseProvider):
             filler=''
         )
 
-        file = AmexMerchantFile()
-        file.set_header(header)
-        file.set_footer(footer)
+        self.file = AmexMerchantFile()
+        self.file.set_header(header)
+        self.file.set_footer(footer)
 
         for count, merchant in enumerate(mids_dicts):
 
-            file.add_detail(AmexDetail(
+            self.file.add_detail(AmexDetail(
                 action_code=merchant['Action'],  # A=Add, U=Update, D=Delete
                 partner_id='AADP0050',
                 version_number='1.0',
@@ -234,4 +235,4 @@ class Amex(BaseProvider):
         )
 
         path = os.path.join(settings.WRITE_FOLDER, 'merchants', self.name.replace(' ', '_').lower(), self.timestamp)
-        save_blob(file.get_detail(), container='dev-media', filename=file_name, path=path, content_type='text')
+        save_blob(self.file.get_detail(), container='dev-media', filename=file_name, path=path, content_type='text')
