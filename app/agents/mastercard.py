@@ -122,7 +122,11 @@ class MasterCard(BaseProvider):
     def process_handback_file(self):
         self.write_path = os.path.join(self.write_path, 'handback')
 
-        self.clean_handback_data()
+        try:
+            self.clean_handback_data()
+        except KeyError as e:
+            raise KeyError('Incorrect csv format for MasterCard handback file.') from e
+
         messages = [self.create_messages()]
 
         mids_dicts = self.df.to_dict('records')

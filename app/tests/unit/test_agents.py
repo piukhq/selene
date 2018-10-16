@@ -76,6 +76,7 @@ class TestMasterCard(TestCase):
         test_mids_file = os.path.join(settings.APP_DIR, 'app/tests/fixture/test_import_mids.csv')
         test_mids_output_file = os.path.join(settings.APP_DIR,
                                              'app/tests/fixture/output/MAS_INPUT_BINK.csv')
+        test_handback_file = os.path.join(settings.APP_DIR, 'app/tests/fixture/test_handback.csv')
 
         cols_to_drop = [provider.mids_col_name for name, provider in PROVIDERS_MAP.items() if name != cls.NAME]
 
@@ -86,7 +87,13 @@ class TestMasterCard(TestCase):
             cls.df = df.drop(cols_to_drop, axis=1)
 
         with open(test_mids_output_file) as f:
-            cls.expected_file = f.read()
+            cls.expected_export_file = f.read()
+
+        with open(test_handback_file) as f:
+            bytes_content = BytesIO(f.read().encode())
+            file = FileStorage(bytes_content)
+            dataframe_with_footer = pd.read_csv(file, sep='|', header=None, skiprows=1, dtype={23: str})
+            cls.handback_df = dataframe_with_footer.iloc[:-1]
 
     def setUp(self):
         timestamp = arrow.utcnow().format('DDMMYY_hhmmssSSS')
@@ -98,7 +105,16 @@ class TestMasterCard(TestCase):
         file_content = self.instance.file.getvalue()
 
         self.assertTrue(mock_save.called)
-        self.assertEqual(self.expected_file.split('\n')[1:], file_content.split('\r\n')[1:])
+        self.assertEqual(self.expected_export_file.split('\n')[1:], file_content.split('\r\n')[1:])
+
+    def test_handback_file_processing(self):
+        timestamp = arrow.utcnow().format('DDMMYY_hhmmssSSS')
+        instance = MasterCard(self.handback_df, timestamp, handback=True)
+
+        messages = instance.process_handback_file()
+
+        self.assertEqual(messages, [['MasterCard - Total rows - 13', 'Invalid MIDs: 3 - Rows: [0, 12, 8]',
+                                     'Total duplicates: 0', 'MasterCard MIDs exported: 10']])
 
 
 class TestVisa(TestCase):
