@@ -48,10 +48,12 @@ class TestAmex(TestCase):
         timestamp = arrow.utcnow().format('DDMMYY_hhmmssSSS')
         self.instance = Amex(self.df, timestamp)
 
+    @mock.patch('app.agents.amex.arrow.now', autospec=True)
     @mock.patch('app.agents.amex.save_blob')
     @mock.patch('app.agents.amex.Sequence', autospec=True)
-    def test_export(self, mock_sequence, mock_save):
+    def test_export(self, mock_sequence, mock_save, mock_date):
         mock_sequence.query.filter.return_value.first.return_value.get_seq_number.return_value = 0
+        mock_date.return_value = arrow.get('2018-10-11').format('MM/DD/YYYY')
 
         self.instance.export()
         file_content = self.instance.file.get_detail()
@@ -99,8 +101,11 @@ class TestMasterCard(TestCase):
         timestamp = arrow.utcnow().format('DDMMYY_hhmmssSSS')
         self.instance = MasterCard(self.df, timestamp)
 
+    @mock.patch('app.agents.mastercard.arrow.utcnow', autospec=True)
     @mock.patch('app.agents.mastercard.save_blob')
-    def test_export(self, mock_save):
+    def test_export(self, mock_save, mock_date):
+        mock_date.return_value = arrow.get('2018-10-11').format('MM/DD/YYYY')
+
         self.instance.export()
         file_content = self.instance.file.getvalue()
 

@@ -86,7 +86,6 @@ class MasterCard(BaseProvider):
 
     def export(self):
         mids_dicts = self.df.to_dict('records')
-
         file = MastercardMerchantFile()
 
         for count, merchant in enumerate(mids_dicts):
@@ -130,7 +129,6 @@ class MasterCard(BaseProvider):
         messages = [self.create_messages()]
 
         mids_dicts = self.df.to_dict('records')
-
         self.write_transaction_matched_csv(mids_dicts=mids_dicts, path=self.write_path)
 
         return messages
