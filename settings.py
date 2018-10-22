@@ -33,3 +33,8 @@ UPLOADED_FILES_DEST = os.path.join(STATIC_URL, 'files')
 AZURE_ACCOUNT_NAME = env_var('AZURE_ACCOUNT_NAME', 'bink')
 AZURE_ACCOUNT_KEY = env_var('AZURE_ACCOUNT_KEY',
                             'xaeP9dmuYEWf/gthvteUj2utPcIM/B4dPRPoyHAd22LEI/6l/XJhYnzu2I66rI7PEdgoyvvDKJNYcmxd9vsLhA==')
+
+CDN_DOMAIN = env_var('CDN_DOMAIN')
+CDN_DEBUG = False
+CDN_TIMESTAMP = False
+CDN_HTTPS = True

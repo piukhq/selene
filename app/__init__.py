@@ -1,6 +1,7 @@
 import logging
 
 from flask import Flask
+from flask_cdn import CDN
 from flask_uploads import configure_uploads
 from raven.contrib.flask import Sentry
 
@@ -10,6 +11,7 @@ import settings
 from app.views import bp, files
 
 sentry = Sentry()
+cdn = CDN()
 
 
 def create_app(config_name='settings'):
@@ -30,6 +32,8 @@ def create_app(config_name='settings'):
         sentry.client.release = __version__
 
     db.init_app(app)
+    cdn.init_app(app)
+
     app.register_blueprint(bp)
     configure_uploads(app, files)
 
