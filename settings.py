@@ -27,7 +27,8 @@ DEV_PORT = env_var('DEV_PORT', '8000')
 DEV_HOST = env_var('DEV_HOST', '0.0.0.0')
 SERVICE_TOKEN = 'Wvp*F3}<aQCAul=l]gjHu!/TD+_x=Sx8'
 
-UPLOADED_FILES_DEST = 'static/files'
+STATIC_URL = env_var('SELENE_STATIC_URL', '/static')
+UPLOADED_FILES_DEST = os.path.join(STATIC_URL, 'files')
 
 AZURE_ACCOUNT_NAME = env_var('AZURE_ACCOUNT_NAME', 'bink')
 AZURE_ACCOUNT_KEY = env_var('AZURE_ACCOUNT_KEY',

@@ -13,7 +13,12 @@ sentry = Sentry()
 
 
 def create_app(config_name='settings'):
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_folder='static',
+        static_url_path=settings.STATIC_URL
+    )
+
     app.config.from_object(config_name)
 
     if settings.SENTRY_DSN:
