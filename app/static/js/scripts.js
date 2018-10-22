@@ -2,7 +2,7 @@
 
 $(document).ready(function () {
 
-    if (window.location.pathname === '/'){index()}
+    if (window.location.pathname === '/mids'){index()}
 
 });
 

@@ -19,8 +19,6 @@ SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{password}@{host}:{port}
     database=env_var('PONTUS_DATABASE', 'pontus')
 )
 
-CASSANDRA_CLUSTER = env_var('CASSANDRA_CLUSTER', '10.0.104.30, 10.0.104.31, 10.0.104.32').split(', ')
-
 SENTRY_DSN = env_var("SELENE_SENTRY_DSN")
 DEBUG = env_var("SELENE_DEBUG", False)
 DEV_PORT = env_var('DEV_PORT', '8000')
