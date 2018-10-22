@@ -13,7 +13,7 @@ bp = Blueprint('selene', __name__)
 files = UploadSet('files', extensions=('csv',))
 
 
-@bp.route("/", methods=['GET', 'POST'])
+@bp.route("/mids", methods=['GET', 'POST'])
 def index():
     input_field_name = 'input_file'
     messages = None
