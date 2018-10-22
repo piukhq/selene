@@ -7,23 +7,17 @@ tests:
   script:
   - pipenv install --dev
   - pipenv run pytest app/tests --cov=app
-  tags:
-    - docker
   services:
 
 complexity:
   stage: tests
   script:
     - xenon --max-average A --max-modules B --max-absolute B .
-  tags:
-    - docker
 
 style:
   stage: tests
   script:
     - flake8
-  tags:
-    - docker
 
 build-latest:
   stage: build
@@ -37,5 +31,3 @@ build-latest:
     - docker push "$CI_REGISTRY/selene:latest"
   only:
     - develop
-  tags:
-    - docker

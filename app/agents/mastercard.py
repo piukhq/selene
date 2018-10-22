@@ -1,7 +1,12 @@
 import os
+import io
+
 import csv
 import arrow
+
 import settings
+from app.agents.base import BaseProvider
+from app.utils import save_blob
 
 
 class MastercardMerchantFile:
@@ -61,115 +66,91 @@ class MastercardMerchantFile:
         writer.writerow(row)
 
 
-class MasterCard:
-    write_path = None
+class MasterCard(BaseProvider):
+    name = 'MasterCard'
+    mids_col_name = 'MasterCard MIDs'
+    write_path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard')
+    file = None
 
-    def __init__(self):
-        self.write_path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'mastercard')
+    def __init__(self, dataframe, timestamp, handback=False):
+        if not handback:
+            super(MasterCard, self).__init__(dataframe, timestamp)
+        else:
+            self.df = dataframe
+            self.timestamp = timestamp
+            self.input_headers = self.df.columns.values
+            self.initial_row_count = len(self.df.index)
+            self.invalid_rows = []
+            self.invalid_row_count = 0
+            self.duplicates_count = 0
 
-    @staticmethod
-    def has_mid(element):
-        """
-        return True if there is a mastercard mid in the row
-        """
-
-        selected = element if isinstance(element, str) else element.get("MasterCard MIDs")
-        if selected and str(selected) != "" and str(selected) != "N/A":
-            return True
-
-        return False
-
-    def write_transaction_matched_csv(self, merchants, now):
-        a = arrow.get(now, 'DDMMYY_hhmmssSSS')
-        filename = 'cass_inp_mastercard_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(self.write_path, now, filename)
-        try:
-            with open(path, 'w') as csv_file:
-                csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
-                for merchant in merchants:
-                    csv_writer.writerow([
-                        'mastercard',
-                        merchant['MasterCard MIDs'].strip(' '),
-                        merchant['Scheme'].strip('" ').lower(),
-                        merchant['Partner Name'].strip('" '),
-                        merchant['Town/City'].strip('" '),
-                        merchant['Postcode'].strip('" '),
-                        'A'
-                    ])
-
-        except IOError:
-            raise Exception('Error writing file:' + path)
-
-    def write_duplicates_file(self, duplicates, now):
-        a = arrow.get(now, 'DDMMYY_hhmmssSSS')
-        filename = 'duplicates_mastercard_{}.txt'.format(a.format('DD-MM-YYYY'))
-        path = os.path.join(self.write_path, now, filename)
-        try:
-            with open(path, 'w') as dup_file:
-                dup_file.write('Date of file creation: {}\n'.format(a.format('DD-MM-YYYY')))
-                for dup in duplicates:
-                    dup_file.write(dup + '\n')
-
-        except IOError:
-            raise Exception('Error writing file:' + path)
-
-    def write_to_file(self, input_file, file_name, now):
-        """
-        writes the given input file to a file under a given name.
-        :param input_file: the file to write
-        :param file_name: the file name under which to write the data
-        :param now: string datetime
-        :return: None
-        """
-
-        path = os.path.join(self.write_path, now, file_name)
-
-        with open(path, 'w') as file:
-            writer = csv.writer(file, delimiter=',', quotechar='"')
-
-            input_file.set_header(writer)
-            input_file.set_data(writer)
-            input_file.set_trailer(writer)
-
-    def export_merchants(self, merchants, validated, now, reason=None):
-        """
-        uses a given set of merchants to generate a file in Mastercard input file format
-        :param merchants: a list of merchants to send to Mastercard
-        :param validated:
-        :param now: string datetime
-        :param reason:
-        :return: None
-        """
-        reason = reason or []
-
+    def export(self):
+        mids_dicts = self.df.to_dict('records')
         file = MastercardMerchantFile()
 
-        for count, merchant in enumerate(merchants):
+        for count, merchant in enumerate(mids_dicts):
 
             detail = [merchant['MasterCard MIDs'], merchant['Partner Name'], merchant['Town/City'],
                       merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
                       '', merchant['Action'],
                       ]
-            if validated:
-                detail.append('')
-            else:
-                detail.append(reason[count])
 
             file.add_detail(detail)
 
-        file_name = self.create_file_name(validated)
+        file_name = 'MAS_INPUT_BINK.csv'
+        self.write_to_file(file, file_name)
+
+    def write_to_file(self, input_file, file_name):
+        """
+        writes the given input file to a file under a given name.
+        :param input_file: the file to write
+        :param file_name: the file name under which to write the data
+        :return: None
+        """
+        path = os.path.join(self.write_path, self.timestamp)
+        self.file = io.StringIO()
+
+        writer = csv.writer(self.file, delimiter=',', quotechar='"')
+
+        input_file.set_header(writer)
+        input_file.set_data(writer)
+        input_file.set_trailer(writer)
+
+        save_blob(self.file.getvalue(), container='dev-media', filename=file_name, path=path, content_type='text')
+
+    def process_handback_file(self):
+        self.write_path = os.path.join(self.write_path, 'handback')
 
         try:
-            self.write_to_file(file, file_name, now)
-        except IOError:
-            raise Exception('Error writing file:' + file_name)
+            self.clean_handback_data()
+        except KeyError as e:
+            raise KeyError('Incorrect csv format for MasterCard handback file.') from e
 
-    @staticmethod
-    def create_file_name(validated):
+        messages = [self.create_messages()]
 
-        file_name = 'MAS_INPUT_BINK.csv'
+        mids_dicts = self.df.to_dict('records')
+        self.write_transaction_matched_csv(mids_dicts=mids_dicts, path=self.write_path)
 
-        if not validated:
-            file_name = 'INVALID_' + file_name
+        return messages
 
-        return file_name
+    def clean_handback_data(self):
+        cols_to_index = {
+            self.mids_col_name: 23,
+            self.PARTNER_NAME: 7,
+            self.TOWN_CITY: 13,
+            self.SCHEME: 45,
+            self.POSTCODE: 17
+        }
+
+        columns_to_clean = [cols_to_index[self.mids_col_name], cols_to_index[self.POSTCODE]]
+
+        for column in columns_to_clean:
+            self._remove_null_rows(column_name=column)
+
+        self._remove_duplicate_mids(column=cols_to_index[self.mids_col_name])
+        self._remove_invalid_postcode_rows(postcode_col=cols_to_index[self.POSTCODE], index_value=True)
+
+        self.df = self.df[self.df.columns[[index for index in cols_to_index.values()]]]
+
+        index_to_column_names = {index: col_name for col_name, index in cols_to_index.items()}
+        self.df = self.df.rename(columns=index_to_column_names)

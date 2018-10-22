@@ -1,28 +1,14 @@
-import os
 import re
-import csv
-import json
-import shutil
-import importlib
-import settings
+from azure.storage.blob import BlockBlobService, ContentSettings
 
-from app.active import AGENTS
+import settings
 from app.models import Sequence, db
 
 
-def init_folders():
-    base_dir = settings.WRITE_FOLDER
-
-    for folder in ['visa', 'amex', 'mastercard']:
-        folder_path = os.path.join(base_dir, 'merchants', folder)
-        os.makedirs(folder_path, exist_ok=True)
-
-
-def resolve_agent(name):
-    class_path = AGENTS[name]
-    module_name, class_name = class_path.split(".")
-    agent_module = importlib.import_module('app.agents.{}'.format(module_name))
-    return getattr(agent_module, class_name)
+bbs = BlockBlobService(
+        account_name=settings.AZURE_ACCOUNT_NAME,
+        account_key=settings.AZURE_ACCOUNT_KEY
+    )
 
 
 def validate_uk_postcode(postcode):
@@ -42,92 +28,57 @@ def validate_uk_postcode(postcode):
     return True
 
 
-def get_agent(partner_slug):
-    agent_class = resolve_agent(partner_slug)
-    return agent_class()
-
-
-def csv_to_list_json(csv_file):
-    data = list()
-    with open(csv_file, "r") as f:
-        reader = csv.reader(f)
-        for row in reader:
-            data.append(row)
-
-    return data
-
-
-def list_json_to_dict_json(file):
-    data = list()
-    header = file[0]
-    for row in file[1:]:
-        if ''.join(row):
-            data.append(dict(zip(header, row)))
-
-    return data
-
-
-def format_json_input(json_file):
-    file = json.loads(json_file) if isinstance(json_file, str) else json_file
-    if isinstance(file[0], list):
-        return list_json_to_dict_json(file)
-
-    return file
-
-
-def empty_folder(path):
-    for the_file in os.listdir(path):
-        file_path = os.path.join(path, the_file)
-
-        if os.path.isfile(file_path):
-            os.unlink(file_path)
-
-        elif os.path.isdir(file_path):
-            shutil.rmtree(file_path)
-
-
-def wipe_output_folders():
-    for folder in ['visa', 'amex', 'mastercard']:
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants', folder)
-        empty_folder(path)
-
-
 def update_amex_sequence_number():
     sequence = Sequence.query.filter_by(scheme_provider='amex').first()
     sequence.next_seq_number += 1
     db.session.commit()
 
 
-def get_attachment(path, provider):
-    pattern = settings.GET_ATTACHMENT[provider]
-    attachment = None
-    for entry in os.scandir(path):
-        if pattern.match(entry.name):
-            attachment = os.path.join(path, entry.name)
+def validate_headers(input_headers):
+    is_valid = True
+    expected_headers = ['Partner Name', 'American Express MIDs', 'MasterCard MIDs', 'Visa MIDs',
+                        'Address (Building Name/Number, Street)', 'Postcode', 'Town/City', 'County/State',
+                        'Country', 'Action', 'Scheme', 'Scheme ID']
 
-    return attachment
+    invalid_headers = [header for header in input_headers if header not in expected_headers]
+    missing_headers = [header for header in expected_headers if header not in input_headers]
+
+    if invalid_headers or missing_headers:
+        is_valid = False
+
+    return is_valid, invalid_headers, missing_headers
 
 
-def prepare_cassandra_file(file, headers):
+def is_handback_file(headers):
+    return headers[0].startswith('10') and 'BINK' in headers[0]
+
+
+def save_blob(content, container, filename, content_type='text', path=''):
     """
-    Remove trailing empty lines, and add headers.
-    :param file: input json file as list of lists with no headers
-    :param headers: cassandra table headers
-    :return: list of dictionaries with no trailing empty lines.
+    Saves a file to the Azure Blob Storage.
+
+    :param content: string or bytes to store as blob.
+    :param container: string. Name of the blob storage container to save in.
+    :param filename: string. Name of file.
+    :param content_type: string. Must be either 'text' or 'bytes' depending on the content type.
+    :param path: string. Folder path to store the file within the container.
+    :return: None
     """
+    if path:
+        if path[0] == '/':
+            path = path[1:]
+        if path[-1] != '/':
+            path = path + '/'
 
-    if set(headers) == set(file[0]):
-        file = file[1:]
+    args = {
+        'container_name': container,
+        'blob_name': '{}{}'.format(path, filename),
+        'content_settings': ContentSettings(content_type='text/csv'),
+    }
 
-    while not ''.join(file[-1]):
-        file = file[:-1]
-
-    data = list()
-    for row in file:
-
-        if len(headers) != len(row):
-            raise ValueError("Columns of the input file do not match the expected value")
-
-        data.append(dict(zip(headers, row)))
-
-    return data
+    if content_type == 'text':
+        args.update(text=content)
+        bbs.create_blob_from_text(**args)
+    elif content_type == 'bytes':
+        args.update(blob=content)
+        bbs.create_blob_from_bytes(**args)

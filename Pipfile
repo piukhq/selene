@@ -6,9 +6,6 @@ name = "pypi"
 [packages]
 arrow = "==0.10.0"
 cassandra-driver = "==3.5.0"
-flask = "==0.12.2"
-flask-restplus = "==0.10.1"
-flask-script = "==2.0.6"
 flask-sqlalchemy = "==2.3.2"
 flask-testing = "==0.6.2"
 plumbum = "==1.6.4"
@@ -21,6 +18,11 @@ blinker = "==1.4"
 bigdatalib = {git = "ssh://git@gitlab.com/olympus-libs/bigdatalib.git"}
 handylib = {git = "ssh://git@gitlab.com/olympus-libs/handylib.git"}
 cassandralib = {git = "ssh://git@gitlab.com/olympus-libs/cassandralib.git"}
+flask = "*"
+flask-uploads = "*"
+azure-storage-blob = "*"
+pandas = "*"
+flask-cdn = "*"
 
 [dev-packages]
 pytest = "*"
@@ -28,6 +30,6 @@ pytest-cov = "*"
 httpretty = "*"
 jedi = "*"
 importmagic = "*"
-"autopep8" = "*"
 yapf = "*"
 "flake8" = "*"
+xlrd = "*"

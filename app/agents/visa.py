@@ -1,9 +1,12 @@
-import csv
-import arrow
 import os
-import settings
 
+import arrow
 from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
+
+import settings
+from app.agents.base import BaseProvider
+from app.utils import save_blob
 
 
 class VisaMerchantFile:
@@ -37,7 +40,10 @@ class VisaMerchantFile:
         self.visa_lines.append(detail)
 
 
-class Visa:
+class Visa(BaseProvider):
+    name = 'Visa'
+    mids_col_name = 'Visa MIDs'
+    file = None
 
     action_translate = dict(
         A='On-Board',
@@ -45,75 +51,13 @@ class Visa:
         D='Remove'
     )
 
-    @staticmethod
-    def has_mid(row):
-        """
-        return True if there is a visa mid in the row
-        """
-        selected = row.get('Visa MIDs')
-        if selected and str(selected) != "" and str(selected) != "N/A":
-            return True
-
-        return False
-
-    @staticmethod
-    def write_transaction_matched_csv(merchants, now):
-
-        a = arrow.utcnow()
-        filename = 'cass_inp_visa_{}'.format(merchants[0]['Partner Name']) + '_{}'.format(a.timestamp) + '.csv'
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', now, filename)
-        try:
-            with open(path, 'w') as csv_file:
-                csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_NONE, escapechar='')
-                for merchant in merchants:
-                    csv_writer.writerow(['visa',
-                                         merchant['Visa MIDs'].strip(' '),
-                                         merchant['Scheme'].strip('" ').lower(),
-                                         merchant['Partner Name'].strip('" '),
-                                         merchant['Town/City'].strip('" '),
-                                         merchant['Postcode'].strip('" '),
-                                         merchant['Action']
-                                         ])
-
-        except IOError:
-            raise Exception('Error writing file:' + path)
-
-    @staticmethod
-    def write_to_file(input_file, file_name, now):
-        """
-        writes the given input file to a file under a given name.
-        :param input_file: the file to write
-        :param file_name: the file name under which to write the data
-        :param now: string datetime
-        :return: None
-        """
-
-        path = os.path.join(settings.WRITE_FOLDER, 'merchants', 'visa', now, file_name)
-
-        wb = Workbook()
-        ws1 = wb.active
-        input_file.set_header(ws1)
-        visa_lines = input_file.get_data()
-        for line in visa_lines:
-            ws1.append(line)
-
-        wb.save(path)
-
-    def export_merchants(self, merchants, validated, now, reason=None):
-        """
-        uses a given set of merchants to generate a file in Visa input file format
-        :param merchants: a list of merchants to send to Visa
-        :param validated:
-        :param now: string datetime
-        :param reason:
-        :return: None
-        """
-        reason = reason or []
-
+    def export(self):
         file = VisaMerchantFile()
         partner_name = ''
 
-        for count, merchant in enumerate(merchants):
+        mids_dicts = self.df.to_dict('records')
+
+        for count, merchant in enumerate(mids_dicts):
             if count == 0:
                 partner_name = merchant['Partner Name']
 
@@ -123,34 +67,36 @@ class Visa:
                       merchant['Postcode'], merchant['Address (Building Name/Number, Street)'],
                       '', action,
                       ]
-            if validated:
-                detail.append('')
-            else:
-                detail.append(reason[count])
 
             file.add_detail(detail)
 
-        file_name = self.create_file_name(validated, partner_name)
-        try:
-            self.write_to_file(file, file_name, now)
-        except IOError:
-            raise Exception('Error writing file:' + file_name)
-
-    @staticmethod
-    def create_file_name(validated, merchant_name):
         # e.g. PVnnn_GLBMID_BINK_yyyymmdd.xlsx
         # e.g. CAID_<merchant_name>_LoyaltyAngels_<date YYYYMMDD>.xlsx
-
-        file_merchant_name = merchant_name.replace(" ", "")
-
+        file_merchant_name = partner_name.replace(" ", "")
         file_name = 'CAID_{}_{}_{}{}'.format(
             file_merchant_name,
             'LoyaltyAngels',
             arrow.now().format('YYYYMMDD'),
             '.xlsx'
         )
+        self.write_to_file(file, file_name, self.timestamp)
 
-        if not validated:
-            file_name = 'INVALID_' + file_name
+    def write_to_file(self, input_file, file_name, now):
+        """
+        writes the given input file to a file under a given name.
+        :param input_file: the file to write
+        :param file_name: the file name under which to write the data
+        :param now: string datetime
+        :return: None
+        """
+        path = os.path.join(settings.WRITE_FOLDER, 'merchants', self.name.replace(' ', '_').lower(), now)
 
-        return file_name
+        self.file = Workbook()
+        ws1 = self.file.active
+        input_file.set_header(ws1)
+        visa_lines = input_file.get_data()
+        for line in visa_lines:
+            ws1.append(line)
+
+        virtual_wb = save_virtual_workbook(self.file)
+        save_blob(virtual_wb, container='dev-media', filename=file_name, path=path, content_type='bytes')

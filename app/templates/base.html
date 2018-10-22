@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- App CSS -->
+    <link href="{{ url_for('static', filename='css/layout.css') }}" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">Bink</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Message Flashing -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class=flashes>
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" style="text-align: center;">
+                <p style="margin-bottom: 0;">{{ message|safe }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Page Content -->
+    <div class="container">
+        {% block main %}{% endblock %}
+    </div>
+
+    <!-- JQuery -->
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+
+    <!-- App scripts -->
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
+  </body>
+
+</html>
