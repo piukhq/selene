@@ -23,6 +23,7 @@ flask-uploads = "*"
 azure-storage-blob = "*"
 pandas = "*"
 flask-cdn = "*"
+itsdangerous = "*"
 
 [dev-packages]
 pytest = "*"

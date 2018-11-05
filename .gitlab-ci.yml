@@ -1,6 +1,7 @@
 stages:
   - tests
   - build
+  - deploy
 
 tests:
   stage: tests
@@ -29,5 +30,14 @@ build-latest:
   script:
     - docker build --pull -t "$CI_REGISTRY/selene:latest" .
     - docker push "$CI_REGISTRY/selene:latest"
+  only:
+    - develop
+
+deploy-dev:
+  stage: deploy
+  image: binkops.azurecr.io/kubedeployer:latest
+  environment: dev
+  script:
+    - kubectl delete pods -l=project=selene -n=dev
   only:
     - develop
