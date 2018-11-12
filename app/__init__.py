@@ -1,5 +1,8 @@
 import logging
 
+from ddtrace import tracer
+from ddtrace.contrib.flask import TraceMiddleware
+
 from flask import Flask
 from flask_cdn import CDN
 from flask_uploads import configure_uploads
@@ -22,6 +25,12 @@ def create_app(config_name='settings'):
     )
 
     app.config.from_object(config_name)
+
+    TraceMiddleware(
+        app,
+        tracer,
+        service="selene",
+        distributed_tracing=True)
 
     if settings.SENTRY_DSN:
         sentry.init_app(

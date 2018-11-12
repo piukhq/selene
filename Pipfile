@@ -24,6 +24,7 @@ azure-storage-blob = "*"
 pandas = "*"
 flask-cdn = "*"
 itsdangerous = "*"
+ddtrace = "*"
 
 [dev-packages]
 pytest = "*"
