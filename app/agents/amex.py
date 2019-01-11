@@ -3,21 +3,11 @@ import os
 
 import settings
 from app.agents.base import BaseProvider
-from app.models import Sequence
 from app.utils import save_blob
 
 
 def get_next_file_number():
-    sequence = Sequence.query.filter(Sequence.scheme_provider == 'amex').first()
-
-    # just for the first time the database is created.
-    if not sequence:
-        from app.models import db
-        sequence = Sequence(scheme_provider='amex', type='ENROL', next_seq_number=1)
-        db.session.add(sequence)
-        db.session.commit()
-
-    return sequence.get_seq_number()
+    return 999
 
 
 class Field(object):

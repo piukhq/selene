@@ -9,7 +9,6 @@ from flask_uploads import configure_uploads
 from raven.contrib.flask import Sentry
 
 from app.version import __version__
-from app.models import db
 import settings
 from app.views import bp, files
 
@@ -40,7 +39,6 @@ def create_app(config_name='settings'):
             level=logging.ERROR)
         sentry.client.release = __version__
 
-    db.init_app(app)
     cdn.init_app(app)
 
     app.register_blueprint(bp)
