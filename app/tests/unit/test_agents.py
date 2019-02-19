@@ -50,15 +50,12 @@ class TestAmex(TestCase):
 
     @mock.patch('app.agents.amex.arrow.now', autospec=True)
     @mock.patch('app.agents.amex.save_blob')
-    @mock.patch('app.agents.amex.Sequence', autospec=True)
-    def test_export(self, mock_sequence, mock_save, mock_date):
-        mock_sequence.query.filter.return_value.first.return_value.get_seq_number.return_value = 0
+    def test_export(self, mock_save, mock_date):
         mock_date.return_value = arrow.get('2018-10-11').format('MM/DD/YYYY')
 
         self.instance.export()
         file_content = self.instance.file.get_detail()
 
-        self.assertTrue(mock_sequence.query.filter.return_value.first.return_value.get_seq_number.called)
         self.assertTrue(mock_save.called)
         self.assertEqual(self.expected_file, file_content)
 

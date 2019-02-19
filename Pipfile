@@ -6,14 +6,12 @@ name = "pypi"
 [packages]
 arrow = "==0.10.0"
 cassandra-driver = "==3.5.0"
-flask-sqlalchemy = "==2.3.2"
 flask-testing = "==0.6.2"
 plumbum = "==1.6.4"
 "psycopg2" = "==2.7.3.2"
 requests = "==2.18.2"
-sqlalchemy = "==1.1.15"
 openpyxl = "==2.4.9"
-raven = "==5.8.1"
+raven = "*"
 blinker = "==1.4"
 bigdatalib = {git = "ssh://git@gitlab.com/olympus-libs/bigdatalib.git"}
 handylib = {git = "ssh://git@gitlab.com/olympus-libs/handylib.git"}

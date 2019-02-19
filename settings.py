@@ -10,15 +10,6 @@ read_env()
 
 WRITE_FOLDER = env_var("WRITE_FOLDER", '/tmp/mids_output/')
 
-SQLALCHEMY_TRACK_MODIFICATIONS = False
-SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'.format(
-    user=env_var('PONTUS_USER', 'pontus'),
-    password=env_var('PONTUS_PASSWORD', 'TJkD8GitA7NA'),
-    host=env_var('PONTUS_HOST', '10.0.104.22'),
-    port=env_var('PONTUS_PORT', '5432'),
-    database=env_var('PONTUS_DATABASE', 'pontus')
-)
-
 SENTRY_DSN = env_var("SELENE_SENTRY_DSN")
 DEBUG = env_var("SELENE_DEBUG", False)
 DEV_PORT = env_var('DEV_PORT', '8000')

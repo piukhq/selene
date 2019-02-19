@@ -2,7 +2,6 @@ import re
 from azure.storage.blob import BlockBlobService, ContentSettings
 
 import settings
-from app.models import Sequence, db
 
 
 bbs = BlockBlobService(
@@ -26,12 +25,6 @@ def validate_uk_postcode(postcode):
         return False
 
     return True
-
-
-def update_amex_sequence_number():
-    sequence = Sequence.query.filter_by(scheme_provider='amex').first()
-    sequence.next_seq_number += 1
-    db.session.commit()
 
 
 def validate_headers(input_headers):
