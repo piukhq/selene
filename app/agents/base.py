@@ -68,9 +68,9 @@ class BaseProvider:
         for row in self.df.itertuples(index=True, name='Postcodes'):
             if index_value:
                 # +1 to postcode_col to make up for the added index column
-                postcode = str(row[postcode_col + 1]).strip()
+                postcode = str(row[postcode_col + 1]).strip().upper()
             else:
-                postcode = str(getattr(row, postcode_col)).strip()
+                postcode = str(getattr(row, postcode_col)).strip().upper()
 
             if not utils.validate_uk_postcode(postcode):
                 invalid_postcode_rows.append(row[0])
@@ -83,6 +83,9 @@ class BaseProvider:
 
     def write_transaction_matched_csv(self, mids_dicts=None, path=None):
         mids_dicts = mids_dicts or self.df.to_dict('records')
+        if not mids_dicts:
+            return
+
         partner_name = mids_dicts[0]['Partner Name'].replace(' ', '_').lower()
         provider_name = self.name.replace(' ', '_').lower()
         file_name = 'cass_inp_{}_{}_{}.csv'.format(provider_name, partner_name, self.timestamp)
@@ -90,17 +93,20 @@ class BaseProvider:
         path = path or os.path.join(settings.WRITE_FOLDER, 'merchants', provider_name, self.timestamp)
         file = io.StringIO()
 
-        csv_writer = csv.writer(file, quoting=csv.QUOTE_NONE, escapechar='')
+        csv_writer = csv.writer(file, quoting=csv.QUOTE_NONE, escapechar='"')
         for row in mids_dicts:
-            csv_writer.writerow([
-                provider_name,
-                row[self.mids_col_name].strip(' '),
-                row['Scheme'].strip('" ').lower(),
-                row['Partner Name'].strip('" '),
-                row['Town/City'].strip('" '),
-                row['Postcode'].strip('" '),
-                'A'
-            ])
+            try:
+                csv_writer.writerow([
+                    provider_name,
+                    row[self.mids_col_name].strip(),
+                    row['Scheme'].strip().lower(),
+                    row['Partner Name'].strip(),
+                    row['Town/City'].strip(),
+                    row['Postcode'].strip(),
+                    'A'
+                ])
+            except Exception as e:
+                raise ValueError(f'Error writing to file. Row: {row}') from e
 
         save_blob(file.getvalue(), container='dev-media', filename=file_name, path=path, content_type='text')
 
