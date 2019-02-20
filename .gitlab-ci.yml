@@ -38,6 +38,7 @@ deploy-dev:
   image: binkops.azurecr.io/kubedeployer:latest
   environment: dev
   script:
+    - ENVIRONMENT=dev deploystatic
     - kubectl delete pods -l=project=selene -n=dev
   only:
     - develop
