@@ -77,3 +77,7 @@ class TestViews(TestCase):
         self.assertTrue(mock_process_mids_file.called)
         self.assertEqual(response.status_code, 200)
         self.assert_flashes('Invalid headers or something', 'danger')
+
+    def test_healthz(self):
+        response = self.client.get(url_for('selene.healthz'))
+        self.assertEqual(response.status_code, 200)

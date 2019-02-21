@@ -93,3 +93,8 @@ def process_mids_file(file):
             raise ValueError(error_message.format(invalid_message, missing_message))
 
     return messages
+
+
+@bp.route('/healthz', methods=['GET'])
+def healthz():
+    return ''
