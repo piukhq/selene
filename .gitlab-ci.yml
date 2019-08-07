@@ -1,7 +1,7 @@
 stages:
   - tests
   - build
-  - deploy
+  - tagging
 
 tests:
   stage: tests
@@ -33,12 +33,11 @@ build-latest:
   only:
     - develop
 
-deploy-dev:
-  stage: deploy
-  image: binkops.azurecr.io/kubedeployer:latest
+tag-develop:
+  stage: tagging
+  image: binkops.azurecr.io/tagbot:latest
   environment: dev
   script:
-    - ENVIRONMENT=dev deploystatic
-    - kubectl delete pods -l=project=selene -n=dev
+    - tagbot --username "$CI_REGISTRY_USER" --password "$CI_REGISTRY_PASSWORD" --source "$CI_REGISTRY/selene:latest" --tag "develop-$CI_COMMIT_SHORT_SHA"
   only:
     - develop
