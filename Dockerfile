@@ -1,25 +1,16 @@
-FROM python:3.6-alpine
+FROM binkhq/python:3.8
 
 WORKDIR /app
 ADD . .
 
-RUN apk add --no-cache --virtual build \
-      git \
-      build-base \
-      libffi-dev \
-      openssl-dev \
-      openssh && \
-    apk add --no-cache \
-      su-exec \
-      libffi \
-      libstdc++ && \
-    adduser -D selene && \
-    mkdir -p /root/.ssh && mv /app/docker_root/root/.ssh/id_rsa /root/.ssh/id_rsa && \
-    chmod 0600 /root/.ssh/id_rsa && \
+RUN apt update && apt -y install git && \
+    mkdir -p /root/.ssh && chown 700 /root/.ssh && \
+    mv /app/docker_root/root/.ssh/id_rsa /root/.ssh && \
+    chown 600 /root/.ssh/id_rsa && \
     ssh-keyscan git.bink.com > /root/.ssh/known_hosts && \
-    ssh-keyscan gitlab.com >> /root/.ssh/known_hosts && \
     pip install pipenv gunicorn && \
     pipenv install --system --deploy --ignore-pipfile && \
-    apk del --no-cache build
+    rm -rf /root/.ssh /app/docker_root && \
+    apt -y autoremove git && rm -rf /var/lib/apt/lists/*
 
-CMD ["/sbin/su-exec","selene","/usr/local/bin/gunicorn","-w 4","-b 0.0.0.0:9000","wsgi:app"]
+CMD ["/usr/local/bin/gunicorn","-w 4","-b 0.0.0.0:9000","wsgi:app"]
