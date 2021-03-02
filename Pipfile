@@ -1,27 +1,28 @@
 [[source]]
-url = "https://pypi.python.org/simple"
+url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
 [packages]
 arrow = "==0.10.0"
 cassandra-driver = "==3.5.0"
-flask-testing = "==0.6.2"
 plumbum = "==1.6.4"
-"psycopg2" = "==2.7.3.2"
+psycopg2-binary = "*"
 requests = "==2.18.2"
 openpyxl = "==2.4.9"
 raven = "*"
 blinker = "==1.4"
-bigdatalib = {git = "ssh://git@gitlab.com/olympus-libs/bigdatalib.git"}
-handylib = {git = "ssh://git@gitlab.com/olympus-libs/handylib.git"}
-cassandralib = {git = "ssh://git@gitlab.com/olympus-libs/cassandralib.git"}
+bigdatalib = {git = "ssh://git@git.bink.com/libs/olympus-libs/bigdatalib.git"}
+handylib = {git = "ssh://git@git.bink.com/libs/olympus-libs/handylib.git"}
+cassandralib = {git = "ssh://git@git.bink.com/libs/olympus-libs/cassandralib.git"}
 flask = "*"
 flask-uploads = "*"
-azure-storage-blob = "*"
+azure-storage-blob = "==2.1.0"
 pandas = "*"
 flask-cdn = "*"
 itsdangerous = "*"
+werkzeug = "==0.16.0"
+xlrd = "==1.2.0"
 
 [dev-packages]
 pytest = "*"
@@ -30,5 +31,11 @@ httpretty = "*"
 jedi = "*"
 importmagic = "*"
 yapf = "*"
-"flake8" = "*"
+flake8 = "*"
 xlrd = "*"
+isort = "*"
+black = "==20.8b1"
+flask-testing = "==0.6.2"
+
+[requires]
+python_version = "3.8"
